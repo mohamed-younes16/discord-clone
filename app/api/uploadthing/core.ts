@@ -4,7 +4,6 @@ import { createUploadthing, type FileRouter } from "uploadthing/next";
 
 const f = createUploadthing();
 
-const auth =  (req: Request) => ({ id: "fakeId" }); 
 
 const currentUserid = async ()=>  await currentUser()
 // FileRouter for your app, can contain multiple FileRoutes
