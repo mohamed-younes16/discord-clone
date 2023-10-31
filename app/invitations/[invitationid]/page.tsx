@@ -7,7 +7,6 @@ const page =async  ({params:{invitationid}}:{params:{invitationid:string}}) => {
 
     const adding = await addingMember(invitationid)
 
-        console.log(adding)
   return   (   <div className=' z-[1000]   
   bg-cover
  w-screen h-screen fixed inset-0 flex flex-col bg-black gap-4 justify-center items-center'>
