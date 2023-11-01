@@ -92,6 +92,32 @@ export const findServer= async (id:string)=>{
   console.log(error)  
   }
 }
+export const findServerbyQuery= async (serverinvitation:string)=>{
+  try {
+    
+    ConnectToDB()
+
+    const currentus =   auth()
+
+    const userfromdb = await getuserfromDB(currentus.userId ||"")
+
+     const Theserver =   await Servers.findOne({invitationLink:serverinvitation}).select("_id name imageUrl")
+
+
+    if (userfromdb) return ( {
+    servername:Theserver?.name ||"",
+    imageUrl:Theserver?.imageUrl ||""
+  })
+    
+
+  
+
+    
+
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 
 export const addUpdateServer= async (data:ServerSetup,action:"create"|"update",id?:string)=>{
@@ -182,16 +208,23 @@ export const addingMember = async (serverinvitation:string)=>{
     
     
     const  isAlreadyIn =  await Servers.find({invitationLink:serverinvitation,"members.member":userfromdb._id})
-     const Theserver =   await Servers.findOne({invitationLink:serverinvitation})
+     const Theserver =   await Servers.findOne({invitationLink:serverinvitation}).select("_id name")
+
 
     if (!isAlreadyIn) {
       await Servers.findOneAndUpdate({invitationLink:serverinvitation},{$push:{members:{member:userfromdb._id,userType:"member"}}})
-    return  {message:'added',serverId:Theserver?._id}
+    return  {message:'added',
+    serverId:Theserver?._id.toString() || "",
+    servername:Theserver?.name ||""
+  }
     }
 
     if (isAlreadyIn) {
      
-      return {message:'exist',serverId:Theserver?._id}
+      return {
+        message:'exist',
+        serverId:Theserver?._id.toString() || "",
+      servername:Theserver?.name || ""}
     }
     
 

@@ -20,7 +20,7 @@ const ServerLinks = ({data}:{data:any}) => {
                  <div>
                     
                     <Link className='w-16 hover:scale-90 transition-all h-16 
-                    relative block rounded-full flexcenter   ' href={`/server/${e._id}`}
+                    relative  rounded-full flexcenter   ' href={`/server/${e._id}`}
                      aria-label="redirect to server page  " >
                            <CurrentServer id={e._id} />
                         <Image  

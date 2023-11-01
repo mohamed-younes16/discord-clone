@@ -24,6 +24,7 @@ interface ServerDocument extends Document {
     members: Member[];
     chat: Chat[];
     createdAt: Date;
+    _id:string;
 }
 
 const servermodel = new mongoose.Schema<ServerDocument>({
