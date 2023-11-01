@@ -52,10 +52,10 @@ const ProfileForm = ({userData}:{userData:UserObject}) => {
     })
 
 
-    async function  onSubmit(values: z.infer<typeof SetupSchema>) {
+    async function  onSubmit(values:any) {
         try {
             toast.loading("uploading.....",{dismissible:false}) 
-        const uploadUser= await addUpdateUser(values)
+        const uploadUser  = await addUpdateUser(values)
         
             toast.dismiss()
             uploadUser  

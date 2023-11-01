@@ -50,7 +50,7 @@ const ServerForm = ({data,submitText,actionType,serverId}:{serverId?:string,data
     })
 
 
-    async function  onSubmit(values: z.infer<typeof ServerSchema>) {
+    async function  onSubmit(values:any) {
         try {
             toast.loading("creating.....",{dismissible:false}) 
     
