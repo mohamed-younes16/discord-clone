@@ -1,6 +1,6 @@
 import Isadded from '@/components/Isadded'
 import { addingMember } from '@/lib/db-actions'
-import { Toaster, toast } from 'sonner'
+import { Toaster } from 'sonner'
 
 
 const page =async  ({params:{invitationid}}:{params:{invitationid:string}}) => {

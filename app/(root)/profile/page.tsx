@@ -4,7 +4,7 @@ import { ModeToggle } from '@/components/ui/themeButton'
 import { Toaster } from 'sonner'
 
 import "@uploadthing/react/styles.css";
-import ProfileForm from '@/components/Forms/ProfileForm'
+
 import { getuserfromDB } from '@/lib/db-actions';
 import { currentUser } from '@clerk/nextjs';
 
@@ -12,6 +12,7 @@ import { HomeIcon } from 'lucide-react';
 import Link from 'next/link';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { UserObject } from '@/index';
+import ProfileForm from '@/components/forms/ProfileForm';
 
 
 

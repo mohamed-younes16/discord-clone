@@ -1,11 +1,12 @@
 
 import SideBarNav from "@/components/SideBarNav"
 
-import { ConnectToDB, findServersBelong, getuserfromDB } from "@/lib/db-actions";
+import { ConnectToDB, getuserfromDB } from "@/lib/db-actions";
 
-import { currentUser } from "@clerk/nextjs"
+import { UserButton, currentUser } from "@clerk/nextjs"
 import { redirect } from "next/navigation";
-import { UserObject } from "..";
+import { UserObject } from "@/index";
+
 
 
 
@@ -21,7 +22,7 @@ const user = await currentUser()
 
 const Userdata:UserObject = await getuserfromDB(user?.id || "")
 
-if (!Userdata?.onboarded ) redirect("/profile")
+
 
 
 
@@ -31,10 +32,9 @@ if (!Userdata?.onboarded ) redirect("/profile")
       "> 
 
 
-          
         
         
-        <SideBarNav userData={Userdata} />
+       
         <div className="ml-20">
 
         </div>
