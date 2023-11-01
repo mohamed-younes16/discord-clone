@@ -1,24 +1,21 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 "use client"
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-hooks/rules-of-hooks */
 import { addingMember, findServerbyQuery } from '@/lib/db-actions'
 import { Toaster, toast } from 'sonner'
 
 import {
   Card,
-  CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-import { useEffect, useLayoutEffect, useState } from 'react'
-import { Check, Settings } from 'lucide-react'
+import { useLayoutEffect, useState } from 'react'
+import { Check, } from 'lucide-react'
 import Image from 'next/image'
 import { Separator } from '@radix-ui/react-dropdown-menu'
-import TooltipComp from '@/components/ui/TooltipComp'
-import { ModeToggle } from '@/components/ui/themeButton'
-
 
 
 const page =  ({params:{invitationid}}:{params:{invitationid:string}}) => {
@@ -39,16 +36,15 @@ const page =  ({params:{invitationid}}:{params:{invitationid:string}}) => {
   
 
     const addingmember =async ()=>{
+      toast.loading("adding...")
      
      const adding =  await addingMember(invitationid)
-
-      console.log(adding)
 
       setServerName(adding?.servername || "")
       
        if (adding?.message == "added" ) {
-           console.log("added")
-         
+      
+         toast.dismiss()
            toast.success(<p className='text-2xl font-semibold'> Added</p>,{className:"text-3xl"})
            
            setTimeout(() => {
@@ -57,7 +53,7 @@ const page =  ({params:{invitationid}}:{params:{invitationid:string}}) => {
            }, 500)
        }
        else if (adding?.message == "exist" ) {
-           console.log("exist")
+        toast.dismiss()
          
            toast.message(<p className='text-2xl font-semibold'> already in </p>)
 

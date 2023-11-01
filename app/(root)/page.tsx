@@ -16,14 +16,6 @@ import { UserObject } from "@/index";
 
 
 export default async function Home() {
-ConnectToDB()
-
-const user = await currentUser()
-
-const Userdata:UserObject = await getuserfromDB(user?.id || "")
-
-
-
 
 
   return ( 

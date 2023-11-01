@@ -1,6 +1,6 @@
 "use server"
 import { ServerSetup, UserSetup } from "@/index";
-import Servers from "@/models/Servers";
+import Servers, { Member } from "@/models/Servers";
 import Users from "@/models/UsersModel"
 import { auth } from "@clerk/nextjs/server";
 import mongoose from "mongoose"
@@ -211,15 +211,17 @@ export const addingMember = async (serverinvitation:string)=>{
      const Theserver =   await Servers.findOne({invitationLink:serverinvitation}).select("_id name")
 
 
-    if (!isAlreadyIn) {
-      await Servers.findOneAndUpdate({invitationLink:serverinvitation},{$push:{members:{member:userfromdb._id,userType:"member"}}})
-    return  {message:'added',
+    if (isAlreadyIn.length == 0) {
+      console.log("adding")
+      const adding = await Servers.findOneAndUpdate({invitationLink:serverinvitation},{$push:{members:{member:userfromdb._id,userType:"member"}}})
+    console.log(adding)
+      return  {message:'added',
     serverId:Theserver?._id.toString() || "",
     servername:Theserver?.name ||""
   }
     }
 
-    if (isAlreadyIn) {
+    if (isAlreadyIn.length > 0) {
      
       return {
         message:'exist',
@@ -234,3 +236,47 @@ export const addingMember = async (serverinvitation:string)=>{
     console.log(error)
   }
 }
+
+
+export const getMembers = async(serverId:string )=> {
+  try {
+    
+    ConnectToDB()
+
+    const currentus =   auth()
+
+    const userfromdb = await getuserfromDB(currentus.userId ||"")
+    
+
+  
+     const Theserver =   await Servers.findById(serverId).populate("members.member").select("members")
+
+    if (userfromdb) {
+         return Theserver?.members
+    }
+    return null
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const changeUserType = async(member:any, type:"editor"|"member",serverId:string)=>{
+  try {
+
+    ConnectToDB();
+
+    const serverup = await Servers.findOneAndUpdate(
+      { _id: serverId, "members.member": member._id }, 
+      { $set: { 'members.$.userType': type } },
+      {new:true}
+  
+    );
+
+    return serverup ? true : false
+
+   
+  } catch (error) {
+    console.log(error);
+  }
+}
+

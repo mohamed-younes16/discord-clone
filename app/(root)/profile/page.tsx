@@ -6,13 +6,14 @@ import { Toaster } from 'sonner'
 import "@uploadthing/react/styles.css";
 
 import { getuserfromDB } from '@/lib/db-actions';
-import { currentUser } from '@clerk/nextjs';
+import { SignOutButton, currentUser } from '@clerk/nextjs';
 
-import { HomeIcon } from 'lucide-react';
+import { HomeIcon, LucideLogOut } from 'lucide-react';
 import Link from 'next/link';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { UserObject } from '@/index';
 import ProfileForm from '@/components/Forms/ProfileForm';
+import TooltipComp from '@/components/ui/TooltipComp';
 
 
 
@@ -21,6 +22,7 @@ import ProfileForm from '@/components/Forms/ProfileForm';
 const Page =async () => {
     const currentUs = await currentUser()
   const CurrentUserData :UserObject = await getuserfromDB(currentUs?.id ||"")
+
 
 return (<>
     <div className="fixed inset-0 left-0 top-0  text-black  
@@ -32,7 +34,17 @@ return (<>
 
     <div className="flex items-center  gap-6">
         
-    <ModeToggle />
+    <div className=' flexcenter  gap-4 '>
+     
+
+              <TooltipComp hoverText='Log-out'>
+                  <SignOutButton>
+                          <LucideLogOut className='h-8 w-8 '/>
+                      </SignOutButton>
+        
+              </TooltipComp>
+    </div>
+            
   
   {CurrentUserData?.onboarded &&    <TooltipProvider>
 

@@ -7,7 +7,7 @@ import {
     PopoverContent,
     PopoverTrigger,
   } from "@/components/ui/popover"
-import { ChevronDown, Settings, UserPlus, Users } from 'lucide-react'
+import { ChevronDown, Settings, UserPlus,  } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import ManageServers from '@/components/CreateServer'
 
@@ -17,6 +17,7 @@ import { InviteButton } from '@/components/InviteButton'
 import { redirect } from 'next/navigation'
 import { UserObject } from '@/index'
 import { currentUser } from '@clerk/nextjs'
+import ManageUsers from '@/components/ManageUsers'
 
 const page = async  ({params:{serverid}}:{params:{serverid:string}}) => {
 
@@ -24,7 +25,6 @@ const currentServer  = await  findServer(serverid)
 const isAdmin = await  isServerAdmin(serverid)
 const user = await currentUser()
 const Userdata:UserObject = await getuserfromDB(user?.id || "")
-
 
 if (!Userdata?.onboarded ) redirect("/profile")
 
@@ -59,38 +59,36 @@ if (!Userdata?.onboarded ) redirect("/profile")
                         
                     </p>
                             <div className='my-2' />
-                     <ManageServers
-
-                      icon={<p className=' flex justify-between items-center  p-1 hover:bg-white rounded-md transition-all !bg-opacity-20'>
-                         Edit Server
-                         <Settings />
-                         
-                        </p>} 
-                        text="Edit Server"
-
-                        data = {{imageUrl:currentServer?.imageUrl,name:currentServer?.name}}
-
-                        submitText="Update"
-                        actionType="update"
-                        serverId={serverid}
-                        />
+                   
                         <InviteButton serverInvitaion={currentServer?.invitationLink || ""}/>
                       
 
                     
                         {isAdmin ?( <>
-                            <div className='my-2' />
-                            <p className=' p-1  flex justify-between items-center  hover:bg-white  rounded-md transition-all !bg-opacity-20'>
-                                                Manage Users
-                                                <Users   />
-                                                
-                                            </p>
-
+                            
                         <Separator className='my-2' />
 
-                        <DeleteLeaveServerButton actionType='delete' serverid={serverid}  />
 
                        
+                       <ManageUsers  serverid={serverid} />
+                 
+                       <ManageServers
+
+                                          icon={<p className=' flex justify-between items-center  p-1 hover:bg-white rounded-md transition-all !bg-opacity-20'>
+                                            Edit Server
+                                            <Settings />
+                                            
+                                            </p>} 
+                                            text="Edit Server"
+
+                                            data = {{imageUrl:currentServer?.imageUrl,name:currentServer?.name}}
+
+                                            submitText="Update"
+                                            actionType="update"
+                                            serverId={serverid}
+                                            />
+                                              <div className="my-2"/>
+                                              <DeleteLeaveServerButton actionType='delete' serverid={serverid}  />
                             </>) : (
                                 <>
                                   <Separator className='my-2' />

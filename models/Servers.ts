@@ -1,12 +1,13 @@
 import mongoose, { Document, Model } from "mongoose";
 import { v4 } from "uuid";
+import { UserDocument } from "./UsersModel";
 
-interface Member {
-    member: mongoose.Types.ObjectId;
+export interface Member {
+    member: UserDocument;
     userType: "admin" | "member" | "editor";
 }
 
-interface Chat {
+export interface Chat {
     creator: mongoose.Types.ObjectId;
     content: {
         text: string;
@@ -17,7 +18,7 @@ interface Chat {
     likes: number;
 }
 
-interface ServerDocument extends Document {
+export interface ServerDocument extends Document {
     name: string;
     imageUrl: string;
     invitationLink: string;
@@ -42,6 +43,7 @@ const servermodel = new mongoose.Schema<ServerDocument>({
             member: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "Users",
+                unique: true, 
             },
             userType: {
                 type: String,
