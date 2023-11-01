@@ -50,9 +50,9 @@ const ServerForm = ({data,submitText,actionType,serverId}:{serverId?:string,data
     })
 
 
-    async function  onSubmit(values:any) {
+    async function  onSubmit(values:z.infer<typeof ServerSchema>) {
         try {
-            toast.loading("creating.....",{dismissible:false}) 
+            toast.loading(actionType == "create"? "creating.....":"updating....",{dismissible:false}) 
     
        const uploadServer =  await addUpdateServer(values,actionType,serverId)  || { valid: false, message:"check your connection" }
             toast.dismiss()

@@ -12,7 +12,8 @@ import { HomeIcon } from 'lucide-react';
 import Link from 'next/link';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { UserObject } from '@/index';
-import ProfileForm from '@/components/forms/ProfileForm';
+import ProfileForm from '@/components/Forms/ProfileForm';
+
 
 
 
