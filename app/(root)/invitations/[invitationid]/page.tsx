@@ -50,6 +50,7 @@ const page =  ({params:{invitationid}}:{params:{invitationid:string}}) => {
            setTimeout(() => {
    
             Router.push(`/server/${adding?.serverId}`)
+            Router.refresh()
            }, 500)
        }
        else if (adding?.message == "exist" ) {
@@ -60,6 +61,7 @@ const page =  ({params:{invitationid}}:{params:{invitationid:string}}) => {
            setTimeout(() => {
    
             Router.push(`/server/${adding?.serverId}`)
+            Router.refresh()
            }, 500)
    
       }}

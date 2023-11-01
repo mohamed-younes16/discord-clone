@@ -77,6 +77,22 @@ export const findServersBelong = async ()=>{
   }
 }
 
+export const findServerBelongByID = async (serverId:string)=>{
+  try {
+    ConnectToDB()
+    const currentus =   auth()
+
+    const userfromdb = await getuserfromDB(currentus.userId ||"")
+
+    const Server = await Servers.findOne({"members.member":userfromdb._id,_id:serverId})
+
+
+    return Server
+  } catch (error) {
+  console.log(error)  
+  }
+}
+
 export const findServer= async (id:string)=>{
   try {
     ConnectToDB()
@@ -263,20 +279,93 @@ export const getMembers = async(serverId:string )=> {
 export const changeUserType = async(member:any, type:"editor"|"member",serverId:string)=>{
   try {
 
+
     ConnectToDB();
 
-    const serverup = await Servers.findOneAndUpdate(
-      { _id: serverId, "members.member": member._id }, 
+    const currentus =   auth()
+
+    const userfromdb = await getuserfromDB(currentus.userId ||"")
+
+
+    const isAdmin =  await Servers.findOne({
+      _id: serverId,
+      'members.member': userfromdb._id,
+      'members.userType': "admin"
+    });
+
+    const isDeletedAdmin = await Servers.findOne({
+      _id: serverId,
+      'members.member': member._id,
+      'members.userType': { $ne: 'admin' }
+    });
+
+    if (!isDeletedAdmin) {
+
+      console.log('User is an admin and cannot be changed.');
+      return false 
+    }
+    if (isAdmin) {
+       const serverup = await Servers.findOneAndUpdate(
+      { _id: serverId, "members.member": member._id ,'members.userType': { $ne: 'admin' }}, 
       { $set: { 'members.$.userType': type } },
       {new:true}
   
     );
 
     return serverup ? true : false
+    }
+   return false
 
    
   } catch (error) {
     console.log(error);
   }
 }
+
+export const deleteUserFromMembers = async (memberId:string, serverId:string) => {
+  try {
+    ConnectToDB();
+
+
+    const currentus =   auth()
+
+    const userfromdb = await getuserfromDB(currentus.userId ||"")
+      console.log(memberId,serverId)
+
+
+    const isAdmin =  await Servers.findOne({
+      _id: serverId,
+      'members.member': userfromdb._id,
+      'members.userType': "admin"
+    });
+    const isDeletedAdmin = await Servers.findOne({
+      _id: serverId,
+      members :{member:memberId,userType:"admin"}
+    });
+      console.log(isDeletedAdmin)
+    if (isAdmin && !isDeletedAdmin) {
+
+      const server = await Servers.findOneAndUpdate(
+      { _id: serverId },
+      { $pull: { members: { member: memberId },userType:{$ne:"admin"}} },
+      { new: true }
+
+
+     
+
+    );
+     console.log(server)
+     return true
+    }
+
+
+    return false
+  } catch (error) {
+  
+    console.log(error);
+    return false
+  }
+};
+
+
 

@@ -1,6 +1,5 @@
 
-/* eslint-disable react-hooks/exhaustive-deps */
-import {  Check, GripVertical, ShieldAlert, UserX, Users } from "lucide-react"
+import {   Users } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -13,17 +12,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-
-  import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-  } from "@/components/ui/dropdown-menu"
 
 import { getMembers, isServerAdmin } from "@/lib/db-actions"
 import Image from "next/image"
@@ -38,14 +26,14 @@ const ManageUsers =async ({serverid}:{serverid:string})  => {
 
 const membersData = await getMembers(serverid)
 const Isadmin = await isServerAdmin(serverid)
-console.log(membersData)
+
 
 
 
   return (
 
     <div>
-            <Dialog >
+            <Dialog > 
 
 
       <DialogTrigger className="w-full" asChild>

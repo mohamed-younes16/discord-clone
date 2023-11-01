@@ -1,5 +1,5 @@
 "use client"
-/* eslint-disable react-hooks/exhaustive-deps */
+
 import { CheckCheck, Copy, Share2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -89,3 +89,4 @@ export function InviteButton({serverInvitaion}:{serverInvitaion:string}) {
     </Dialog>
   )
 }
+

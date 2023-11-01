@@ -28,7 +28,7 @@ const DeleteLeaveServerButton = ({serverid , actionType}:{serverid:string,action
 <DialogTrigger className='w-full'>  <p className=' p-1  text-red-600 flex justify-between items-center 
 hover:bg-white  rounded-md transition-all !bg-opacity-20'>
     {actionType} Server
-    <Trash2Icon className='' />
+    {actionType == "delete" ?  <Trash2Icon /> : <LogOutIcon/>} 
     </p>
     
     </DialogTrigger>
@@ -40,7 +40,7 @@ hover:bg-white  rounded-md transition-all !bg-opacity-20'>
       onClick={()=> deleteServ()}
       
       className=" mt-4 flex gap-4 "  variant={"destructive"}>
-                 {actionType}  {actionType == "delete" ?  <Trash2Icon /> : <LogOutIcon/>} 
+                 {actionType}   {actionType == "delete" ?  <Trash2Icon /> : <LogOutIcon/>} 
       </Button>
     </DialogDescription>
     </DialogHeader>

@@ -1,13 +1,13 @@
 
 
-import { findServer, getuserfromDB, isServerAdmin } from '@/lib/db-actions'
+import { findServer, findServerBelongByID, getuserfromDB, isServerAdmin } from '@/lib/db-actions'
 
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
   } from "@/components/ui/popover"
-import { ChevronDown, Settings, UserPlus,  } from 'lucide-react'
+import { ChevronDown, ServerOff, Settings, UserPlus,  } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import ManageServers from '@/components/CreateServer'
 
@@ -18,10 +18,16 @@ import { redirect } from 'next/navigation'
 import { UserObject } from '@/index'
 import { currentUser } from '@clerk/nextjs'
 import ManageUsers from '@/components/ManageUsers'
+import { Button } from '@/components/ui/button'
+import Image from 'next/image'
+import Link from 'next/link'
+
 
 const page = async  ({params:{serverid}}:{params:{serverid:string}}) => {
 
 const currentServer  = await  findServer(serverid)
+const belongToServer = await findServerBelongByID(serverid)
+
 const isAdmin = await  isServerAdmin(serverid)
 const user = await currentUser()
 const Userdata:UserObject = await getuserfromDB(user?.id || "")
@@ -30,12 +36,13 @@ if (!Userdata?.onboarded ) redirect("/profile")
 
 
   return (
-    
+     
     <div className=' min-h-screen dark:bg-[url(/assets/magicdark.png)] 
      bg-cover bg-[url(/assets/magiclight.png)]'>
+
     
-      
-        <div className="pl-[90px]  w-full h-full">
+    
+      {belongToServer ? (<div className="pl-[90px]  w-full h-full">
           <div  suppressHydrationWarning className="w-48 px-4 py-2 bg-[#26282c] h-screen">
 
       
@@ -106,7 +113,27 @@ if (!Userdata?.onboarded ) redirect("/profile")
 
                 </Popover>
           </div>
+        </div>):
+        ( <>
+        <div className="flexcenter backdrop-blur-sm bg-black !bg-opacity-60 flex-col gap-6  w-full h-screen">
+        <ServerOff size={200} strokeWidth={0.9} />
+        <p className=' text-2xl font-bold'>You are not invited to The server </p>
+
+        <Image height={60} width={60}
+                    className="!h-20 !w-20  border border-white rounded-full bg-cover "
+                    alt="image of user" src={currentServer?.imageUrl || ""} />
+
+          <div className="flexcenter gap-6">
+            <Button >
+               <Link href={"/"}> return to main page</Link>
+            </Button>
+          </div>
         </div>
+
+        </>)
+        }
+        
+
     </div>
   )
 }
