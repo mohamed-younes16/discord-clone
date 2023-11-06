@@ -13,7 +13,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { useLayoutEffect, useState } from 'react'
-import { Check, } from 'lucide-react'
+import { Check, Loader2, } from 'lucide-react'
 import Image from 'next/image'
 import { Separator } from '@radix-ui/react-dropdown-menu'
 
@@ -21,6 +21,7 @@ import { Separator } from '@radix-ui/react-dropdown-menu'
 const page =  ({params:{invitationid}}:{params:{invitationid:string}}) => {
   const [servername , setServerName] = useState("") 
   const [serverImage , setserverImage] = useState("") 
+  const [isjoning,setisjoning] = useState(false)
    const Router =useRouter()
 
   useLayoutEffect(() => {
@@ -28,7 +29,9 @@ const page =  ({params:{invitationid}}:{params:{invitationid:string}}) => {
     const serverdata = await findServerbyQuery(invitationid );
      setServerName(serverdata?.servername || "")
      setserverImage(serverdata?.imageUrl || "")
+
   }
+  
   getname()
   }, [])
   
@@ -36,6 +39,7 @@ const page =  ({params:{invitationid}}:{params:{invitationid:string}}) => {
   
 
     const addingmember =async ()=>{
+      setisjoning(true)
       toast.loading("adding...")
      
      const adding =  await addingMember(invitationid)
@@ -48,7 +52,7 @@ const page =  ({params:{invitationid}}:{params:{invitationid:string}}) => {
            toast.success(<p className='text-2xl font-semibold'> Added</p>,{className:"text-3xl"})
            
            setTimeout(() => {
-   
+              setisjoning(false)
             Router.push(`/server/${adding?.serverId}`)
             Router.refresh()
            }, 500)
@@ -59,7 +63,7 @@ const page =  ({params:{invitationid}}:{params:{invitationid:string}}) => {
            toast.message(<p className='text-2xl font-semibold'> already in </p>)
 
            setTimeout(() => {
-   
+            setisjoning(false)
             Router.push(`/server/${adding?.serverId}`)
             Router.refresh()
            }, 500)
@@ -102,8 +106,12 @@ const page =  ({params:{invitationid}}:{params:{invitationid:string}}) => {
  
   <CardFooter>
     <div className="flex w-full gap-4">
-       <Button className=' w-full flexcenter !bg-white !text-black  gap-5' onClick={()=>addingmember()}>Join the Server
-       <Check className="mr-2 font-bold h-6 text-green-700 w-6"  strokeWidth={5}/> </Button>
+       <Button className=' w-full flexcenter !bg-white !text-black  gap-5'
+        onClick={()=>addingmember()}>Join the Server
+
+     {isjoning ? (<Loader2 className=' animate-spin' />):( <Check className="mr-2 font-bold h-6 w-6"  strokeWidth={5}/> )} 
+
+       </Button>
       <Button variant={"outline"} onClick={()=>Router.push("/")}> cancel</Button>
     </div>
    

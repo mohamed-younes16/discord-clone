@@ -23,7 +23,13 @@ export interface ServerDocument extends Document {
     imageUrl: string;
     invitationLink: string;
     members: Member[];
-    chat: Chat[];
+    channels:{ 
+        name:String;
+        type:"text"|"video"|"audio" ;
+        chat:Chat[];
+        creator: mongoose.Types.ObjectId;
+        createdAt: Date;
+    };
     createdAt: Date;
     _id:string;
 }
@@ -32,7 +38,7 @@ const servermodel = new mongoose.Schema<ServerDocument>({
     name: {
         type: String,
         required: true,
-        unique: true,
+        unique:true,
     },
     imageUrl: {
         type: String,
@@ -43,7 +49,7 @@ const servermodel = new mongoose.Schema<ServerDocument>({
             member: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "Users",
-                unique: true, 
+               
             },
             userType: {
                 type: String,
@@ -52,7 +58,22 @@ const servermodel = new mongoose.Schema<ServerDocument>({
             },
         },
     ],
-    chat: [
+
+    channels : [{
+        name: {
+            type:String,
+           
+        },
+        creator :
+        {type: mongoose.Schema.Types.ObjectId,
+            ref: "Users", 
+        },
+            type :{
+                type: String,
+                enum: ["audio", "text", "video"],
+                default: "text",
+            },
+        chat: [
         {
             creator: {
                 type: mongoose.Schema.Types.ObjectId,
@@ -61,7 +82,7 @@ const servermodel = new mongoose.Schema<ServerDocument>({
             content: {
                 text: {
                     type: String,
-                    required: true,
+                   
                 },
                 image: String,
                 file: String,
@@ -71,16 +92,25 @@ const servermodel = new mongoose.Schema<ServerDocument>({
                 default: new Date(),
             },
             likes: Number,
-        },
-    ],
+        }],
+        createdAt: {
+            type: Date,
+            default: new Date(),
+        }
+
+}
+],
+    
     createdAt: {
         type: Date,
         default: new Date(),
     },
     invitationLink :{
         type:String,
-        default:v4(),
-        
+        default:v4({ random: [
+            0x10, 0x91, 0x56, 0xbe, 0xc4, 0xfb, 0xc1, 0xea, 0x71, 0xb4, 0xef, 0xe1, 0x67, 0x1c, 0x58, 0x36,
+          ],}),
+        unique:true
     }
 });
 

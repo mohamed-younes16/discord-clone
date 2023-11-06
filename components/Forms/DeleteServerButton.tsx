@@ -10,14 +10,80 @@ import {
   } from "@/components/ui/dialog"
 import { Button } from '@/components/ui/button'
 import { LogOutIcon, Trash2Icon } from 'lucide-react'
-import { deleteServer } from '@/lib/db-actions'
+import { UserLeaves, deleteServer } from '@/lib/db-actions'
+import { Toaster, toast } from 'sonner'
+import {  useRouter } from 'next/navigation'
 const DeleteLeaveServerButton = ({serverid , actionType}:{serverid:string,actionType:"leave" | "delete"}) => {
-
+const router = useRouter()
     const deleteServ = async  ()=> {
+      
            
 
-       if (actionType == "delete"){ await deleteServer(serverid)}
+       if (actionType == "delete"){
+        
+     
+        try {
+              toast.loading(actionType == "delete"? "deleting.....":"leaving....",) 
+      
+        const idDeleted = await deleteServer(serverid)   ||  { valid: false, message:"check your connection" }
+            
+            if ( idDeleted?.valid)  {
+                      toast.success(idDeleted?.message,{duration:3000}) 
+          setTimeout(() => {
 
+              window.location.reload()
+          }, 500);
+      
+          }
+         
+          else {
+            setTimeout(() => {
+              toast.dismiss()
+              setTimeout(() => {
+                  toast.error(idDeleted?.message,{duration:3000})
+              }, 300);
+            }, 200);
+            
+             
+          }
+            
+
+      }
+
+      catch (error) {console.log(error)} 
+      }
+
+      else if (actionType == "leave") {
+        try {
+          toast.loading(actionType == "leave" && "leaving.....") 
+  
+    const LeaveServer = await UserLeaves(serverid)   ||  { valid: false, message:"check your connection" }
+        
+                    if ( LeaveServer?.valid)  {
+                              toast.success(LeaveServer?.message,{duration:3000}) 
+                  setTimeout(() => {
+
+                    router.push("/")
+                  }, 500);
+              
+                  }
+                
+                  else {
+                    setTimeout(() => {
+                      toast.dismiss()
+                      setTimeout(() => {
+                          toast.error(LeaveServer?.message,{duration:3000})
+                      }, 300);
+
+                    }, 200);
+                    
+                    
+                  }
+                    
+
+              }
+              catch (error) {console.log(error)} 
+              }
     }
     
   return (
@@ -33,6 +99,7 @@ hover:bg-white  rounded-md transition-all !bg-opacity-20'>
     
     </DialogTrigger>
 <DialogContent>
+  <Toaster richColors position='top-center'/>
     <DialogHeader>
     <DialogTitle>Are you sure absolutely sure?</DialogTitle>
     <DialogDescription>

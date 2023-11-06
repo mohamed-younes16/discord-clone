@@ -1,10 +1,10 @@
 "use server"
 import { ServerSetup, UserSetup } from "@/index";
-import Servers, { Member } from "@/models/Servers";
-import Users from "@/models/UsersModel"
+import Servers from "@/models/Servers";
+import Users, { UserDocument } from "@/models/UsersModel"
 import { auth } from "@clerk/nextjs/server";
 import mongoose from "mongoose"
-import { v4 as uuidv4 } from 'uuid';
+import { v4 } from "uuid";
 
 
 export const ConnectToDB = async ()=> {
@@ -111,6 +111,7 @@ export const findServer= async (id:string)=>{
 export const findServerbyQuery= async (serverinvitation:string)=>{
   try {
     
+   
     ConnectToDB()
 
     const currentus =   auth()
@@ -118,7 +119,6 @@ export const findServerbyQuery= async (serverinvitation:string)=>{
     const userfromdb = await getuserfromDB(currentus.userId ||"")
 
      const Theserver =   await Servers.findOne({invitationLink:serverinvitation}).select("_id name imageUrl")
-
 
     if (userfromdb) return ( {
     servername:Theserver?.name ||"",
@@ -147,8 +147,10 @@ export const addUpdateServer= async (data:ServerSetup,action:"create"|"update",i
     const userfromdb = await getuserfromDB(currentus.userId ||"")
 
     if(action === "create" && currentus.userId && userfromdb) {
-      const invitationLink = uuidv4()
-    const newServer =  await Servers.create({...data})
+
+
+    const newServer =  await Servers.create({...data,invitationLink:v4()})
+  
 
     newServer.members.push({member:userfromdb._id,userType:"admin"})
 
@@ -204,11 +206,21 @@ export const deleteServer = async (id:string)=>{
   try {
  
     const isPermitted =   await isServerAdmin(id)
-    isPermitted ? await Servers.findByIdAndRemove(id) : ""
-      return "Deleted"
+
+   if (isPermitted){ 
+
+    await Servers.findByIdAndRemove(id) 
+    
+    return { valid: true, message:"deleted" }
+
+  }
+
+  return  { valid: false, message:"check your connection" }
+      
 
   } catch (error) {
     console.log(error)
+   return { valid: false, message:"check your connection" }
   }
 }
 
@@ -228,7 +240,7 @@ export const addingMember = async (serverinvitation:string)=>{
 
 
     if (isAlreadyIn.length == 0) {
-      console.log("adding")
+      
       const adding = await Servers.findOneAndUpdate({invitationLink:serverinvitation},{$push:{members:{member:userfromdb._id,userType:"member"}}})
     console.log(adding)
       return  {message:'added',
@@ -276,7 +288,7 @@ export const getMembers = async(serverId:string )=> {
   }
 }
 
-export const changeUserType = async(member:any, type:"editor"|"member",serverId:string)=>{
+export const changeUserType = async(memberId:string, type:"editor"|"member",serverId:string)=>{
   try {
 
 
@@ -287,32 +299,24 @@ export const changeUserType = async(member:any, type:"editor"|"member",serverId:
     const userfromdb = await getuserfromDB(currentus.userId ||"")
 
 
-    const isAdmin =  await Servers.findOne({
-      _id: serverId,
-      'members.member': userfromdb._id,
-      'members.userType': "admin"
-    });
-
-    const isDeletedAdmin = await Servers.findOne({
-      _id: serverId,
-      'members.member': member._id,
-      'members.userType': { $ne: 'admin' }
-    });
-
-    if (!isDeletedAdmin) {
-
-      console.log('User is an admin and cannot be changed.');
-      return false 
-    }
+    const isAdmin =  await isServerAdmin(serverId)
+      console.log(isAdmin)
     if (isAdmin) {
-       const serverup = await Servers.findOneAndUpdate(
-      { _id: serverId, "members.member": member._id ,'members.userType': { $ne: 'admin' }}, 
-      { $set: { 'members.$.userType': type } },
-      {new:true}
-  
-    );
+      const server :any = await Servers.findById(serverId);
+      const memberIndex = server.members.findIndex(
+        (member:any) => member.member.toString() === memberId
+      );
 
-    return serverup ? true : false
+      if (memberIndex !== -1 && server.members[memberIndex].userType !== 'admin') {
+        server.members[memberIndex].userType = type;
+        await server.save();
+
+        console.log(server);
+        return true;
+      }
+ 
+
+  
     }
    return false
 
@@ -322,6 +326,33 @@ export const changeUserType = async(member:any, type:"editor"|"member",serverId:
   }
 }
 
+export const isAdmin = async (serverId:string)=> {
+
+  try {
+    ConnectToDB();
+
+
+    const currentus =   auth()
+
+    const userfromdb = await getuserfromDB(currentus.userId ||"")
+
+
+    const isadm =  await Servers.findOne({
+        _id: serverId,
+        'members.member': userfromdb._id,
+        'members.userType': "admin"
+      })
+          return isadm ? true : false
+
+
+
+  } catch (error) {
+    
+    console.log(error)
+    return false 
+
+  }
+}
 export const deleteUserFromMembers = async (memberId:string, serverId:string) => {
   try {
     ConnectToDB();
@@ -330,7 +361,7 @@ export const deleteUserFromMembers = async (memberId:string, serverId:string) =>
     const currentus =   auth()
 
     const userfromdb = await getuserfromDB(currentus.userId ||"")
-      console.log(memberId,serverId)
+
 
 
     const isAdmin =  await Servers.findOne({
@@ -366,6 +397,88 @@ export const deleteUserFromMembers = async (memberId:string, serverId:string) =>
     return false
   }
 };
+export const UserLeaves = async (serverId:string) => {
+  try {
+    ConnectToDB();
+
+
+    const currentus =   auth()
+
+    const userfromdb = await getuserfromDB(currentus.userId ||"")
+
+
+    const isDeletedAdmin = await Servers.findOne({
+      _id: serverId,
+      members :{member: userfromdb._id,userType:"admin"}
+    });
+    
+    if (!isDeletedAdmin) {
+
+      const server = await Servers.findOneAndUpdate(
+      { _id: serverId },
+      { $pull: { members: { member: userfromdb._id },userType:{$ne:"admin"}} },
+    )
+   
+     return { valid: true, message:"leaved" }
+    }
+
+
+    return { valid: false, message:"not authorized" }
+  } catch (error) {
+  
+    console.log(error);
+    return { valid: false, message:"error happend" }
+  }
+};
 
 
 
+
+
+
+
+export const addChannelToServer = async (serverId:string,name:string,type:"text"|"video"|"audio" )=>{
+  try {
+    
+    ConnectToDB()
+
+  const isadmin = await isAdmin(serverId)
+
+
+  const currentus =   auth()
+
+  const userfromdb:UserDocument = await getuserfromDB(currentus.userId ||"")
+
+
+  
+  if(isadmin)  {
+    const isnameUnique =  await Servers.findOne({_id:serverId,"channels.name":name})
+    console.log(isnameUnique)
+    if( !isnameUnique) {
+    
+
+    const Theserver = await Servers.findByIdAndUpdate(
+        serverId.toString(),
+        {
+          $push:{channels: {name,type:type.toString(),chat:[],creator:userfromdb._id}}
+        }
+        ,{new: true}
+        )
+     
+          console.log(Theserver,type)
+        return{ valid: true, message:"added channel" }
+
+    }
+   
+
+      return{ valid: false, message:"channel already exists" }
+
+  } 
+  return{ valid: false, message:"unauthorized or check connection" }
+    
+
+  } catch (error) {
+    console.log(error)
+    return{ valid: false, message:"error happend" }
+  }
+}
