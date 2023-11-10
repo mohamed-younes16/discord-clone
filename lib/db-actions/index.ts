@@ -2,8 +2,9 @@
 import { ServerSetup, UserSetup } from "@/index";
 import Servers from "@/models/Servers";
 import Users, { UserDocument } from "@/models/UsersModel"
-import { auth } from "@clerk/nextjs/server";
+import { auth, getAuth } from "@clerk/nextjs/server";
 import mongoose from "mongoose"
+import { NextApiRequest } from "next";
 import { v4 } from "uuid";
 
 
@@ -23,7 +24,9 @@ export const ConnectToDB = async ()=> {
 
 
 export const getuserfromDB=async (id:string)=>{
+
     try {
+      ConnectToDB()
       const user = await Users.findOne({id})
       return user
     } catch (error) {
@@ -151,7 +154,8 @@ export const addUpdateServer= async (data:ServerSetup,action:"create"|"update",i
 
     const newServer =  await Servers.create({...data,invitationLink:v4()})
   
-
+      newServer.channels.push({name:"general",chat:[],
+      type:"text",creator:userfromdb._id,createdAt:new Date()})
     newServer.members.push({member:userfromdb._id,userType:"admin"})
 
     await newServer.save()
@@ -190,7 +194,7 @@ export const isServerAdmin = async (id:string)=>{
 
     const userfromdb = await getuserfromDB(currentus.userId ||"")
     const serverFromDb = await Servers.findById(id) 
-    .populate("members.member","id username") // Replace "username email" with the fields you want to populate
+    .populate("members.member","id username") 
     .exec();
     
     const isPermitted = serverFromDb?.members.find((e:any)=>e.member.id == userfromdb.id && e.userType =="admin")
@@ -296,7 +300,7 @@ export const changeUserType = async(memberId:string, type:"editor"|"member",serv
 
     const currentus =   auth()
 
-    const userfromdb = await getuserfromDB(currentus.userId ||"")
+
 
 
     const isAdmin =  await isServerAdmin(serverId)
@@ -472,6 +476,170 @@ export const addChannelToServer = async (serverId:string,name:string,type:"text"
    
 
       return{ valid: false, message:"channel already exists" }
+
+  } 
+  return{ valid: false, message:"unauthorized or check connection" }
+    
+
+  } catch (error) {
+    console.log(error)
+    return{ valid: false, message:"error happend" }
+  }
+}
+
+
+export const SendMessage = async (channelId:any,serverId:any,message:string,req:NextApiRequest )=>{
+  try {
+    
+    ConnectToDB()
+
+  
+
+
+  const {userId} =   getAuth(req)
+
+  const userfromdb:UserDocument = await getuserfromDB(userId ||"")
+
+
+
+  
+  if(userfromdb?.onboarded)  {
+  
+
+ const  servermessage:any =  await Servers.findOneAndUpdate(
+   {   _id:  serverId.toString(),"channels.name":channelId},
+        {
+          $push:{"channels.$.chat": {
+            creator : userfromdb._id,
+            content:{text:message},
+            likes:0
+          }}
+        }
+        ,{new: true}
+        ).populate("channels.chat.creator","username imageUrl")
+     
+  
+        return servermessage?.channels.filter((e:any)=>e.name === channelId )[0].chat
+
+
+
+  } 
+  return 
+    
+
+  } catch (error) {
+    console.log(error)
+    return{ valid: false, message:"error happend" }
+  }
+}
+
+
+
+
+export const GetChannels = async (serverId:any)=>{
+  try {
+    
+    ConnectToDB()
+
+  
+  const {userId} =   auth()
+
+  const userfromdb:UserDocument = await getuserfromDB(userId ||"")
+
+
+
+  
+  if(userfromdb)  {
+  
+
+      const  serverChannels =  await Servers.findById(serverId)
+      .select('channels')
+          
+
+        return serverChannels
+
+
+
+  } 
+  return 
+    
+
+  } catch (error) {
+    console.log(error)
+    return{ valid: false, message:"error happend" }
+  }
+}
+
+
+
+export const updateChannel = async (serverId:string,channelId:string,values:any)=>{
+  try {
+    
+    ConnectToDB()
+
+  const isadmin = await isAdmin(serverId)
+
+  
+  if(isadmin)  {
+    const isnameUnique =  await Servers.findOne({_id:serverId,"channels.name":values.name})
+    console.log(isnameUnique)
+    if( !isnameUnique) {
+    
+
+    const Theserver = await Servers.findOneAndUpdate(
+      {   _id:  serverId.toString(),"channels._id":channelId},
+        {
+          $set: {
+            "channels.$.name": values.name,
+            "channels.$.type": values.type.toString(),
+          },
+        }
+        ,{new: true}
+        )
+     
+       
+        return{ valid: true, message:"updated channel" }
+
+    }
+   
+
+      return{ valid: false, message:"channel already exists" }
+
+  } 
+  return{ valid: false, message:"unauthorized or check connection" }
+    
+
+  } catch (error) {
+    console.log(error)
+    return{ valid: false, message:"error happend" }
+  }
+}
+
+export const deletechannelDB = async (serverId:string,channelId:string,)=>{
+  try {
+    
+    ConnectToDB()
+
+  const isadmin = await isAdmin(serverId)
+
+  
+  if(isadmin)  {
+  
+    
+
+    const Theserver = await Servers.findOneAndUpdate(
+      {   _id:  serverId.toString()},
+        {
+          $pull: {channels:{_id:channelId}}
+         
+          ,
+        }
+        ,{new: true}
+        )
+     
+       console.log(Theserver)
+        return{ valid: true, message:"deleted channel" }
+
 
   } 
   return{ valid: false, message:"unauthorized or check connection" }

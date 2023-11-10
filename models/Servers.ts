@@ -23,13 +23,13 @@ export interface ServerDocument extends Document {
     imageUrl: string;
     invitationLink: string;
     members: Member[];
-    channels:{ 
+    channels:{  
         name:String;
         type:"text"|"video"|"audio" ;
         chat:Chat[];
         creator: mongoose.Types.ObjectId;
         createdAt: Date;
-    };
+    }[];
     createdAt: Date;
     _id:string;
 }

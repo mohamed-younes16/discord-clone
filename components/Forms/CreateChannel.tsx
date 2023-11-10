@@ -31,10 +31,10 @@ import { Toaster, toast } from 'sonner'
 
 import {
     Dialog,
-    DialogClose,
+
     DialogContent,
     DialogDescription,
-    DialogFooter,
+
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -42,14 +42,20 @@ import {
 import { GitBranch,  } from "lucide-react"
 
 import { Separator } from "../ui/separator"
-import { addChannelToServer } from "@/lib/db-actions"
+import { addChannelToServer, updateChannel } from "@/lib/db-actions"
+import { ReactNode } from "react"
+import { ChannelDocument } from "@/index"
 
 
 
 
 
-const ChannelForm = ({serverId}:{serverId:string}) => {
+const ChannelForm = ({serverId,icon,actionType,channel=""}:
+    {serverId:string,icon?:ReactNode
+    ,actionType:"create"|"update",channel?:string }) => {
 
+        const channelDocument:ChannelDocument | null =  actionType == "update" 
+        ?  JSON.parse(channel) : null
 
      const ChannelSchema = z.object({
   
@@ -65,21 +71,24 @@ const ChannelForm = ({serverId}:{serverId:string}) => {
         resolver:zodResolver(ChannelSchema),
         defaultValues:{
 
-            name:"",
-            type:"text"
+            name:channelDocument?.name || "",
+            type:channelDocument?.type || "text"
         }
 
     })
 
 
     async function  onSubmit(values:z.infer<typeof ChannelSchema>) {
-            console.log(values)
+            
         try {
 
-            toast.loading("creating.....",{dismissible:false}) 
+            toast.loading("",{dismissible:false}) 
     
-       const uploadServer =  await addChannelToServer(serverId||"",values.name,values.type)  || { valid: false, message:"check your connection" }
+       const uploadServer =  actionType == "create" ? 
+       (  await addChannelToServer(serverId||"",values.name,values.type)  || { valid: false, message:"check your connection" })
+       : (await updateChannel(serverId,channelDocument?._id || "" , values) || { valid: false, message:"check your connection" })
             toast.dismiss()
+
           if ( uploadServer?.valid)  {
                     toast.success(uploadServer?.message,{duration:3000}) 
                     
@@ -107,10 +116,10 @@ const ChannelForm = ({serverId}:{serverId:string}) => {
     <Dialog > 
 
 
-    <DialogTrigger className="w-full" asChild>
-      <div className=" p-1 my-2 !bg-opacity-25 transition-all 
-      rounded-md dark:hover:bg-white flex items-center justify-between">
-          Create Channel <GitBranch />
+    <DialogTrigger  asChild>
+      <div className=" my-2 p-1 !bg-opacity-25 transition-all 
+      rounded-md dark:hover:bg-white text-base   gap-5 flex cursor-pointer items-center justify-between">
+        {icon ?  <>{icon} </> : (<>   {actionType} Channel<GitBranch  size={20}/></> )  }
 
 
           </div> 
@@ -121,7 +130,7 @@ const ChannelForm = ({serverId}:{serverId:string}) => {
       <DialogHeader>
 
         <DialogTitle>
-            <h1 className=" text-2xl font-bold "> Create Channel</h1>
+            <h1 className=" text-2xl font-bold "> {actionType} Channel</h1>
             </DialogTitle>
 
         <DialogDescription>
@@ -171,9 +180,9 @@ const ChannelForm = ({serverId}:{serverId:string}) => {
 
                 <Select onValueChange={e=>field.onChange(e)}>
                 <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Channel Type" />
+                    <SelectValue  placeholder={  channelDocument?.type || "Channel Type"} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent >
                     <SelectItem value="text">Text</SelectItem>
                     <SelectItem value="audio">Audio</SelectItem>
                     <SelectItem value="video">Video</SelectItem>
@@ -191,7 +200,7 @@ const ChannelForm = ({serverId}:{serverId:string}) => {
 
 <Button type="submit" disabled={form.formState.isSubmitting } 
  className={`${form.formState.isSubmitting ?" animate-bounce bg-gray-500":"" } flexcenter gap-6`}>
-    create
+    {actionType}
   {  form.formState.isSubmitting  && 
     <div className="w-8 h-8 border-4 border-white
      dark:border-black !border-t-transparent rounded-full animate-spin"/>

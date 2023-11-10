@@ -1,3 +1,9 @@
+import { Server as NetServer , Socket } from "net";
+import { NextApiResponse } from "next";
+import { Server as IoServer} from "socket.io";
+
+
+
 export type UserObject = {
     _id: ObjectId;
     id: string;
@@ -31,4 +37,21 @@ export type UserSetup = {
     members: any[]; // The structure of the "members" array is not specified in the provided data
     chat: any[]; // The structure of the "chat" array is not specified in the provided data
     __v: number;
+  }
+
+  export type NextApiResponseServerIo = NextApiResponse & {
+    socket :Socket &{
+        server:NetServer& {
+          io:IoServer
+        }
+    }
+  }
+
+  export interface ChannelDocument {
+    _id: string;
+    name: string;
+    type: "text" | "video" | "audio";
+    chat: Chat[];
+    creator: mongoose.Types.ObjectId;
+    createdAt: Date;
   }
