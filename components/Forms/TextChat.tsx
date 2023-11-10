@@ -28,16 +28,20 @@ import { Badge } from "@/components/ui/badge"
 import {io} from "socket.io-client"
 import { useEffect, useState } from "react"
 import { Send } from "lucide-react"
+import { Chat } from "@/models/Servers"
+import { ChannelDocument } from "@/index"
+import Image from "next/image"
+import { ScrollArea } from "../ui/scroll-area"
 
 
-const TextChat = ({serverId,channelId}:{serverId:string,channelId:string}) => {
-
+const TextChat = ({serverId,channelId,data,userId}:{serverId:string,channelId:string,data:string,userId:string}) => {
+console.log(JSON.parse(data) , userId)
     const [connected , setIsconnected ] = useState(false)
-
-
+    const [chat ,setChat] = useState<Chat[]>(JSON.parse(data).chat  || [])
+    console.log(chat)
     const socket  = io({path:"/api/socket/io",addTrailingSlash:false})
     socket.on("message",(message)=>{
-        console.log(message)
+        setChat(message)
     })
 
     useEffect(() => {
@@ -86,23 +90,8 @@ const TextChat = ({serverId,channelId}:{serverId:string,channelId:string}) => {
                 }
             })
             console.log(url,values)
-        const ismessageSent:any =await axios.post(url,values)
-
-            toast.dismiss()
-        //   if ( ismessageSent.valid)  {
-        //             toast.success(ismessageSent?.message,{duration:3000}) 
-                    
-        // setTimeout(() => {
-
-        //     window.location.reload()
-        // }, 500);
-        
-        //     }
-           
-        //     else {
-        //          toast.error(ismessageSent?.message,{duration:3000})
-        //     }
-              
+            await axios.post(url,values)
+            form.reset()
 
         }
 
@@ -113,7 +102,24 @@ const TextChat = ({serverId,channelId}:{serverId:string,channelId:string}) => {
 
 
 
-  return (<>    <Form {...form}  >
+  return (
+   <div className="flex-col flex  h-screen  w-full">
+     <ScrollArea className="chat flex px-4 flex-col max-h-[85%] h-[85%]  gap-10 ">
+    {chat && chat.map((e:any,i)=>
+    <div key={i} className={`w-full gap-6 flex ${e.creator._id == userId ? "flex-row-reverse" :""}`}>
+       <Image src={e.creator.imageUrl} 
+       className=" w-12 h-12 rounded-full overflow-hidden "
+        alt="" height={50} width={50}/>
+          <p>
+        {e.content.text}
+
+    </p>
+    </div>
+  )}
+   
+     </ScrollArea>
+<div className="p-4 max-h-[15%] h-[15%] ">
+    <Form {...form}  >
   
     <form  onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 
@@ -164,7 +170,11 @@ const TextChat = ({serverId,channelId}:{serverId:string,channelId:string}) => {
 
 } 
 </div>
-  </>
+</div>
+   </div>
+  
+
+  
    
 
 

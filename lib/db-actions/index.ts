@@ -35,6 +35,19 @@ export const getuserfromDB=async (id:string)=>{
     }
 }
 
+
+export const getCurrentProfile=async ()=>{
+
+  try {
+    ConnectToDB()
+    const {userId} = auth()
+    const user = await Users.findOne({id:userId})
+    return user
+  } catch (error) {
+    console.log(error)
+    return "user not found"
+  }
+}
 export const addUpdateUser = async (data:UserSetup)=>{
 
   try {
@@ -102,7 +115,7 @@ export const findServer= async (id:string)=>{
 
 
 
-    const Server= await Servers.findById(id)
+    const Server= await Servers.findById(id).populate("channels.chat.creator","username imageUrl")
 
 
 

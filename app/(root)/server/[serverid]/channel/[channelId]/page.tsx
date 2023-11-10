@@ -27,11 +27,9 @@ import ChannelForm from '@/components/Forms/CreateChannel'
 
 import ChannelHandler from '@/components/Forms/ChannelHandler'
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { ReactNode } from 'react'
 
- 
 const page = async  ({params:{serverid,channelId}}:{params:{serverid:string,channelId:string}}) => {
-     console.log(channelId)
+
     
 const currentServer = await  findServer(serverid)
 const belongToServer = await findServerBelongByID(serverid)
@@ -49,12 +47,12 @@ if (!Userdata?.onboarded ) redirect("/profile")
     return (
      
     <div className=' min-h-screen dark:bg-[url(/assets/magicdark.png)] 
-     bg-cover bg-[url(/assets/magiclight.png)]'>
+     bg-cover bg-[url(/assets/wavygoldbg.svg)] dark:bg-transparent bg-[#131313fc]'>
 
     
     
       {belongToServer ? (<div className="pl-[90px]  flex  w-full h-full">
-          <div  suppressHydrationWarning className="w-60   bg-gray-400 dark:bg-[#26282c] h-screen">
+          <div  suppressHydrationWarning className="w-60   bg-gray-400 dark:bg-[#191919fc] h-screen">
 
       
                 <Popover>
@@ -143,9 +141,9 @@ if (!Userdata?.onboarded ) redirect("/profile")
                       return (el.type == e )&&  
                       (  <div className={`flex justify-between
                       transition-all px-4 dark:hover:!text-white
-                      ${channelId == el.name ? "bg-gray-400":""}
-                      items-center hover:bg-gray-400
-                      !bg-opacity-20`}>
+                      ${channelId == el.name ? "bg-gray-900 dark:bg-gray-400":""}
+                      items-center dark:hover:bg-gray-400
+                      hover:!bg-opacity-20`}>
                          <Link href={`/server/${serverid}/channel/${el.name}`}
                          className=" w-full  py-2 ">
                            <div className="flex
@@ -189,15 +187,13 @@ if (!Userdata?.onboarded ) redirect("/profile")
 
           </div>
          
-          <div className=" w-full  backdrop-blur-md "> 
-    <div className="flex-col  flex  w-full h-full">
-      <div className="chat h-full "></div>
-      <div className="p-4 ">
-          <TextChat channelId={channelId} serverId={serverid} />
-      </div>
+          <div className=" w-full h-screen  backdrop-blur-sm "> 
+
     
-    </div>
-</div>
+          <TextChat data={JSON.stringify(currentServer?.channels.filter(e=>e.name==channelId)[0])} userId={Userdata._id.toString()} channelId={channelId} serverId={serverid} />
+      
+  
+        </div>
           
 
      

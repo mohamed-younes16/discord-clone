@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { LogOutIcon, Trash2Icon } from 'lucide-react'
 import { UserLeaves, deleteServer } from '@/lib/db-actions'
 import { Toaster, toast } from 'sonner'
-import {  useRouter } from 'next/navigation'
+import {  redirect, useRouter } from 'next/navigation'
 const DeleteLeaveServerButton = ({serverid , actionType}:{serverid:string,actionType:"leave" | "delete"}) => {
 const router = useRouter()
     const deleteServ = async  ()=> {
@@ -55,16 +55,16 @@ const router = useRouter()
 
       else if (actionType == "leave") {
         try {
-          toast.loading(actionType == "leave" && "leaving.....") 
+          toast.loading(actionType == "leave" && "leaving.....",{duration:1000}) 
   
     const LeaveServer = await UserLeaves(serverid)   ||  { valid: false, message:"check your connection" }
         
                     if ( LeaveServer?.valid)  {
                               toast.success(LeaveServer?.message,{duration:3000}) 
-                  setTimeout(() => {
-
                     router.push("/")
-                  }, 500);
+                      redirect("/")
+                  
+                 
               
                   }
                 

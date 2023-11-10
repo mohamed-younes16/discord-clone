@@ -40,7 +40,7 @@ const page =  ({params:{invitationid}}:{params:{invitationid:string}}) => {
 
     const addingmember =async ()=>{
       setisjoning(true)
-      toast.loading("adding...")
+      toast.loading("joining...")
      
      const adding =  await addingMember(invitationid)
 
@@ -49,7 +49,7 @@ const page =  ({params:{invitationid}}:{params:{invitationid:string}}) => {
        if (adding?.message == "added" ) {
       
          toast.dismiss()
-           toast.success(<p className='text-2xl font-semibold'> Added</p>,{className:"text-3xl"})
+           toast.success(<p className='text-xl font-semibold'> Joined</p>,{className:"text-3xl"})
            
            setTimeout(() => {
               setisjoning(false)
