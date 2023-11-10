@@ -38,9 +38,9 @@ const TextChat = ({serverId,channelId,data,userId}:{serverId:string,channelId:st
 console.log(JSON.parse(data) , userId)
     const [connected , setIsconnected ] = useState(false)
     const [chat ,setChat] = useState<Chat[]>(JSON.parse(data).chat  || [])
-    console.log(chat)
+    
     const socket  = io({path:"/api/socket/io",addTrailingSlash:false})
-    socket.on("message",(message)=>{
+    socket.on(`message-server-${serverId}-channel-${channelId}`,(message)=>{
         setChat(message)
     })
 

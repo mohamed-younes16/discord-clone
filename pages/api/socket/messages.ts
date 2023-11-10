@@ -1,12 +1,8 @@
 
 import { NextApiRequest } from "next";
-
-
 import { NextApiResponseServerIo } from "@/index";
+import { SendMessage,  } from "@/lib/db-actions";
 
-import { getAuth } from "@clerk/nextjs/server";
-import { SendMessage, getuserfromDB } from "@/lib/db-actions";
-import { UserDocument } from "@/models/UsersModel";
 
 
 
@@ -24,7 +20,7 @@ const Handler = async (
 
 const sending =  await SendMessage(channelId,serverId,message,req)
 
- res.socket?.server?.io?.emit("message",sending)
+ res.socket?.server?.io?.emit(`message-server-${serverId}-channel-${channelId}`,sending)
 
 res.status(200).json({message:"succes________________________"})
 

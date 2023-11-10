@@ -1,18 +1,10 @@
 import { ModeToggle } from './ui/themeButton';
-
 import { UserCircle2 } from "lucide-react";
-
-import {  UserObject } from "..";
-
 import Link from "next/link";
-
 import TooltipComp from './ui/TooltipComp';
 import { Separator } from './ui/separator';
-
-
 import { findServersBelong } from '@/lib/db-actions';
 import { ScrollArea } from './ui/scroll-area';
-
 import ServerLinks from './ServersLinks';
 import ManageServers from './CreateServer';
 
@@ -21,14 +13,14 @@ import ManageServers from './CreateServer';
 
 
 
-const SideBarNav =async ({userData}:{userData:UserObject}) => {
+const SideBarNav =async () => {
   const allservers = await findServersBelong()
 
   return (
 
     <div suppressHydrationWarning className=' fixed top-0  flexcenter left-0 h-screen  
     w-[90px] 
-     bg-gray-300 dark:bg-[#0f0f0f] '>
+     bg-gray-400 dark:bg-[#0f0f0f] shadow-xl shadow-black z-50  '>
  
       <div className="flex h-full p-2 flex-col w-full justify-between">
 

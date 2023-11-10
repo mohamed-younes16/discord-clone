@@ -36,7 +36,7 @@ if (!Userdata?.onboarded ) redirect("/profile")
 
 
       <html  suppressHydrationWarning lang="en" 
-        
+         className=' '
     >
         <body>      <ThemeProvider
     attribute="class"
