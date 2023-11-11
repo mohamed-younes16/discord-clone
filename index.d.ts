@@ -55,3 +55,18 @@ export type UserSetup = {
     creator: mongoose.Types.ObjectId;
     createdAt: Date;
   }
+  export interface PopulatedChat {
+      creator: UserObject;
+      content: {
+          text: string;
+         
+          file?: {
+              url:string;
+              fileType:"image"|"pdf";
+          }
+      };
+      createdAt: Date;
+      likes: number;
+      _id:string;
+  }
+  

@@ -20,8 +20,8 @@ const SideBarNav =async () => {
 
     <div suppressHydrationWarning className=' fixed top-0  flexcenter left-0 h-screen  
     w-[90px] 
-     bg-gray-400 dark:bg-[#0f0f0f] shadow-xl shadow-black z-50  '>
- 
+    bg-gray-400 dark:bg-[#0f0f0f] shadow-xl shadow-black z-50  '>
+
       <div className="flex h-full p-2 flex-col w-full justify-between">
 
           <div className='flexcenter flex-col'>
@@ -32,13 +32,11 @@ const SideBarNav =async () => {
             <ScrollArea>
               <ServerLinks data={allservers}/>
             </ScrollArea>
-           
-           
-     
+
           </div>
         
 
-            <div className=' flexcenter flex-col  gap-6'>  
+            <div className='flexcenter flex-col  gap-6'>  
             <TooltipComp hoverText='change theme'>
               <ModeToggle/>
             </TooltipComp>
@@ -50,15 +48,10 @@ const SideBarNav =async () => {
         
               </TooltipComp>
 
-                    
-               
-        
-
           </div>
 
       </div>
 
- 
     </div>
   )
 }

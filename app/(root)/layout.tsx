@@ -1,11 +1,11 @@
 
 import { ThemeProvider } from '@/components/ui/theme-provider';
 import '../globals.css'
-import { ClerkProvider, currentUser } from '@clerk/nextjs'
+import { ClerkProvider,  } from '@clerk/nextjs'
 import '@radix-ui/themes/styles.css';
 import { ReactNode } from 'react';
 import SideBarNav from '@/components/SideBarNav';
-import { ConnectToDB, getuserfromDB } from '@/lib/db-actions';
+import { ConnectToDB, getCurrentProfile,  } from '@/lib/db-actions';
 import { UserObject } from '@/index';
 import { redirect } from 'next/navigation';
 
@@ -19,11 +19,8 @@ export const metadata = {
 }
 export default async function RootLayout({ children }:{children:ReactNode}) {
 
-  ConnectToDB()
 
-const user = await currentUser()
-
-const Userdata:UserObject = await getuserfromDB(user?.id || "")
+const Userdata:UserObject = await getCurrentProfile()
 
 
 if (!Userdata?.onboarded ) redirect("/profile")
@@ -44,8 +41,8 @@ if (!Userdata?.onboarded ) redirect("/profile")
     enableSystem
     
     storageKey="discord-theme"
-  >
-    <SideBarNav userData={Userdata}/>
+  >  
+
      {children}
   </ThemeProvider>
          

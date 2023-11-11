@@ -13,39 +13,47 @@ import {
     FormControl,
     FormField,
     FormItem,
-    FormLabel,
+
     FormMessage,
 } from "@/components/ui/form"
 
 import { Input  } from "@/components/ui/input"
 import { Button } from '@/components/ui/button'
 import qs from "query-string";
-import { toast } from 'sonner'
+import { Toaster, toast } from 'sonner'
 
 import { Badge } from "@/components/ui/badge"
 
 
 import {io} from "socket.io-client"
 import { useEffect, useState } from "react"
-import { Send } from "lucide-react"
-import { Chat } from "@/models/Servers"
-import { ChannelDocument } from "@/index"
-import Image from "next/image"
+import {  Send } from "lucide-react"
+
+
 import { ScrollArea } from "../ui/scroll-area"
+import EmojiPicker from "./EmojiPicker"
+
+import UploadFileChat from "./UploadFileChat"
+import TooltipComp from "../ui/TooltipComp"
+import { PopulatedChat } from "@/index"
+
+import MessageComp from "../MessageComp"
+
 
 
 const TextChat = ({serverId,channelId,data,userId}:{serverId:string,channelId:string,data:string,userId:string}) => {
-console.log(JSON.parse(data) , userId)
+
     const [connected , setIsconnected ] = useState(false)
-    const [chat ,setChat] = useState<Chat[]>(JSON.parse(data).chat  || [])
-    
+    const [chat ,setChat] = useState<PopulatedChat[]>(JSON.parse(data).chat  || [])
+   
     const socket  = io({path:"/api/socket/io",addTrailingSlash:false})
     socket.on(`message-server-${serverId}-channel-${channelId}`,(message)=>{
+        toast.dismiss()
         setChat(message)
     })
 
     useEffect(() => {
-    
+        toast.dismiss()
     const socket = new ( io as any) (process.env.NEXT_PUBLIC_SITE_URL!,{
         path:"/api/socket/io",addTrailingSlash:false})
 
@@ -54,6 +62,7 @@ console.log(JSON.parse(data) , userId)
             setIsconnected(true)
         })
 
+
     }, [])
 
 
@@ -61,24 +70,30 @@ console.log(JSON.parse(data) , userId)
 
         message:z.string().min(1,{message:"Empty"})
         .refine(e=>e.toLocaleLowerCase() !== "general",{message:"you can't create an channel with name 'General'"}),
-
+        fileUrl:z.string(),
+        fileType:z.enum(["pdf","image"])
 
         })
+
+  
         
     const form = useForm<z.infer<typeof ChannelSchema>>({
         resolver:zodResolver(ChannelSchema),
         defaultValues:{
             message:"",
-        }
+            fileUrl:"",
+            fileType:"pdf"
 
+        }
     })
+
 
 
     async function  onSubmit(values:z.infer<typeof ChannelSchema>) {
         
         try {
 
-            toast.loading("creating.....",{dismissible:false}) 
+            toast.loading("sending.....",{dismissible:false,duration:90000}) 
     
             const url  = qs.stringifyUrl({
                 url: "http://localhost:3000/api/socket/messages",
@@ -86,10 +101,10 @@ console.log(JSON.parse(data) , userId)
                     serverId,
                     channelId,
                     type:"text",
-                    
+                    actionType:"create",
                 }
             })
-            console.log(url,values)
+           
             await axios.post(url,values)
             form.reset()
 
@@ -98,42 +113,74 @@ console.log(JSON.parse(data) , userId)
         catch (error) {console.log(error)} 
     }
 
-   
-
+ 
 
 
   return (
    <div className="flex-col flex  h-screen  w-full">
+    <Toaster/>
      <ScrollArea className="chat flex px-4 flex-col max-h-[85%] h-[85%]  gap-10 ">
-    {chat && chat.map((e:any,i)=>
-    <div key={i} className={`w-full gap-6 flex ${e.creator._id == userId ? "flex-row-reverse" :""}`}>
-       <Image src={e.creator.imageUrl} 
-       className=" w-12 h-12 rounded-full overflow-hidden "
-        alt="" height={50} width={50}/>
-          <p>
-        {e.content.text}
+    {chat && chat.map((e,i)=>
+   <MessageComp channelId={channelId} userId={userId} serverId={serverId} data={e} key={i}  />
+   
 
-    </p>
-    </div>
   )}
    
      </ScrollArea>
 <div className="p-4 max-h-[15%] h-[15%] ">
     <Form {...form}  >
   
-    <form  onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+    <form   className="space-y-8">
 
 
 
-<div className="flex w-full pb-12 gap-4">
+<div className="flex pb-12 gap-4">
+<FormField
+    control={form.control}
+ 
+    name="fileUrl"
+
+    render={({ field }) => (<>
+    
+    
+    
+        <FormItem className=" flex relative flex-col  items-start   ">
+
+            {field.value &&<TooltipComp hoverText="one file added ">
+        <p className=" bg-red-700 absolute w-6 flexcenter z-40 h-6 
+            rounded-full -top-1 -right-1 text-base"> 1
+                </p>
+</TooltipComp>}
+
+         <UploadFileChat setFileType={(type:"pdf"|"image")=>form.setValue("fileType",type)} SetfieldValue={(url:string)=> field.onChange(url)} />
+
+            <FormControl className="">
+         
+
+            </FormControl>
+            <FormMessage />
+        </FormItem>
+     
+    </>
+
+  
+
+
+        )}
+    /> 
+    
+
+
+
     <FormField
     control={form.control}
  
     name="message"
 
-    render={({ field }) => (
-
-
+    render={({ field }) => (<>
+    
+    
+    
         <FormItem className=" flex flex-col w-full items-start   ">
 
         
@@ -143,23 +190,32 @@ console.log(JSON.parse(data) , userId)
                  !ring-0
                  !outline-none !border-none "
                  type="text" {...field}  />
+
             </FormControl>
             <FormMessage />
         </FormItem>
+        <EmojiPicker  onemojichange={(e:any)=>field.onChange(`${field.value}${e}`)} />
+    </>
+
+  
 
 
         )}
     /> 
 
 
+
 <Button type="submit" disabled={form.formState.isSubmitting } 
+
+onClick={form.handleSubmit(onSubmit)}
  className={`${form.formState.isSubmitting ?" bg-gray-500":"" } flexcenter gap-6`}>
    <Send />
 
-     </Button>  
+     </Button>    
+  
 </div>
 
-
+ 
     </form>
 
 

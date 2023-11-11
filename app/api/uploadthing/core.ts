@@ -23,7 +23,20 @@ imageUploader: f({ image: { maxFileSize: "4MB",maxFileCount:1, }, })
     })
     .onUploadComplete(async ({ metadata, file }) => {
 
-    }),
+    }),  
+    messageFile: f(["pdf"])
+    .middleware( async ({ req }) => {
+        // This code runs on your server before upload
+        const user = await currentUserid();
+    
+        // If you throw, the user will not be able to upload
+        if (!user) throw new Error("Unauthorized");
+    
+        // Whatever is returned here is accessible in onUploadComplete as `metadata`
+        return { userId: user.id };
+        })
+        
+    .onUploadComplete(() => {})
     
 } satisfies FileRouter;
 

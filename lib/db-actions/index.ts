@@ -501,36 +501,35 @@ export const addChannelToServer = async (serverId:string,name:string,type:"text"
 }
 
 
-export const SendMessage = async (channelId:any,serverId:any,message:string,req:NextApiRequest )=>{
+export const SendMessage = async (channelId:any,serverId:any,message:string,
+  fileUrl:string,fileType:"pdf"|"image",req:NextApiRequest )=>{
   try {
     
     ConnectToDB()
 
-  
+ 
 
 
   const {userId} =   getAuth(req)
 
   const userfromdb:UserDocument = await getuserfromDB(userId ||"")
 
-
-
   
   if(userfromdb?.onboarded)  {
-  
+
 
  const  servermessage:any =  await Servers.findOneAndUpdate(
    {   _id:  serverId.toString(),"channels.name":channelId},
         {
           $push:{"channels.$.chat": {
             creator : userfromdb._id,
-            content:{text:message},
+            content:{text:message,file:{url:fileUrl,fileType}},
             likes:0
           }}
         }
         ,{new: true}
         ).populate("channels.chat.creator","username imageUrl")
-     
+  
   
         return servermessage?.channels.filter((e:any)=>e.name === channelId )[0].chat
 
@@ -545,6 +544,72 @@ export const SendMessage = async (channelId:any,serverId:any,message:string,req:
     return{ valid: false, message:"error happend" }
   }
 }
+
+
+export const EditMessageDB = async (
+  channelId: any,
+  serverId: any,
+  messageId: string,
+  message: string,
+  req: NextApiRequest
+) => {
+  try {
+    ConnectToDB();
+
+    const { userId } = getAuth(req);
+    const userfromdb: UserDocument = await getuserfromDB(userId || "");
+
+    if (userfromdb?.onboarded) {
+      const servermessage: any = await Servers.findOneAndUpdate(
+        {
+          _id: serverId.toString(),
+          "channels.name": channelId,
+          "channels.chat._id": messageId, // Match the specific message by its _id
+        },
+        {
+          $set: { "channels.$[outer].chat.$[inner].content.text": message },
+        },
+        { new: true, arrayFilters: [{ "outer.chat._id": messageId }, { "inner._id": messageId }] }
+      ).populate("channels.chat.creator", "username imageUrl");
+
+      return servermessage?.channels.filter((e: any) => e.name === channelId)[0].chat;
+    }
+    return;
+  } catch (error) {
+    console.log(error);
+    return { valid: false, message: "error happened" };
+  }
+};
+
+
+
+export const DeleteMessageDB = async (channelId: any, serverId: any,
+   messageId: string,req:NextApiRequest ) => {
+  try {
+    ConnectToDB();
+
+    const { userId } =getAuth(req)
+    const userfromdb: UserDocument = await getuserfromDB(userId || "");
+
+    if (userfromdb?.onboarded) {
+      const servermessage: any = await Servers.findOneAndUpdate(
+        { _id: serverId.toString(), "channels.name": channelId },
+        {
+          $pull: { "channels.$.chat": { _id: messageId } },
+        },
+        { new: true }
+      ).populate("channels.chat.creator", "username imageUrl");
+
+      console.log(servermessage)
+      return servermessage?.channels.filter((e: any) => e.name === channelId)[0].chat;
+    }
+    return;
+  } catch (error) {
+    console.log(error);
+    return { valid: false, message: "error happened" };
+  }
+};
+
 
 
 

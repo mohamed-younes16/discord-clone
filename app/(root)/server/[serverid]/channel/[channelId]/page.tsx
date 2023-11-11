@@ -26,6 +26,7 @@ import ChannelForm from '@/components/Forms/CreateChannel'
 import dynamic from 'next/dynamic'
 import ChannelHandler from '@/components/Forms/ChannelHandler'
 import { ScrollArea } from "@/components/ui/scroll-area"
+import SideBarNav from '@/components/SideBarNav'
 
 const  TextChat  = dynamic (()=>import ( '@/components/Forms/TextChat') , {ssr:false,}) 
 
@@ -40,7 +41,7 @@ const page = async  ({params:{serverid,channelId}}:{params:{serverid:string,chan
     
 const currentServer = await  findServer(serverid)
 const belongToServer = await findServerBelongByID(serverid)
-
+const currentChannel = (currentServer?.channels.filter(e=>e.name==channelId) || [])?.length > 0 
 const isAdmin = await  isServerAdmin(serverid)
 
 const Userdata:UserObject = await getCurrentProfile()
@@ -54,10 +55,10 @@ if (!Userdata?.onboarded ) redirect("/profile")
     return (
     
     <div className=''>
-
+        <SideBarNav  />
     
     
-    {belongToServer ? (<div className="pl-[90px]  flex  w-full h-full">
+    {belongToServer && currentChannel ? (<div className="pl-[90px]  flex  w-full h-full">
         <div  suppressHydrationWarning className="w-60  bg-gray-400 
         dark:bg-[#191919fc] h-screen">
 
@@ -211,20 +212,20 @@ if (!Userdata?.onboarded ) redirect("/profile")
 
         </div>):
         ( <>
-        <div className="flexcenter backdrop-blur-sm bg-black 
-        !bg-opacity-60 flex-col gap-6  w-full h-screen">
+        <div className="flexcenter backdrop-blur-md  bg-black 
+        !bg-opacity-75 flex-col gap-6  w-full h-screen">
     
     { currentServer &&
         <Image height={60} width={60}
                     className="!h-20 !w-20  border border-white rounded-full bg-cover "
                     alt="image of user" src={currentServer?.imageUrl || ""} />}
 
-        { !belongToServer && currentServer ? 
+        {  !belongToServer && currentServer && currentChannel ? 
         (<><MonitorX size={120}/>
         <p className=' text-2xl font-bold text-center max-md:text-lg'>You are not invited to The server </p>
         
         </>) 
-        :
+        :  
         (<><ServerCrashIcon  size={150} strokeWidth={1} />
             <p className=' text-2xl font-bold'>Server Not Found </p>
             

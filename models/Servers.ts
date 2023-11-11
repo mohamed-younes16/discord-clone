@@ -11,8 +11,11 @@ export interface Chat {
     creator: mongoose.Types.ObjectId;
     content: {
         text: string;
-        image?: string;
-        file?: string;
+       
+        file?: {
+            url:string;
+            fileType:"image"|"pdf";
+        }
     };
     createdAt: Date;
     likes: number;
@@ -80,12 +83,12 @@ const servermodel = new mongoose.Schema<ServerDocument>({
                 ref: "Users",
             },
             content: {
-                text: {
-                    type: String,
-                   
+                text:  String,
+               
+                file: {
+                    url:String,
+                    fileType : {type:String,enum :["image","pdf"]}
                 },
-                image: String,
-                file: String,
             },
             createdAt: {
                 type: Date,
