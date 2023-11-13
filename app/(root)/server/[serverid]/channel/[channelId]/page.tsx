@@ -17,7 +17,7 @@ import ManageServers from '@/components/CreateServer'
 import DeleteLeaveServerButton from '@/components/Forms/DeleteServerButton'
 import { InviteButton } from '@/components/InviteButton'
 import { redirect } from 'next/navigation'
-import { UserObject } from '@/index'
+import { ChannelDocument, UserObject } from '@/index'
 import ManageUsers from '@/components/ManageUsers'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
@@ -27,6 +27,8 @@ import dynamic from 'next/dynamic'
 import ChannelHandler from '@/components/Forms/ChannelHandler'
 import { ScrollArea } from "@/components/ui/scroll-area"
 import SideBarNav from '@/components/SideBarNav'
+import mongoose from 'mongoose'
+import LiveVidAud from '@/components/LiveVidAud'
 
 const  TextChat  = dynamic (()=>import ( '@/components/Forms/TextChat') , {ssr:false,}) 
 
@@ -36,12 +38,14 @@ const  TextChat  = dynamic (()=>import ( '@/components/Forms/TextChat') , {ssr:f
 
 
 
-const page = async  ({params:{serverid,channelId}}:{params:{serverid:string,channelId:string}}) => {
+const page = async  ({params:{serverid,channelId,}}:{params:{serverid:string,channelId:string}}) => {
 
     
 const currentServer = await  findServer(serverid)
 const belongToServer = await findServerBelongByID(serverid)
-const currentChannel = (currentServer?.channels.filter(e=>e.name==channelId) || [])?.length > 0 
+
+const currentChannel = currentServer?.channels.find(e => e.name === channelId) 
+  
 const isAdmin = await  isServerAdmin(serverid)
 
 const Userdata:UserObject = await getCurrentProfile()
@@ -199,11 +203,22 @@ if (!Userdata?.onboarded ) redirect("/profile")
 
     
     {currentServer &&   
-    <TextChat
+
+    currentChannel.type == "text" ? (  <TextChat
         data={JSON.stringify(currentServer?.
         channels.filter(e=>e.name==channelId)[0])}
         userId={Userdata._id.toString()} 
-        channelId={channelId} serverId={serverid} />}    
+        channelId={channelId} serverId={serverid} />) :
+        currentChannel.type == "video" ?
+        (
+
+            <LiveVidAud audio={false} video={true} user={JSON.parse(JSON.stringify (Userdata))} chatId = {currentChannel._id.toString()} />
+        ) :(
+            <LiveVidAud audio={true} video={false} user={JSON.parse(JSON.stringify (Userdata))} chatId = {currentChannel._id.toString()} />
+
+
+        )
+  }    
 
 
         </div>

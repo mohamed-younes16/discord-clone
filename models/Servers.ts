@@ -32,6 +32,7 @@ export interface ServerDocument extends Document {
         chat:Chat[];
         creator: mongoose.Types.ObjectId;
         createdAt: Date;
+        _id:string;
     }[];
     createdAt: Date;
     _id:string;

@@ -1,6 +1,7 @@
 import { Server as NetServer , Socket } from "net";
 import { NextApiResponse } from "next";
 import { Server as IoServer} from "socket.io";
+import { Chat } from "./models/Servers";
 
 
 
@@ -54,7 +55,7 @@ export type UserSetup = {
     chat: Chat[];
     creator: mongoose.Types.ObjectId;
     createdAt: Date;
-  }
+  } 
   export interface PopulatedChat {
       creator: UserObject;
       content: {
