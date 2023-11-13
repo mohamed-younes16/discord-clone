@@ -168,7 +168,7 @@ export const addUpdateServer= async (data:ServerSetup,action:"create"|"update",i
     const newServer =  await Servers.create({...data,invitationLink:v4()})
   
       newServer.channels.push({name:"general",chat:[],
-      type:"text",creator:userfromdb._id,createdAt:new Date()})
+      type:"text",creator:userfromdb._id,createdAt:new Date(),_id:new mongoose.Types.ObjectId})
     newServer.members.push({member:userfromdb._id,userType:"admin"})
 
     await newServer.save()

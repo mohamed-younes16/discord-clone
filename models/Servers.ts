@@ -32,10 +32,10 @@ export interface ServerDocument extends Document {
         chat:Chat[];
         creator: mongoose.Types.ObjectId;
         createdAt: Date;
-        _id:string;
+        _id: mongoose.Types.ObjectId;
     }[];
     createdAt: Date;
-    _id:string;
+    _id: mongoose.Types.ObjectId;
 }
 
 const servermodel = new mongoose.Schema<ServerDocument>({
