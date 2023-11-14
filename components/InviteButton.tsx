@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
 import { CheckCheck, Copy, Share2 } from "lucide-react"
