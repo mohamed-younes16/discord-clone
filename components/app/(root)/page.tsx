@@ -1,6 +1,6 @@
 import SideBarNav from "@/components/SideBarNav";
 import { findServersBelong } from "@/lib/db-actions";
-import { ServerDocument } from "@/models/Servers";
+
 
 
 export default async function Home() {
