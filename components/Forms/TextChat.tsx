@@ -86,12 +86,16 @@ const TextChat = ({serverId,channelId,data,userId}:
           bottomRef.current.scrollIntoView({ behavior: "smooth" });
         }
       }, [chat]);
-   const socket  = io(origin,{path:"/api/socket/io",addTrailingSlash:false,})
-    socket.on(`message-server-${serverId}-channel-${channelId}`,(message)=>{
-        toast.dismiss()
-        setChat(message)
-    })
 
+
+ 
+  const socket = new ( io as any) (process.env.NEXT_PUBLIC_SITE_URL!,{
+        path:"/api/socket/io",addTrailingSlash:false})
+
+        socket.on(`message-server-${serverId}-channel-${channelId}`,(message:PopulatedChat[])=>{
+            toast.dismiss()
+            setChat(message)
+        });
     const ChannelSchema = z.object({
 
         message:z.string().min(1,{message:"Empty"})
