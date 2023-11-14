@@ -1,4 +1,4 @@
-import { ChannelDocument } from "@/index"
+
 import { GetChannels } from "@/lib/db-actions"
 import { redirect } from "next/navigation"
 

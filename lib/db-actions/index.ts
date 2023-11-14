@@ -109,14 +109,17 @@ export const findServerBelongByID = async (serverId:string)=>{
   }
 }
 
-export const findServer= async (id:string)=>{
+export const findServer= async (id:string,chatOptions: { limit: number })=>{
   try {
     ConnectToDB()
 
 
 
-    const Server: ServerDocument | null = await Servers.findById(id)?.populate("channels.chat.creator", "username imageUrl") ;
+    const Server: ServerDocument | null = await Servers.findById(id)?.populate("channels.chat.creator", 
+    "username imageUrl")
 
+
+    
     return Server;
     
   } catch (error) {
@@ -648,7 +651,48 @@ export const GetChannels = async (serverId:any)=>{
 }
 
 
+export const getChat = async (serverId:string,channelId:string,limit:number)=> {
 
+  try {
+    
+    ConnectToDB()
+
+  
+
+
+  const userfromdb:UserDocument = await getCurrentProfile()
+
+
+
+  
+  if(userfromdb)  {
+  
+
+      const  chat =  await Servers.findOne({_id:serverId,"channels.name":channelId},{"channels.chat":{$slice:[2,limit]}},{})   .populate({
+        path: 'channels.chat',
+        options: {
+          sort: { createdAt: -1 }, // Sort by createdAt in descending order
+          limit: limit || 10, // Set the limit to the desired number of messages (default: 10)
+         
+        },
+      });
+
+    console.log(chat?.channels)
+          
+
+        return chat
+
+
+
+  } 
+  return 
+    
+
+  } catch (error) {
+    console.log(error)
+    return{ valid: false, message:"error happend" }
+  }
+}
 export const updateChannel = async (serverId:string,channelId:string,values:any)=>{
   try {
     

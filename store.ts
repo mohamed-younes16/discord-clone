@@ -7,6 +7,6 @@ type Store = {
   }
   
  export  const useStore = create<Store>()((set) => ({
-    SideBarOpen:false ,
+    SideBarOpen:true ,
     setSideBarOpen: (v:boolean) => set(() => ({ SideBarOpen:v })),
   }))

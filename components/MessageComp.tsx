@@ -85,7 +85,7 @@ const MessageComp = ({data,serverId,channelId,userId}:
 
 
   return (
-    <> 
+    <div className="hover:bg-[#55555550] transition-all "> 
     
     <div  className={`w-full flex justify-between ${data.creator._id == userId ? "flex-row-reverse text-end" :"text-start"}`}>
 
@@ -97,8 +97,8 @@ const MessageComp = ({data,serverId,channelId,userId}:
                 <div>
 
                     <div className={` gap-6 flexcenter  ${data.creator._id !== userId ? "flex-row-reverse" :""}`}>
-                        <span className=" text-sm text-gray-500"> {formatDate(data.createdAt.toString())}  </span>
-                        <span  className=" text-white text-xl font-bold"> {data?.creator.username}</span>
+                        <span className=" text-sm text-gray-800 dark:text-gray-500"> {formatDate(data.createdAt.toString())}  </span>
+                        <span  className=" text-white text-xl font-semibold"> {data?.creator.username}</span>
                     </div>
         <div className=" mt-4">
             {data.content.file?.url && ( data.content.file.fileType =="pdf"  ? (
@@ -177,7 +177,7 @@ const MessageComp = ({data,serverId,channelId,userId}:
                 
                 </Form>
                 ) :(
-                    <p className="  text-gray-300 mt-4">
+                    <p className="  text-gray-500 dark:text-gray-300 mt-4">
 
 
 
@@ -198,7 +198,7 @@ const MessageComp = ({data,serverId,channelId,userId}:
     
      <Separator/>
     
-    </>
+    </div>
   )
 }
 

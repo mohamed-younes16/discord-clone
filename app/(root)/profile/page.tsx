@@ -1,12 +1,10 @@
 
-import { ModeToggle } from '@/components/ui/themeButton'
-
 import { Toaster } from 'sonner'
 
 import "@uploadthing/react/styles.css";
 
-import { getuserfromDB } from '@/lib/db-actions';
-import { SignOutButton, currentUser } from '@clerk/nextjs';
+import { getCurrentProfile,  } from '@/lib/db-actions';
+import { SignOutButton,  } from '@clerk/nextjs';
 
 import { HomeIcon, LucideLogOut } from 'lucide-react';
 import Link from 'next/link';
@@ -20,16 +18,16 @@ import TooltipComp from '@/components/ui/TooltipComp';
 
 
 const Page =async () => {
-    const currentUs = await currentUser()
-  const CurrentUserData :UserObject = await getuserfromDB(currentUs?.id ||"")
+  
+  const CurrentUserData :UserObject = await getCurrentProfile()
 
 
 return (<>
-    <div className="fixed inset-0 left-0 top-0  text-black  
+    <div className="fixed inset-0  flexcenter left-0 top-0  text-black  
     dark:text-white
     min-h-screen dark:bg-[url(/assets/magicdark.png)] 
     bg-cover bg-[url(/assets/magiclight.png)]">
- <div className=' w-[80dvw] m-auto p-4 rounded-2xl  mt-6 border-gray-400 border-2 backdrop-blur-xl '> 
+ <div className=' w-[80dvw]  p-4 rounded-2xl  mt-6 border-gray-400 border backdrop-blur-xl '> 
  <Toaster richColors closeButton position='top-center'/>
 
     <div className="flex items-center  gap-6">
@@ -68,7 +66,7 @@ return (<>
 
 
 
-<ProfileForm userData={CurrentUserData}/>
+<ProfileForm userData={JSON.parse(JSON.stringify(CurrentUserData)) }/>
 
 </div></div>
 

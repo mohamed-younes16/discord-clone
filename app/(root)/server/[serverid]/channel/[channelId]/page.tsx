@@ -35,7 +35,7 @@ const  TextChat  = dynamic (()=>import ( '@/components/Forms/TextChat') , {ssr:f
 const page = async  ({params:{serverid,channelId,}}:{params:{serverid:string,channelId:string}}) => {
 
     
-const currentServer = await  findServer(serverid)
+const currentServer = await  findServer(serverid,{limit:6})
 const belongToServer = await findServerBelongByID(serverid)
 const allservers  = await findServersBelong()
 const currentChannel = currentServer?.channels.find(e => e.name === channelId) 
@@ -61,9 +61,8 @@ if (!Userdata?.onboarded ) redirect("/profile")
     <div className="  flex  w-full h-full">
 
        
-                  <SideBarNav serverid={serverid} isAdmin={JSON.parse( JSON.stringify(isAdmin))}
-        channelId={channelId}  allservers={JSON.parse( JSON.stringify( allservers))}
-        currentServer={JSON.parse( JSON.stringify(currentServer))} >
+            <SideBarNav  allservers={JSON.parse( JSON.stringify( allservers))}
+        >
               <div   className="w-60  bg-gray-400 
                 dark:bg-[#191919fc] h-screen">
 
@@ -209,14 +208,13 @@ if (!Userdata?.onboarded ) redirect("/profile")
         </SideBarNav>
     
         
-        <div className=" w-full h-screen  backdrop-blur-sm  bg-[#27272767] "> 
+        <div className=" w-full h-screen  backdrop-blur-sm  bg-[#27272794] "> 
 
     
     {currentServer &&   
 
     currentChannel.type == "text" ? (  <TextChat
-        data={JSON.stringify(currentServer?.
-        channels.filter(e=>e.name==channelId)[0])}
+        data={JSON.parse (JSON.stringify(currentChannel.chat))}
         userId={Userdata._id.toString()} 
         channelId={channelId} serverId={serverid} />) :
         currentChannel.type == "video" ?

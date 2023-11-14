@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -26,7 +27,7 @@ import { Badge } from "@/components/ui/badge"
 
 
 import {io} from "socket.io-client"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import {  Send } from "lucide-react"
 
 
@@ -38,15 +39,17 @@ import TooltipComp from "../ui/TooltipComp"
 import { PopulatedChat } from "@/index"
 
 import MessageComp from "../MessageComp"
+import { getChat } from "@/lib/db-actions"
 
 
 
-const TextChat = ({serverId,channelId,data,userId}:{serverId:string,channelId:string,data:string,userId:string}) => {
+const TextChat = ({serverId,channelId,data,userId}:
+    {serverId:string,channelId:string,data:PopulatedChat[],userId:string}) => {
 
     const [connected , setIsconnected ] = useState(false)
-    const [chat ,setChat] = useState<PopulatedChat[]>(JSON.parse(data).chat  || [])
+    const [chat ,setChat] = useState<PopulatedChat[]>(data || [])
     const [origin , setorigin] = useState<string>("")   
-
+    const bottomRef = useRef<HTMLDivElement>(null);
  
 
     useEffect(() => {
@@ -59,11 +62,30 @@ const TextChat = ({serverId,channelId,data,userId}:{serverId:string,channelId:st
         socket.on("connect",()=>{
             console.log("connected!")
             setIsconnected(true)
-        })
+        });
 
+        (async () => {
+            
+          try {
+                const chat = await getChat(serverId,channelId,5)
+                console.log(chat)
+         
+          } catch (e) {
+            console.error(e);
+          }
+        })();
+        
+        return () => {
+            socket.disconnect();
+          };
 
     }, [])
-
+    useEffect(() => {
+        // Scroll to the bottom whenever chat updates
+        if (bottomRef.current) {
+          bottomRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+      }, [chat]);
    const socket  = io(origin,{path:"/api/socket/io",addTrailingSlash:false,})
     socket.on(`message-server-${serverId}-channel-${channelId}`,(message)=>{
         toast.dismiss()
@@ -129,7 +151,7 @@ const TextChat = ({serverId,channelId,data,userId}:{serverId:string,channelId:st
    
 
   )}
-   
+    <div ref={bottomRef} />
      </ScrollArea>
 <div className="p-4 max-h-[15%] h-[15%] ">
     <Form {...form}  >

@@ -1,6 +1,6 @@
 "use client"
 import { ModeToggle } from './ui/themeButton';
-import { ChevronDown, Hash, Lock, Mic, PlusIcon, Settings, UserCircle2, UserPlus, Video } from "lucide-react";
+import { UserCircle2 } from "lucide-react";
 import Link from "next/link";
 import TooltipComp from './ui/TooltipComp';
 import { Separator } from './ui/separator';
@@ -11,19 +11,7 @@ import ManageServers from './CreateServer';
 
 import { ReactNode, useEffect, useState } from 'react';
 
-import Image from 'next/image';
 
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import { InviteButton } from './InviteButton';
-import DeleteLeaveServerButton from './Forms/DeleteServerButton';
-import ChannelForm from './Forms/CreateChannel';
-
-import { Member, ServerDocument } from '@/models/Servers';
-import ManageUsers from './ManageUsers';
 import { useStore } from '@/store';
 
 
@@ -31,11 +19,10 @@ import { useStore } from '@/store';
 
 
 
-const SideBarNav = ({allservers,serverid,currentServer,channelId,isAdmin,children}:
-  {allservers:any,serverid?:string,currentServer?:any | undefined,
-     channelId?:string,isAdmin?:any ,children?:ReactNode }) => {
+const SideBarNav = ({allservers,children}:
+  {allservers:any,children?:ReactNode}) => {
 
-    const channlesType = currentServer && [ ...new Set( currentServer?.channels.map((e:any)=>e.type))]
+ 
 
   const [visible , setvisible] = useState(true)
       const {SideBarOpen,setSideBarOpen} = useStore()

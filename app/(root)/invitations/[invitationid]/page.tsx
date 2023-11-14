@@ -1,6 +1,5 @@
 "use client"
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react-hooks/rules-of-hooks */
+
 import { addingMember, findServerbyQuery } from '@/lib/db-actions'
 import { Toaster, toast } from 'sonner'
 
@@ -18,7 +17,7 @@ import Image from 'next/image'
 import { Separator } from '@radix-ui/react-dropdown-menu'
 
 
-const page =  ({params:{invitationid}}:{params:{invitationid:string}}) => {
+const Page =  ({params:{invitationid}}:{params:{invitationid:string}}) => {
   const [servername , setServerName] = useState("") 
   const [serverImage , setserverImage] = useState("") 
   const [isjoning,setisjoning] = useState(false)
@@ -127,5 +126,5 @@ const page =  ({params:{invitationid}}:{params:{invitationid:string}}) => {
  </div>) 
 }
 
-export default page
+export default Page
 
