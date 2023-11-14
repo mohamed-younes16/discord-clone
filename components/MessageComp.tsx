@@ -40,7 +40,7 @@ import EmojiPicker from "./Forms/EmojiPicker"
 const MessageComp = ({data,serverId,channelId,userId}:
     {data:PopulatedChat,serverId:string,channelId:string,userId:string}) => {
     const [isEditing, setIsEditing] = useState<boolean>(false)
-    console.log(data.creator._id  , userId )
+   
     const messageSchema = z.object({
 
         message:z.string().min(1,{message:"can't be Empty"})

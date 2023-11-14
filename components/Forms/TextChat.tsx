@@ -45,15 +45,14 @@ const TextChat = ({serverId,channelId,data,userId}:{serverId:string,channelId:st
 
     const [connected , setIsconnected ] = useState(false)
     const [chat ,setChat] = useState<PopulatedChat[]>(JSON.parse(data).chat  || [])
-   
-    const socket  = io({path:"/api/socket/io",addTrailingSlash:false})
-    socket.on(`message-server-${serverId}-channel-${channelId}`,(message)=>{
-        toast.dismiss()
-        setChat(message)
-    })
+    const [origin , setorigin] = useState<string>("")   
+
+ 
 
     useEffect(() => {
         toast.dismiss()
+        setorigin(window.location  && window.location.origin)
+       
     const socket = new ( io as any) (process.env.NEXT_PUBLIC_SITE_URL!,{
         path:"/api/socket/io",addTrailingSlash:false})
 
@@ -65,6 +64,11 @@ const TextChat = ({serverId,channelId,data,userId}:{serverId:string,channelId:st
 
     }, [])
 
+   const socket  = io(origin,{path:"/api/socket/io",addTrailingSlash:false,})
+    socket.on(`message-server-${serverId}-channel-${channelId}`,(message)=>{
+        toast.dismiss()
+        setChat(message)
+    })
 
     const ChannelSchema = z.object({
 
@@ -92,11 +96,11 @@ const TextChat = ({serverId,channelId,data,userId}:{serverId:string,channelId:st
     async function  onSubmit(values:z.infer<typeof ChannelSchema>) {
         
         try {
-
+            
             toast.loading("sending.....",{dismissible:false,duration:90000}) 
-    
+                console.log()
             const url  = qs.stringifyUrl({
-                url: "http://localhost:3000/api/socket/messages",
+                url:`${origin}/api/socket/messages`,
                 query :{
                     serverId,
                     channelId,

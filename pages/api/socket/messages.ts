@@ -17,7 +17,7 @@ const Handler = async (
   }
   const {message,fileUrl,fileType,} =  await req.body
   const {serverId,channelId ,actionType,messageId } :any =  req.query
-console.log(channelId,serverId,messageId,message)
+
  const sending = actionType  == "create" ?
   (await SendMessage(channelId,serverId,message,fileUrl,fileType,req))
   :actionType  == "delete"  ? (await DeleteMessageDB(channelId,serverId,messageId ,req))
