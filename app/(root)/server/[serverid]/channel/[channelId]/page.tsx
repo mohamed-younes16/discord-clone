@@ -2,27 +2,19 @@ import { findServer, findServerBelongByID,
     findServersBelong,
     getCurrentProfile, isServerAdmin } from '@/lib/db-actions'
 
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-import { ChevronDown, Hash, Lock, Mic, MonitorX, PlusIcon,
-    ServerCrashIcon, Settings, UserPlus, Video,  } from 'lucide-react'
-import { Separator } from '@/components/ui/separator'
-import ManageServers from '@/components/CreateServer'
-import DeleteLeaveServerButton from '@/components/Forms/DeleteServerButton'
-import { InviteButton } from '@/components/InviteButton'
+
+import {   MonitorX, 
+    ServerCrashIcon,   } from 'lucide-react'
+
 import { redirect } from 'next/navigation'
 import { UserObject } from '@/index'
-import ManageUsers from '@/components/ManageUsers'
+
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import Link from 'next/link'
-import ChannelForm from '@/components/Forms/CreateChannel'
+
 import dynamic from 'next/dynamic'
-import ChannelHandler from '@/components/Forms/ChannelHandler'
-import { ScrollArea } from "@/components/ui/scroll-area"
+
 import SideBarNav from '@/components/SideBarNav'
 import LiveVidAud from '@/components/LiveVidAud'
 
@@ -52,7 +44,7 @@ if (!Userdata?.onboarded ) redirect("/profile")
     
     <div className=''>
         <SideBarNav serverid={serverid} isAdmin={JSON.parse( JSON.stringify(isAdmin))}
-         channelId={channelId} allservers={JSON.parse( JSON.stringify( allservers))} currentServer={JSON.parse( JSON.stringify(currentServer))} />
+         channelId={channelId}  allservers={JSON.parse( JSON.stringify( allservers))} currentServer={JSON.parse( JSON.stringify(currentServer))} />
     
     
     {belongToServer && currentChannel ? (

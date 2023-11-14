@@ -12,7 +12,7 @@ const allServers  = await findServersBelong()
     bg-cover  bg-[url(/assets/cccircular.svg)] dark:bg-transparent bg-[#3e3e3efc]
       ">  
 
-  <SideBarNav  allservers={JSON.parse( JSON.stringify( allServers))} />
+  <SideBarNav    allservers={JSON.parse( JSON.stringify( allServers))} />
         
         
        

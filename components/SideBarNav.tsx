@@ -29,7 +29,8 @@ import ManageUsers from './ManageUsers';
 
 
 
-const SideBarNav = ({allservers,serverid,currentServer,channelId,isAdmin}:{allservers:any,serverid:string,currentServer?:ServerDocument | undefined, channelId?:string,isAdmin:any }) => {
+const SideBarNav = ({allservers,serverid,currentServer,channelId,isAdmin}:
+  {allservers:ServerDocument,serverid?:string,currentServer?:ServerDocument | undefined, channelId?:string,isAdmin?:any }) => {
   const channlesType = currentServer && [ ...new Set( currentServer?.channels.map((e:any)=>e.type))]
   const [open , setopen] = useState(false)
   const [visible , setvisible] = useState(true)
@@ -170,7 +171,7 @@ ${open ? "translate-x-0" : "-translate-x-full"}
 
 
                             
-                            <ManageUsers  serverid={serverid} />
+                            <ManageUsers  serverid={serverid || ""} />
                     
                             <ManageServers
 
@@ -185,17 +186,17 @@ ${open ? "translate-x-0" : "-translate-x-full"}
 
                                                     submitText="Update"
                                                     actionType="update"
-                                                    serverId={serverid}
+                                                    serverId={serverid || ""}
                                                     />
                                                     <div className="my-2"/>
-                                                    <DeleteLeaveServerButton actionType='delete' serverid={serverid}  />
+                                                    <DeleteLeaveServerButton actionType='delete' serverid={serverid || ""}  />
                                                     <div className="my-2"></div>
-                                                    <ChannelForm actionType='create' serverId={serverid} />
+                                                    <ChannelForm actionType='create' serverId={serverid || ""} />
                                     </>) : (
                                         <>
                                         <Separator className='my-2' />
 
-                                    <DeleteLeaveServerButton actionType='leave'  serverid={serverid}  />
+                                    <DeleteLeaveServerButton actionType='leave'  serverid={serverid ||""}  />
 
                                         </>
 
@@ -215,7 +216,7 @@ ${open ? "translate-x-0" : "-translate-x-full"}
                             <p className=' w-full'>
                             {e} Channels
                             </p>
-                            {isAdmin && <ChannelForm actionType='create'  icon={<PlusIcon/>} serverId={serverid} /> }
+                            {isAdmin && <ChannelForm actionType='create'  icon={<PlusIcon/>} serverId={serverid || ""} /> }
                         </div>
 
                             {   currentServer?.channels.map ((el)=> {
@@ -248,7 +249,7 @@ ${open ? "translate-x-0" : "-translate-x-full"}
                                 </Link>
                                 {el.name !== "general" 
                                 
-                                ? (                        <ChannelHandler channel={JSON.stringify(el) }  serverId={serverid} />
+                                ? (                        <ChannelHandler channel={JSON.stringify(el) }  serverId={serverid || ""} />
         )
                                 :(<Lock />)}
                             </div>
