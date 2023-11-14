@@ -9,7 +9,7 @@ import { ScrollArea } from './ui/scroll-area';
 import ServerLinks from './ServersLinks';
 import ManageServers from './CreateServer';
 
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 
 import Image from 'next/image';
 
@@ -21,20 +21,24 @@ import {
 import { InviteButton } from './InviteButton';
 import DeleteLeaveServerButton from './Forms/DeleteServerButton';
 import ChannelForm from './Forms/CreateChannel';
-import ChannelHandler from './Forms/ChannelHandler';
-import { ServerDocument } from '@/models/Servers';
+
+import { Member, ServerDocument } from '@/models/Servers';
 import ManageUsers from './ManageUsers';
+import { useStore } from '@/store';
 
 
 
 
 
-const SideBarNav = ({allservers,serverid,currentServer,channelId,isAdmin}:
-  {allservers:ServerDocument,serverid?:string,currentServer?:ServerDocument | undefined, channelId?:string,isAdmin?:any }) => {
-  const channlesType = currentServer && [ ...new Set( currentServer?.channels.map((e:any)=>e.type))]
-  const [open , setopen] = useState(false)
+
+const SideBarNav = ({allservers,serverid,currentServer,channelId,isAdmin,children}:
+  {allservers:any,serverid?:string,currentServer?:any | undefined,
+     channelId?:string,isAdmin?:any ,children?:ReactNode }) => {
+
+    const channlesType = currentServer && [ ...new Set( currentServer?.channels.map((e:any)=>e.type))]
+
   const [visible , setvisible] = useState(true)
-
+      const {SideBarOpen,setSideBarOpen} = useStore()
 
   const isPcUser = () => {
     const userAgent = navigator.userAgent.toLowerCase();
@@ -74,29 +78,31 @@ const SideBarNav = ({allservers,serverid,currentServer,channelId,isAdmin}:
     
 
   return (
-
-    <div suppressHydrationWarning className={`fixed duration-700 top-0 transition-all 
+<div className={`transition-all relative z-50  duration-700  ${SideBarOpen ? "lg:pl-[330px] ":""}`}>
+  
+  
+  <div suppressHydrationWarning className={`fixed duration-700 top-0 transition-all 
     max-w-fit z-50   flexcenter left-0 h-screen  
     w-fit 
     bg-gray-400 dark:bg-[#0f0f0f] shadow-xl shadow-black    
      flex flex-col 
 max-h-[calc(100dvh-100px)]  min-h-full justify-between 
-${open ? "translate-x-0" : "-translate-x-full"}
+${SideBarOpen ? "translate-x-0" : "-translate-x-full"}
 
 `}>
   
         
         <button className={`absolute  z-[888] cursor-pointer
-            ${ open ? " hover:shadow-red-400":" hover:shadow-emerald-400"}
-            bottom-[120px]  shadow-lg  !rounded-full right-0 
-            ${visible || open 
-              ? "translate-x-full "
-              :""}
+            bottom-[120px] bg-[url(/assets/right-arrow.svg)] flex
+             h-[60px] border-black border-[6px] w-[60px] animate-pulse  shadow-lg  !rounded-full right-0 
+            active:scale-95 
+            ${visible || SideBarOpen 
+              ? "translate-x-full scale-100 "
+              :"scale-75"}
+               bg-black bg-cover
+            p-1 delay-100  transition-all`}
+            onClick={()=> setSideBarOpen(!SideBarOpen)}>
               
-            bg-[#040209] p-1 delay-100  transition-all`}
-            onClick={()=> setopen(s=>!s)}>
-                <Image src="/assets/right-arrow.svg" height={60} width={60} 
-                alt="toggle menu " style={{transitionDuration:"700ms"}}  className={`transition-all   animate-[pulse_3s_infinite_ease-out] ${open ?"rotate-180":""}`} />
             </button>
 
             {/* <button onClick={()=>setopen(false)} className="ml-2 rounded-full text-white p-2  top-4 right-4
@@ -104,6 +110,7 @@ ${open ? "translate-x-0" : "-translate-x-full"}
                 <Image alt="close" src="/assets/close.svg" height={40} width={40}/>
             </button> */}
             <div className="flex h-full">
+               <div className="flex h-full">
                     <div className="flex h-full p-2 flex-col  w-[90px]   justify-between">
 
                   <div className='flexcenter flex-col'>
@@ -134,147 +141,17 @@ ${open ? "translate-x-0" : "-translate-x-full"}
 
               </div>  
 
-              {currentServer &&<div  suppressHydrationWarning className="w-60  bg-gray-400 
-                dark:bg-[#191919fc] h-screen">
-
             
-                        <Popover>
-
-                            <PopoverTrigger className='w-full'>
-
-                            <div role='button' className=" px-4 w-full text-start flex justify-between 
-                            text-xl font-semibold items-center py-2 bg-gray-500
-                            dark:bg-[#202226] text-gray-800 dark:text-gray-200">
-                                {currentServer?.name}
-
-                                        <ChevronDown/>
-                            </div>
-
-                            </PopoverTrigger>
-
-                            <PopoverContent className='w-48 cursor-pointer '>
-                                <p className=' p-1   dark:text-indigo-400 flex justify-between
-                                items-center  hover:bg-white  rounded-md transition-all !bg-opacity-20'>
-                                Share Server
-                                <UserPlus />
-                                
-                            </p>
-                                    <div className='my-2' />
-                        
-                                <InviteButton serverInvitaion={currentServer?.invitationLink || ""}/>
-                            
-
-                            
-                                {isAdmin ?( <>
-                                    
-                                <Separator className='my-2' />
-
-
-                            
-                            <ManageUsers  serverid={serverid || ""} />
-                    
-                            <ManageServers
-
-                                                icon={<p className=' flex justify-between items-center  p-1 hover:bg-white rounded-md transition-all !bg-opacity-20'>
-                                                    Edit Server
-                                                    <Settings />
-                                                    
-                                                    </p>} 
-                                                    text="Edit Server"
-
-                                                    data = {{imageUrl:currentServer?.imageUrl,name:currentServer?.name}}
-
-                                                    submitText="Update"
-                                                    actionType="update"
-                                                    serverId={serverid || ""}
-                                                    />
-                                                    <div className="my-2"/>
-                                                    <DeleteLeaveServerButton actionType='delete' serverid={serverid || ""}  />
-                                                    <div className="my-2"></div>
-                                                    <ChannelForm actionType='create' serverId={serverid || ""} />
-                                    </>) : (
-                                        <>
-                                        <Separator className='my-2' />
-
-                                    <DeleteLeaveServerButton actionType='leave'  serverid={serverid ||""}  />
-
-                                        </>
-
-                                    ) }
-                                                    
-                            
-                                
-                        
-                            </PopoverContent>
-
-                        </Popover>
-                        <ScrollArea className="flex flex-col">
-
-                        {channlesType?.map((e:string)=>(<>
-
-                        <div className="flex items-center px-3 w-full justify-between">
-                            <p className=' w-full'>
-                            {e} Channels
-                            </p>
-                            {isAdmin && <ChannelForm actionType='create'  icon={<PlusIcon/>} serverId={serverid || ""} /> }
-                        </div>
-
-                            {   currentServer?.channels.map ((el)=> {
-
-                            return (el.type == e )&&  
-                            (  <div className={`flex justify-between
-                            transition-all px-4 dark:hover:!text-white
-                            ${channelId == el.name ? "bg-gray-900 dark:bg-gray-400":""}
-                            items-center dark:hover:bg-gray-400
-                            hover:!bg-opacity-20`}>
-                                <Link href={`/server/${serverid}/channel/${el.name}`}
-                                className=" w-full  py-2 ">
-                                <div className="flex
-                                    text-gray-500 text-base
-                                    gap-4">
-
-                            {    e== "text" 
-                            ? ( <Hash size={20} />)
-                            : e == "audio" ? 
-                            (<Mic size={20}/>)
-                            :e=="video" 
-                            ? (<Video size={20} />) :""
-
-                            }
-                                <p>{el.name}</p>
-                
-                                </div>
-
-                                
-                                </Link>
-                                {el.name !== "general" 
-                                
-                                ? (                        <ChannelHandler channel={JSON.stringify(el) }  serverId={serverid || ""} />
-        )
-                                :(<Lock />)}
-                            </div>
-                            
-                                )
-                                
-
-
-                            } )}
-                        </>
-
-
-
-
-                        ) )}
-                
-                        </ScrollArea>
-
-                </div>}
               
             </div>
 
-     
+     {children}
 
+            </div>
+           
     </div>
+</div>
+    
   )
 }
 
