@@ -29,7 +29,7 @@ import ManageUsers from './ManageUsers';
 
 
 
-const SideBarNav = ({allservers,serverid,currentServer,channelId,isAdmin}:{allservers:any,serverid:string,currentServer?:ServerDocument | undefined, channelId?:string,isAdmin:any }) => {
+const SideBarNav = ({allservers,serverid,currentServer,channelId,isAdmin}:{allservers?:any,serverid?:string,currentServer?:ServerDocument | undefined, channelId?:string,isAdmin:any }) => {
   const channlesType = currentServer && [ ...new Set( currentServer?.channels.map((e:any)=>e.type))]
   const [open , setopen] = useState(false)
   const [visible , setvisible] = useState(true)
