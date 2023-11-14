@@ -40,6 +40,7 @@ import { PopulatedChat } from "@/index"
 
 import MessageComp from "../MessageComp"
 import { getChat } from "@/lib/db-actions"
+import { useRouter } from "next/navigation"
 
 
 
@@ -50,7 +51,7 @@ const TextChat = ({serverId,channelId,data,userId}:
     const [chat ,setChat] = useState<PopulatedChat[]>(data || [])
     const [origin , setorigin] = useState<string>("")   
     const bottomRef = useRef<HTMLDivElement>(null);
- 
+    const router = useRouter()
 
     useEffect(() => {
         toast.dismiss()
@@ -94,7 +95,9 @@ const TextChat = ({serverId,channelId,data,userId}:
 
         socket.on(`message-server-${serverId}-channel-${channelId}`,(message:PopulatedChat[])=>{
             toast.dismiss()
+            router.refresh()
             setChat(message)
+            router.refresh()
         });
     const ChannelSchema = z.object({
 
@@ -136,6 +139,8 @@ const TextChat = ({serverId,channelId,data,userId}:
             })
            
             await axios.post(url,values)
+            toast.dismiss()
+            router.refresh()
             form.reset()
 
         }
