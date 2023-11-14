@@ -1,6 +1,6 @@
 "use server"
 import { ServerSetup, UserSetup } from "@/index";
-import Servers from "@/models/Servers";
+import Servers, { ServerDocument } from "@/models/Servers";
 import Users, { UserDocument } from "@/models/UsersModel"
 import { auth, getAuth } from "@clerk/nextjs/server";
 import mongoose from "mongoose"
@@ -115,11 +115,10 @@ export const findServer= async (id:string)=>{
 
 
 
-    const Server= await Servers.findById(id).populate("channels.chat.creator","username imageUrl")
+    const Server: ServerDocument | null = await Servers.findById(id)?.populate("channels.chat.creator", "username imageUrl") ;
 
-
-
-    return Server
+    return Server;
+    
   } catch (error) {
   console.log(error)  
   }

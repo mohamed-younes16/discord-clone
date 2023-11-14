@@ -1,8 +1,10 @@
 import SideBarNav from "@/components/SideBarNav";
+import { findServersBelong } from "@/lib/db-actions";
+import { ServerDocument } from "@/models/Servers";
 
 
 export default async function Home() {
-
+const allServers  = await findServersBelong()
 
   return ( 
 
@@ -10,7 +12,7 @@ export default async function Home() {
     bg-cover  bg-[url(/assets/cccircular.svg)] dark:bg-transparent bg-[#3e3e3efc]
       ">  
 
-  <SideBarNav  />
+  <SideBarNav  allservers={JSON.parse( JSON.stringify( allServers))} />
         
         
        
