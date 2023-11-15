@@ -52,36 +52,18 @@ const TextChat = ({serverId,channelId,data,userId}:
     const [origin , setorigin] = useState<string>("")   
     const bottomRef = useRef<HTMLDivElement>(null);
     const router = useRouter()
+    const [socket,setSocket] = useState<any>(null)
     toast.dismiss()
-    useEffect(() => {
-        toast.dismiss()
-        setorigin(window.location  && window.location.origin)
-       
-    const socket = new ( io as any) (process.env.NEXT_PUBLIC_SITE_URL!,{
-        path:"/api/socket/io",addTrailingSlash:false})
 
-        socket.on("connect",()=>{
-            console.log("connected!")
-            setIsconnected(true)
-        });
 
-        (async () => {
-            
-          try {
-                const chat = await getChat(serverId,channelId,5)
-                console.log(chat)
-         
-          } catch (e) {
-            console.error(e);
-          }
-        })();
-        
-        return () => {
-            socket.disconnect();
-          };
 
-    }, [])
-    useEffect(() => {
+   useEffect(() => {
+
+            setSocket( new ( io as any) (process.env.NEXT_PUBLIC_SITE_URL!,{
+                    path:"/api/socket/io",addTrailingSlash:false})
+            )
+    
+
         toast.dismiss()
         if (bottomRef.current) {
           bottomRef.current.scrollIntoView({ behavior: "smooth" });
@@ -89,17 +71,45 @@ const TextChat = ({serverId,channelId,data,userId}:
       }, [chat]);
 
 
- 
-  const socket = new ( io as any) (process.env.NEXT_PUBLIC_SITE_URL!,{
-        path:"/api/socket/io",addTrailingSlash:false})
 
-        socket.on(`message-server-${serverId}-channel-${channelId}`,(message:PopulatedChat[])=>{
-            toast.dismiss()
+
+    
+    useEffect(() => {
+
+        toast.dismiss()
+
+        setorigin(window.location  && window.location.origin)
+        
+        const socket = new ( io as any) (process.env.NEXT_PUBLIC_SITE_URL!,{
+
+            path:"/api/socket/io",addTrailingSlash:false})
+
+            socket.on("connect",()=>{
+                setIsconnected(true)
+            });
+
             
-            setChat(message)
-            console.log(message)
-            router.refresh()
-        });
+        return () => {
+                socket.disconnect();
+        };
+
+    }, [])
+
+
+
+ 
+        socket &&  socket.on(`message-server-${serverId}-channel-${channelId}`,(message:PopulatedChat[])=>{
+                    toast.dismiss()
+                    
+                    setChat(message)
+                    console.log(message)
+                    router.refresh()
+                });
+
+
+
+ 
+ 
     const ChannelSchema = z.object({
 
         message:z.string().min(1,{message:"Empty"})
