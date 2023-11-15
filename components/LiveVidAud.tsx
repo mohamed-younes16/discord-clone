@@ -4,24 +4,20 @@ import '@livekit/components-styles';
 import {
   LiveKitRoom,
   VideoConference,
-  GridLayout,
-  ParticipantTile,
   RoomAudioRenderer,
-  ControlBar,
-  useTracks,
 
 } from '@livekit/components-react';
 import { useEffect, useState } from 'react';
-import { Track } from 'livekit-client';
+
 import { Loader2 } from 'lucide-react';
 import { UserDocument } from '@/models/UsersModel';
-import { useTheme } from 'next-themes';
-import Image from 'next/image';
+
+
 
 export default function LiveVidAud({user , chatId , audio,video}:{user:UserDocument,chatId:string,audio:boolean,video:boolean}) {
 
   const [token, setToken] = useState("");
-const  { theme,} = useTheme()
+
   useEffect(() => {
     (async () => {
         const name =` ${user.username} ${user.name}`

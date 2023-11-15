@@ -261,7 +261,7 @@ export const addingMember = async (serverinvitation:string)=>{
     if (isAlreadyIn.length == 0) {
       
       const adding = await Servers.findOneAndUpdate({invitationLink:serverinvitation},{$push:{members:{member:userfromdb._id,userType:"member"}}})
-    console.log(adding)
+    
       return  {message:'added',
     serverId:Theserver?._id.toString() || "",
     servername:Theserver?.name ||""
@@ -313,13 +313,13 @@ export const changeUserType = async(memberId:string, type:"editor"|"member",serv
 
     ConnectToDB();
 
-    const currentus =   auth()
+  
 
 
 
 
     const isAdmin =  await isServerAdmin(serverId)
-      console.log(isAdmin)
+ 
     if (isAdmin) {
       const server :any = await Servers.findById(serverId);
       const memberIndex = server.members.findIndex(
@@ -330,7 +330,7 @@ export const changeUserType = async(memberId:string, type:"editor"|"member",serv
         server.members[memberIndex].userType = type;
         await server.save();
 
-        console.log(server);
+        
         return true;
       }
  
@@ -392,7 +392,7 @@ export const deleteUserFromMembers = async (memberId:string, serverId:string) =>
       _id: serverId,
       members :{member:memberId,userType:"admin"}
     });
-      console.log(isDeletedAdmin)
+     
     if (isAdmin && !isDeletedAdmin) {
 
       const server = await Servers.findOneAndUpdate(
@@ -404,7 +404,7 @@ export const deleteUserFromMembers = async (memberId:string, serverId:string) =>
      
 
     );
-     console.log(server)
+   
      return true
     }
 
@@ -433,7 +433,7 @@ export const UserLeaves = async (serverId:string) => {
     
     if (!isDeletedAdmin) {
 
-      const server = await Servers.findOneAndUpdate(
+      await Servers.findOneAndUpdate(
       { _id: serverId },
       { $pull: { members: { member: userfromdb._id },userType:{$ne:"admin"}} },
     )
@@ -472,7 +472,7 @@ export const addChannelToServer = async (serverId:string,name:string,type:"text"
   
   if(isadmin)  {
     const isnameUnique =  await Servers.findOne({_id:serverId,"channels.name":name})
-    console.log(isnameUnique)
+   
     if( !isnameUnique) {
     
 
@@ -484,7 +484,7 @@ export const addChannelToServer = async (serverId:string,name:string,type:"text"
         ,{new: true}
         )
      
-          console.log(Theserver,type)
+         
         return{ valid: true, message:"added channel" }
 
     }
@@ -602,7 +602,7 @@ export const DeleteMessageDB = async (channelId: any, serverId: any,
         { new: true }
       ).populate("channels.chat.creator", "username imageUrl");
 
-      console.log(servermessage)
+  
       return servermessage?.channels.filter((e: any) => e.name === channelId)[0].chat;
     }
     return;
@@ -671,13 +671,13 @@ export const getChat = async (serverId:string,channelId:string,limit:number)=> {
       const  chat =  await Servers.findOne({_id:serverId,"channels.name":channelId},{"channels.chat":{$slice:[2,limit]}},{})   .populate({
         path: 'channels.chat',
         options: {
-          sort: { createdAt: -1 }, // Sort by createdAt in descending order
-          limit: limit || 10, // Set the limit to the desired number of messages (default: 10)
+          sort: { createdAt: -1 }, 
+          limit: limit || 10, 
          
         },
       });
 
-    console.log(chat?.channels)
+
           
 
         return chat
@@ -703,7 +703,7 @@ export const updateChannel = async (serverId:string,channelId:string,values:any)
   
   if(isadmin)  {
     const isnameUnique =  await Servers.findOne({_id:serverId,"channels.name":values.name})
-    console.log(isnameUnique)
+
     if( !isnameUnique) {
     
 
@@ -758,7 +758,7 @@ export const deletechannelDB = async (serverId:string,channelId:string,)=>{
         ,{new: true}
         )
      
-       console.log(Theserver)
+
         return{ valid: true, message:"deleted channel" }
 
 

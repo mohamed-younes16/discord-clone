@@ -97,6 +97,7 @@ const TextChat = ({serverId,channelId,data,userId}:
             toast.dismiss()
             
             setChat(message)
+            console.log(message)
             router.refresh()
         });
     const ChannelSchema = z.object({
@@ -127,7 +128,7 @@ const TextChat = ({serverId,channelId,data,userId}:
         try {
             
             toast.loading("sending.....",{dismissible:false,duration:90000}) 
-                console.log()
+            
             const url  = qs.stringifyUrl({
                 url:`${origin}/api/socket/messages`,
                 query :{
@@ -140,9 +141,8 @@ const TextChat = ({serverId,channelId,data,userId}:
            
             await axios.post(url,values)
             toast.dismiss()
-           
             form.reset()
-            router.refresh()
+        
         }
 
         catch (error) {console.log(error)} 
