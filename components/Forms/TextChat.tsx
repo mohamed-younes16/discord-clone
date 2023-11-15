@@ -100,10 +100,10 @@ const TextChat = ({serverId,channelId,data,userId}:
  
         socket &&  socket.on(`message-server-${serverId}-channel-${channelId}`,(message:PopulatedChat[])=>{
                     toast.dismiss()
-                    
+                          console.log(message)
                     setChat(message)
                     console.log(message)
-                    router.refresh()
+              
                 });
 
 
