@@ -6,7 +6,7 @@ type Store = {
     setSideBarOpen: (v:boolean) => void;
   }
   
- export  const useStore = create(persist( (set) => ({
+ export  const useStore = create<Store>()(persist( (set) => ({
     SideBarOpen:true ,
     setSideBarOpen: (v:boolean) => set(() => ({ SideBarOpen:v })),
   }),{name:"data",
