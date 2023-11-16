@@ -21,14 +21,14 @@ export default function LiveVidAud({user , chatId , audio,video}:{user:UserDocum
   useEffect(() => {
     (async () => {
         const name =` ${user.username} ${user.name}`
-        console.log(name , chatId)
+
       try {
 
         const resp = await fetch(
           `/api/get-participant-token?room=${chatId}&username=${name}`
         );
         const data = await resp.json();
-        console.log(data)    
+
         setToken(data.token);
       } catch (e) {
         console.error(e);

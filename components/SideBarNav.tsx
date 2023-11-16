@@ -9,10 +9,13 @@ import { ScrollArea } from './ui/scroll-area';
 import ServerLinks from './ServersLinks';
 import ManageServers from './CreateServer';
 
+
+import {io} from "socket.io-client"
 import { ReactNode, useEffect, useState } from 'react';
 
 
 import { useStore } from '@/store';
+import { toast } from 'sonner';
 
 
 
@@ -23,7 +26,7 @@ const SideBarNav = ({allservers,children}:
   {allservers:any,children?:ReactNode}) => {
 
  
-
+    const [origin , setorigin] = useState<string>("")   
   const [visible , setvisible] = useState(true)
       const {SideBarOpen,setSideBarOpen} = useStore()
 
@@ -43,6 +46,23 @@ const SideBarNav = ({allservers,children}:
     
       
     };
+    useEffect(() => {
+
+      toast.dismiss()
+
+      setorigin(window.location  && window.location.origin)
+      
+      const socket = new ( io as any) (process.env.NEXT_PUBLIC_SITE_URL!,{
+
+          path:"/api/socket/io",addTrailingSlash:false})
+
+          socket.on('connect', (socket:any) => {
+      
+          });
+          
+     
+
+  }, [])
 
 
     useEffect(() => {

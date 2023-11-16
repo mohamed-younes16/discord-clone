@@ -29,7 +29,7 @@ const member:Member = JSON.parse(memberstring)
 const changeUser = async (member:any, type:"editor"|"member",serverId:string) =>{
 try {
     toast.loading("changing permissions.....")
-    console.log(member)
+
     const changing = await changeUserType(member._id.toString(), type, serverId)
         if(changing) {
                
@@ -50,7 +50,7 @@ const deletemember = async (member:any,serverId:string) =>{
   try {
       toast.loading("deleteing member .....")
       const deleting = await deleteUserFromMembers(member._id ,serverId)
-      console.log(deleting)
+
           if(deleting) {
                   
                   toast.success("deleted successfully")

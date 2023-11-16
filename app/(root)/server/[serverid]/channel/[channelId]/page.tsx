@@ -43,7 +43,7 @@ const channlesType = currentServer && [ ...new Set( currentServer?.channels.map(
 const isAdmin = await  isServerAdmin(serverid)
 
 const Userdata:UserObject = await getCurrentProfile()
-console.log(currentServer?.members)
+
 
 
 

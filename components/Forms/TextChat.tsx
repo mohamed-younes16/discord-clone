@@ -85,7 +85,11 @@ const TextChat = ({serverId,channelId,data,userId}:
             path:"/api/socket/io",addTrailingSlash:false})
 
             socket.on("connect",()=>{
+                console.log("conne")
                 setIsconnected(true)
+
+
+                
             });
 
             
@@ -100,10 +104,9 @@ const TextChat = ({serverId,channelId,data,userId}:
  
         socket &&  socket.on(`message-server-${serverId}-channel-${channelId}`,(message:PopulatedChat[])=>{
                     toast.dismiss()
-                          console.log(message)
+                   
                     setChat(message)
-                    console.log(message)
-              
+               
                 });
 
 
