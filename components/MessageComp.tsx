@@ -6,8 +6,7 @@ import { useForm } from "react-hook-form"
 
 
 
-import * as z from "zod"
-import axios from "axios"
+import { Button } from '@/components/ui/button'
 import {
     Form,
     FormControl,
@@ -15,13 +14,13 @@ import {
     FormItem,
     FormMessage,
 } from "@/components/ui/form"
-
-import { Input  } from "@/components/ui/input"
-import { Button } from '@/components/ui/button'
-import qs from "query-string";
+import { Input } from "@/components/ui/input"
+import axios from "axios"
+import qs from "query-string"
 import { toast } from 'sonner'
+import * as z from "zod"
 
-import { FileText,  } from "lucide-react"
+import { FileText, } from "lucide-react"
 
 import Image from "next/image"
 
@@ -30,15 +29,15 @@ import { formatDate } from "@/lib/utils"
 import { PopulatedChat } from "@/index"
 import Link from "next/link"
 import { useState } from "react"
+import EmojiPicker from "./Forms/EmojiPicker"
 import MessageOpts from "./Forms/MessageOpts"
 import { Separator } from "./ui/separator"
-import EmojiPicker from "./Forms/EmojiPicker"
 
 
 
 
-const MessageComp = ({data,serverId,channelId,userId}:
-    {data:PopulatedChat,serverId:string,channelId:string,userId:string}) => {
+const MessageComp = ({data,serverId,channelId,userId,origin}:
+    {data:PopulatedChat,serverId:string,channelId:string,userId:string,origin:string}) => {
     const [isEditing, setIsEditing] = useState<boolean>(false)
    
     const messageSchema = z.object({
@@ -65,7 +64,7 @@ const MessageComp = ({data,serverId,channelId,userId}:
             toast.loading("editing.....",{dismissible:false,duration:90000}) 
     
             const url  = qs.stringifyUrl({
-                url: "http://localhost:3000/api/socket/messages",
+                url:`${origin}/api/socket/messages`,
                 query :{
                     serverId,
                     channelId,
@@ -192,7 +191,7 @@ const MessageComp = ({data,serverId,channelId,userId}:
                 </div>
             
             </div>
-   {userId.toString() === data.creator._id.toString() &&   <MessageOpts setEdit={setIsEditing}  serverId={serverId} channelId={channelId} messageId={data._id.toString()}  />                                         }   
+   {userId.toString() === data.creator._id.toString() && <MessageOpts origin={origin}  setEdit={setIsEditing}  serverId={serverId} channelId={channelId} messageId={data._id.toString()}  />                                         }   
 
     </div>
     

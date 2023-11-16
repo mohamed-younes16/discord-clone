@@ -587,13 +587,15 @@ export const EditMessageDB = async (
 
 export const DeleteMessageDB = async (channelId: any, serverId: any,
    messageId: string,req:NextApiRequest ) => {
+
   try {
     ConnectToDB();
-
+    console.log(channelId ,messageId)
     const { userId } =getAuth(req)
     const userfromdb: UserDocument = await getuserfromDB(userId || "");
-
+    
     if (userfromdb?.onboarded) {
+
       const servermessage: any = await Servers.findOneAndUpdate(
         { _id: serverId.toString(), "channels.name": channelId },
         {
@@ -602,7 +604,6 @@ export const DeleteMessageDB = async (channelId: any, serverId: any,
         { new: true }
       ).populate("channels.chat.creator", "username imageUrl");
 
-  
       return servermessage?.channels.filter((e: any) => e.name === channelId)[0].chat;
     }
     return;

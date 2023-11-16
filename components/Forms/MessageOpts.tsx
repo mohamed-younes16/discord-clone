@@ -28,8 +28,8 @@ import { toast } from "sonner";
 
 
 
-const MessageOpts = ({messageId ,channelId ,serverId,setEdit}:
-    {messageId:string ,channelId:string ,serverId:string,setEdit: Dispatch<SetStateAction<boolean>>}) => {
+const MessageOpts = ({messageId ,channelId ,serverId,setEdit,origin}:
+    {messageId:string ,channelId:string, origin:string,serverId:string,setEdit: Dispatch<SetStateAction<boolean>>}) => {
      
   return (
     <Popover  >
@@ -57,11 +57,11 @@ const MessageOpts = ({messageId ,channelId ,serverId,setEdit}:
                                  onClick={async ()=>{
                                   toast.loading("deleteing...",{duration:90000})
                                   const url  = qs.stringifyUrl({
-                                    url: "http://localhost:3000/api/socket/messages",
+                                    url: `${origin}/api/socket/messages`,
                                     query :{
                                         serverId,
                                         channelId,
-                                        
+                                        messageId,
                                         actionType:"delete",
                                     }
                                 })

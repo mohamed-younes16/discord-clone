@@ -39,7 +39,7 @@ import TooltipComp from "../ui/TooltipComp"
 import { PopulatedChat } from "@/index"
 
 import MessageComp from "../MessageComp"
-import { getChat } from "@/lib/db-actions"
+
 import { useRouter } from "next/navigation"
 
 
@@ -166,7 +166,7 @@ const TextChat = ({serverId,channelId,data,userId}:
     <Toaster/>
      <ScrollArea className="chat flex px-4 flex-col max-h-[85%] h-[85%]  gap-10 ">
     {chat && chat.map((e,i)=>
-   <MessageComp channelId={channelId} userId={userId} serverId={serverId} data={e} key={i}  />
+   <MessageComp origin={origin} channelId={channelId} userId={userId} serverId={serverId} data={e} key={i}  />
    
 
   )}

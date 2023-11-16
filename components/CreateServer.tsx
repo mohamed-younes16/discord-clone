@@ -1,19 +1,18 @@
 "use client"
 
 import {
-    Dialog,
-    DialogContent,
+  Dialog,
+  DialogContent,
 
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-  } from "@/components/ui/dialog"
-
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { PlusIcon } from 'lucide-react'
-import ServerForm from './Forms/ServerForm'
-import { Toaster } from 'sonner'
 import { useTheme } from 'next-themes'
 import { ReactNode } from "react"
+import { Toaster } from 'sonner'
+import ServerForm from './Forms/ServerForm'
 
 
 const ManageServers = ({icon,text,data,submitText,actionType,serverId}:
