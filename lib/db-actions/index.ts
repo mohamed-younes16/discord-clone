@@ -115,8 +115,9 @@ export const findServer= async (id:string,chatOptions: { limit: number })=>{
 
 
 
-    const Server: ServerDocument | null = await Servers.findById(id)?.populate("channels.chat.creator", 
-    "username imageUrl")
+    const Server: ServerDocument | null = await Servers.findById(id)?.
+    populate("channels.chat.creator", 
+    "username imageUrl",).populate("members.member","imageUrl username name _id")
 
 
     

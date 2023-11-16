@@ -81,12 +81,17 @@ ${SideBarOpen ? "translate-x-0" : "-translate-x-full"}
         
         <button className={`absolute  z-[888] cursor-pointer
             bottom-[120px] bg-[url(/assets/right-arrow.svg)] flex
-             h-[60px] border-black border-[6px] w-[60px] animate-pulse  shadow-lg  !rounded-full right-0 
+             h-[60px] border-black border-[6px] w-[60px]  duration-500  !rounded-full right-0 
             active:scale-95 
+
             ${visible || SideBarOpen 
-              ? "translate-x-full scale-100 "
-              :"scale-75"}
-               bg-black bg-cover
+              ? "translate-x-full ":""}
+
+              ${ SideBarOpen 
+                ? "rotate-180"
+                :""}
+
+          bg-black bg-cover
             p-1 delay-100  transition-all`}
             onClick={()=> setSideBarOpen(!SideBarOpen)}>
               

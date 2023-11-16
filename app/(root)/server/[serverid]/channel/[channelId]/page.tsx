@@ -43,7 +43,7 @@ const channlesType = currentServer && [ ...new Set( currentServer?.channels.map(
 const isAdmin = await  isServerAdmin(serverid)
 
 const Userdata:UserObject = await getCurrentProfile()
-
+console.log(currentServer?.members)
 
 
 
@@ -143,12 +143,12 @@ if (!Userdata?.onboarded ) redirect("/profile")
 
                         </Popover>
 
-                         <ScrollArea className="flex flex-col">
+                         <ScrollArea className="flex px-3 flex-col">
 
                         {channlesType?.map((e:string)=>(<>
 
-                        <div className="flex items-center px-3 w-full justify-between">
-                            <p className=' w-full'>
+                        <div className="flex items-center  w-full justify-between">
+                            <p className='  text-lg font-semibold  w-full'>
                             {e} Channels
                             </p>
                             {isAdmin && <ChannelForm actionType='create'  icon={<PlusIcon/>} serverId={serverid || ""} /> }
@@ -201,6 +201,44 @@ if (!Userdata?.onboarded ) redirect("/profile")
 
 
                         ) )}
+
+
+                        <Separator className=' my-6' />
+
+                                <h2 className=' text-lg font-semibold '>
+                                    Members
+                                </h2>
+
+                                {currentServer?.members.map((m)=>(<>
+                                    <Separator className=' my-4'/>
+
+                                <div key={m.member._id} className=' w-full flex items-center gap-4 '>
+                                        <div className="w-12 h-12 relative rounded-full overflow-hidden object-cover">
+                                             <Image  fill src={m.member.imageUrl ||""} alt='' />
+
+
+                                        </div>
+        <div className=" flex justify-between  items-center" >
+                            <div>
+                                  <p className=" text-start text-xl dark:text-white 
+                            font-semibold ">  
+                              {m.member.username}</p>
+                              <p className=" text-start text-xl dark:text-gray-500
+                            font-semibold ">  
+                              {m.member.name}</p>
+                            </div>
+
+                           
+                        </div>
+                                       
+                                    </div>
+                                    
+                                    
+                                    </>
+                                    
+                                ))}
+
+
                 
                         </ScrollArea> 
 

@@ -108,7 +108,7 @@ const MessageComp = ({data,serverId,channelId,userId,origin}:
                                                     File Link
                                                         <FileText className="w-6 h-6"/>
                                                     </Link>
-                                                    ) :(<div className=" rounded-2xl relative overflow-hidden h-48 w-60">
+                                                    ) :(<div className=" rounded-2xl object-cover  relative overflow-hidden h-48 w-80">
                                                     <Image src={data.content.file.url} fill alt="image of a message"/>
                                                     </div>))
 
