@@ -4,7 +4,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useForm } from "react-hook-form";
-
+import Lenis from '@studio-freight/lenis'
 import * as z from "zod";
 import axios from "axios";
 import {
@@ -26,7 +26,6 @@ import { io } from "socket.io-client";
 import { useEffect, useRef, useState } from "react";
 import { Send } from "lucide-react";
 
-import { ScrollArea } from "../ui/scroll-area";
 import EmojiPicker from "./EmojiPicker";
 
 import UploadFileChat from "./UploadFileChat";
@@ -51,9 +50,31 @@ const TextChat = ({
   const [origin, setorigin] = useState<string>("");
   const bottomRef = useRef<HTMLDivElement>(null);
   const [socket, setSocket] = useState<any>(null);
+  const wrapper:any = useRef();
+  const content:any = useRef();
   toast.dismiss();
+  useEffect(() => {
+    
+    const lenis = new Lenis({
+      wrapper:wrapper.current,
+      duration:1.2,
+      
+      content:content.current,
+    
+    
+    })
+    
+    function raf(time:any) {
+      lenis.raf(time)
+      requestAnimationFrame(raf)
+    }
+    
+    requestAnimationFrame(raf)
+  }, [])
 
   useEffect(() => {
+
+
     toast.dismiss();
     if (bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: "smooth" });
@@ -139,10 +160,12 @@ const TextChat = ({
   }
 
   return (
-    <div className="flex-col flex  h-screen  w-full">
-      <Toaster />
-      <ScrollArea className="chat flex px-4 flex-col max-h-[85%] h-[85%]  gap-10 ">
-        {chat &&
+    <div className="flex-col flex  h-screen  w-full" > 
+     <Toaster richColors />
+     
+ <div    id="text-wrapper" ref={wrapper}  className="chat overflow-hidden   flex px-4 flex-col max-h-[85%] h-[85%]  gap-10 ">
+<div ref={content} id="text-content" >
+  {chat &&
           chat.map((e, i) => (
             <MessageComp
               origin={origin}
@@ -154,7 +177,12 @@ const TextChat = ({
             />
           ))}
         <div ref={bottomRef} />
-      </ScrollArea>
+</div>
+        
+      </div>
+     
+    
+     
       <div className="p-4 max-h-[15%] h-[15%] ">
         <Form {...form}>
           <form className="space-y-8">

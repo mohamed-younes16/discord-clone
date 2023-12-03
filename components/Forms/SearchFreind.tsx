@@ -10,7 +10,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import { Input } from "@/components/ui/input";
 
 import { useForm } from "react-hook-form";
@@ -25,12 +29,13 @@ import { getAUser } from "@/lib/db-actions";
 import { UserDocument } from "@/models/UsersModel";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
+import { Button } from "../ui/button";
 
 const SearchFreind = () => {
   const [freinds, setFreinds] = useState<UserDocument[]>([]);
   const [loading, setIsLoading] = useState<boolean>(false);
-  
-    const ChannelSchema = z.object({
+
+  const ChannelSchema = z.object({
     name: z
       .string()
       .min(4, { message: "must be at least 4 characters long" })
@@ -46,9 +51,9 @@ const SearchFreind = () => {
       name: "",
       type: "Online",
     },
-  })
-  
-  const {watch,} = form
+  });
+
+  const { watch } = form;
   const SideBarOpen = useStore().SideBarOpen;
 
   const freindsList: ["Online", "All", "Pending", "Blocked"] = [
@@ -57,9 +62,6 @@ const SearchFreind = () => {
     "Pending",
     "Blocked",
   ];
-
-
-
 
   async function onSubmit(values: z.infer<typeof ChannelSchema>) {
     try {
@@ -72,40 +74,37 @@ const SearchFreind = () => {
   }
 
   useEffect(() => {
-  
-  const sub  =   watch(async(v)=>{
-  setIsLoading(true)
+    const sub = watch(async (v) => {
+      setIsLoading(true);
 
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 5000)
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 5000);
+      if (watch().name.length == 0) setFreinds([]);
+      if (watch().name.length > 0) {
+        const users = await getAUser(watch().name, watch().type);
 
-  if( watch().name.length > 0 )  {
-      const users = await getAUser(watch().name, watch().type);
-       
         setFreinds(users?.users || []);
         setIsLoading(false);
+      }
+    });
 
-  }
-      
-
-   })
-  
-    return () => sub.unsubscribe()
-
+    return () => sub.unsubscribe();
   }, [watch]);
-
 
   return (
     <div
       className={` ${SideBarOpen && "pl-[90px] "} transition-all duration-700 `}
     >
-      { !(freinds.length > 0 ) &&   <div
-            className=" w-1/3 absolute -translate-x-1/2 top-1/2 left-1/2 -translate-y-1/2 max-md:h-2/3 max-md:w-2/3 h-1/3
+      {!(freinds.length > 0) && (
+        <div
+          className=" w-1/3 absolute -translate-x-1/2 top-1/2 left-1/2 -translate-y-1/2 max-md:h-2/3 max-md:w-2/3 h-1/3
            bg-contain bg-center bg-no-repeat bg-[url(/assets/p2.svg)] "
-          />}
-     
-      <div className={`w-full bg-[#252525]  shadow-xl  `}>
+        />
+      )}
+
+      <div className={`w-full bg-[#252525]  transition-all duration-700 shadow-xl max-w-[calc(100dvw_-_${SideBarOpen ? "90px":"0px"})] 
+      ${SideBarOpen && "overflow-x-scroll"}  overflow-y-hidden `}>
         <div className="flex p-3  items-center ">
           <div className="flexcenter w-fit mr-7 gap-2">
             <svg
@@ -131,7 +130,10 @@ const SearchFreind = () => {
           </div>
           <div className="flexcenter   h-12 ">
             {freindsList.map((e) => (
-              <>
+              <>    <Separator
+                  orientation="vertical"
+                  className="mx-3  bg-zinc-700 "
+                />
                 <button
                   className={`p-1 text-lg rounded-md
                       hover:bg-zinc-400 transition-all
@@ -145,10 +147,7 @@ const SearchFreind = () => {
                 >
                   {e}
                 </button>
-                <Separator
-                  orientation="vertical"
-                  className="mx-3  bg-zinc-700 "
-                />
+            
               </>
             ))}
           </div>
@@ -160,80 +159,84 @@ const SearchFreind = () => {
           <FormField
             control={form.control}
             name="name"
-            render={({ field }) =>{
-             
+            render={({ field }) => {
               return (
+                <FormItem className=" flex flex-col items-start   ">
+                  <FormLabel>Freind Name</FormLabel>
 
-              <FormItem className=" flex flex-col items-start   ">
-                <FormLabel>Freind Name</FormLabel>
-
-                <FormControl className="">
-                  <Input
-                    className="account-form_input "
-                    type="text"
-              
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}}
+                  <FormControl className="">
+                    <Input
+                      className="account-form_input "
+                      type="text"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
           />
-
-          {/* <Button
-            type="submit"
-            disabled={form.formState.isSubmitting}
-            className={`${
-              form.formState.isSubmitting ? " animate-bounce bg-gray-500" : ""
-            } flexcenter gap-6`}
-          >
-            Search
-            {form.formState.isSubmitting && (
-              <div
-                className="w-8 h-8 border-4 border-white
-   dark:border-black !border-t-transparent rounded-full animate-spin"
-              />
-            )}
-          </Button> */}
         </form>
       </Form>
 
       {loading ? (
-       watch().name.length > 0 && <Loader2 className=" animate-spin" />
+        watch().name.length > 0 && (
+          <div className="flexcenter px-6">
+            <Loader2 className=" animate-spin h-14 w-14 " />
+          </div>
+        )
       ) : (
-        <div className="flexcenter p-6 flex-col">
+
+        <>  
+        <Popover>
+  <PopoverTrigger>
+    
+         <div className="flexcenter p-6 flex-col">
           {freinds?.map((e) => (
-              <div key={e._id.toString()} 
-              className="flex w-full items-start gap-4  my-6">
+            <div
+              key={e._id.toString()}
+              className="flex w-full items-start gap-4  my-6"
+            >
+              {e?.imageUrl && (
+                <Image
+                  height={60}
+                  width={60}
+                  className="!h-16 !w-16 rounded-full bg-cover "
+                  alt="image of user"
+                  src={e?.imageUrl}
+                />
+              )}
 
-              {e?.imageUrl && 
-              <Image height={60} width={60}
-              className="!h-16 !w-16 rounded-full bg-cover "
-              alt="image of user" src={e?.imageUrl} />
-              }
-
-                  <div className=" flex justify-between w-full items-center" >
-                      <div>
-                            <p className=" text-start text-xl dark:text-white 
-                      font-semibold ">  
-                        {e.username}</p>
-                        <p className=" text-start text-xl dark:text-gray-500
-                      font-semibold ">  
-                        {e.name}</p>
-                      </div>
-
-                     
-                  </div>
-               
-                 
-
-              
+              <div className=" flex justify-between w-full items-center">
+                <div>
+                  <p
+                    className=" text-start text-xl dark:text-white 
+                      font-semibold "
+                  >
+                    {e.username}
+                  </p>
+                  <p
+                    className=" text-start text-xl dark:text-gray-500
+                      font-semibold "
+                  >
+                    {e.name}
+                  </p>
+                </div>
               </div>
+            </div>
           ))}
         </div>
-      )}
-        
 
+  </PopoverTrigger>
+  <PopoverContent align="end" sideOffset={60} >
+    <div className="flex"> <Button>
+      Add Freind </Button></div>
+  </PopoverContent>
+</Popover>
+
+        </>
+     
+      )}
     </div>
   );
 };
