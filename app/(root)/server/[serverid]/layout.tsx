@@ -1,8 +1,9 @@
+import { Loader2 } from 'lucide-react';
 import React from 'react'
 
 const layout = ({
     children,
-    params,
+
   }: {
     children: React.ReactNode;
     params: { serverId: string };
@@ -11,7 +12,9 @@ const layout = ({
     <div className=' min-h-screen dark:bg-[url(/assets/magicdark.png)] 
     bg-cover  bg-[url(/assets/cccircular.svg)] dark:bg-transparent bg-[#3e3e3efc]'>
 
-        {children}
+        {children || <div className="fixed inset-0 flexcenter">
+    <Loader2 className=" h-20 w-20 animate-spin "/>
+</div>}
     </div>
   )
 }

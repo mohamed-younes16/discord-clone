@@ -15,7 +15,7 @@ const loading = () => {
      <div className=' flex gap-1'> {[...Array(4).keys()].map((e,i)=>
      <div key={i} style={{animationDelay:`${i*.20}s`}} 
      className='  h-8 mx-3 rounded-full     dark:bg-white 
-      bg-black  w-8 animate-pulse'></div>)}</div> 
+      bg-black  w-8 animate-scale '></div>)}</div> 
    </div>
   )
 }

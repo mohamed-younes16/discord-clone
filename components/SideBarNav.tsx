@@ -1,94 +1,109 @@
-"use client"
-import { ModeToggle } from './ui/themeButton';
+"use client";
+import { ModeToggle } from "./ui/themeButton";
 import { UserCircle2 } from "lucide-react";
 import Link from "next/link";
-import TooltipComp from './ui/TooltipComp';
-import { Separator } from './ui/separator';
+import TooltipComp from "./ui/TooltipComp";
 
-import { ScrollArea } from './ui/scroll-area';
-import ServerLinks from './ServersLinks';
-import ManageServers from './CreateServer';
+import { ScrollArea } from "./ui/scroll-area";
+import ServerLinks from "./ServersLinks";
+import ManageServers from "./CreateServer";
 
+import { io } from "socket.io-client";
+import { ReactNode, useEffect, useState } from "react";
 
-import {io} from "socket.io-client"
-import { ReactNode, useEffect, useState } from 'react';
-
-
-import { useStore } from '@/store';
-import { toast } from 'sonner';
+import { useStore } from "@/store";
+import { checkState } from "@/lib/db-actions";
 
 
+const SideBarNav = ({
+  allservers,
+  children,
+}: {
+  allservers: any;
+  children?: ReactNode;
+}) => {
+  const socket = new (io as any)(process.env.NEXT_PUBLIC_SITE_URL!, {
+    path: "/api/socket/io",
+    addTrailingSlash: false,
+  });
 
+  socket.on("connect", () => {
+    socket.emit("disconnect-manually");
+  });
 
-
-
-const SideBarNav = ({allservers,children}:
-  {allservers:any,children?:ReactNode}) => {
-
- 
-    const [origin , setorigin] = useState<string>("")   
-  const [visible , setvisible] = useState(true)
-      const {SideBarOpen,setSideBarOpen} = useStore()
+  const [visible, setvisible] = useState(true);
+  const { SideBarOpen, setSideBarOpen } = useStore();
 
   const isPcUser = () => {
     const userAgent = navigator.userAgent.toLowerCase();
-    
-    const pcKeywords = ['windows', 'macintosh', 'linux'];
-        for (const keyword of pcKeywords) {
-            if(userAgent.toLowerCase().includes("android") || userAgent.toLowerCase().includes("iphone")) {
-                return false;
-            }
-        else if (userAgent.toLowerCase().includes(keyword)) {
-            
-            return true;
-        }
-        }
-    
-      
+
+    const pcKeywords = ["windows", "macintosh", "linux"];
+    for (const keyword of pcKeywords) {
+      if (
+        userAgent.toLowerCase().includes("android") ||
+        userAgent.toLowerCase().includes("iphone")
+      ) {
+        return false;
+      } else if (userAgent.toLowerCase().includes(keyword)) {
+        return true;
+      }
+    }
+  };
+
+  useEffect(() => {
+    socket.on("connect", () => {
+      console.log("Connected to server");
+    });
+
+    socket.on("disconnect", () => {
+      console.log("Disconnected from server");
+    });
+
+    const handleWindowClose = async (e: BeforeUnloadEvent) => {
+      checkState(false);
     };
-    useEffect(() => {
 
-      toast.dismiss()
+    window.addEventListener("beforeunload", handleWindowClose);
 
-      setorigin(window.location  && window.location.origin)
-      
-      const socket = new ( io as any) (process.env.NEXT_PUBLIC_SITE_URL!,{
-
-          path:"/api/socket/io",addTrailingSlash:false})
-
-          socket.on('connect', (socket:any) => {
-      
-          });
-          
+    return () => {
      
 
-  }, [])
+      socket && socket.disconnect();
+      window.removeEventListener("beforeunload", handleWindowClose);
+    };
+  }, []);
 
 
-    useEffect(() => {
-    function trackMousePosition(event: { clientX: number; }) {
-        if (isPcUser() ) {
-                ((event.clientX / window.innerWidth ) * 100) < 10   ? setvisible(true) :setvisible(false);
-        }
-        else if (window.innerWidth <= 800){
-            setvisible(true)
-        }
-    
+
+  useEffect(() => {
+    function trackMousePosition(event: { clientX: number }) {
+      if (isPcUser()) {
+        (event.clientX / window.innerWidth) * 100 < 10
+          ? setvisible(true)
+          : setvisible(false);
+      } else if (window.innerWidth <= 800) {
+        setvisible(true);
+      }
     }
 
-    document.addEventListener('pointermove', trackMousePosition)
-    
-    return () => document.removeEventListener('pointermove', trackMousePosition);
-        
+    document.addEventListener("pointermove", trackMousePosition);
 
-    }, [])
-    
+    return () =>
+      document.removeEventListener("pointermove", trackMousePosition);
+  }, []);
 
+
+
+  
   return (
-<div className={`transition-all relative z-50  duration-700  ${SideBarOpen ? "lg:pl-[330px] ":""}`}>
-  
-  
-  <div suppressHydrationWarning className={`fixed duration-700 top-0 transition-all 
+    <div
+      className={`transition-all relative z-50  duration-700  ${
+        SideBarOpen ? "lg:pl-[330px] " : ""
+      }`}
+    >
+      <div
+        suppressHydrationWarning
+        className={`fixed duration-700 top-0 transition-all 
     max-w-fit z-50   flexcenter left-0 h-screen  
     w-fit 
     bg-gray-400 dark:bg-[#0f0f0f] shadow-xl shadow-black    
@@ -96,89 +111,61 @@ const SideBarNav = ({allservers,children}:
 max-h-[calc(100dvh-100px)]  min-h-full justify-between 
 ${SideBarOpen ? "translate-x-0" : "-translate-x-full"}
 
-`}>
-  
-        
-        <button className={`absolute  z-[888] cursor-pointer
+`}
+      >
+        <button
+          className={`absolute  z-[888] cursor-pointer
             bottom-[120px] bg-[url(/assets/right-arrow.svg)] flex
              h-[60px] border-black border-[6px] w-[60px]  duration-500  !rounded-full right-0 
             active:scale-95 
 
-            ${visible || SideBarOpen 
-              ? "translate-x-full ":""}
+            ${visible || SideBarOpen ? "translate-x-full " : ""}
 
-              ${ SideBarOpen 
-                ? "rotate-180"
-                :""}
+              ${SideBarOpen ? "rotate-180" : ""}
 
           bg-black bg-cover
             p-1 delay-100  transition-all`}
-            onClick={()=> setSideBarOpen(!SideBarOpen)}>
-              
-            </button>
+          onClick={() => setSideBarOpen(!SideBarOpen)}
+        ></button>
 
-            {/* <button onClick={()=>setopen(false)} className="ml-2 rounded-full text-white p-2  top-4 right-4
-            absolute hover:shadow-[red]   shadow-md transition-all ">
-                <Image alt="close" src="/assets/close.svg" height={40} width={40}/>
-            </button> */}
-            <div className="flex h-full">
-               <div className="flex h-full">
-                    <div className="flex h-full p-2 flex-col  w-[90px]   justify-between">
+        <div className="flex h-full">
+          <div className="flex h-full">
+            <div className="flex h-full p-2 flex-col  w-[90px]   justify-between">
+              <div className="flexcenter flex-col">
+                <ScrollArea>
+                  <ServerLinks data={allservers} />
+                </ScrollArea>
 
-                  <div className='flexcenter flex-col'>
-                    <TooltipComp hoverText='Create Server'>
-                      <ManageServers actionType='create' submitText='create' />
-                    </TooltipComp>
-                    <Separator  className='my-4'/>
-                    <ScrollArea>
-                      <ServerLinks data={allservers}/>
-                    </ScrollArea>
+                <TooltipComp hoverText="Create Server">
+                  <ManageServers actionType="create" submitText="create" />
+                </TooltipComp>
+              </div>
 
-                  </div>
-                
+              <div className="flexcenter flex-col  gap-6">
+                <TooltipComp hoverText="change theme">
+                  <ModeToggle />
+                </TooltipComp>
 
-                    <div className='flexcenter flex-col  gap-6'>  
-                    <TooltipComp hoverText='change theme'>
-                      <ModeToggle/>
-                    </TooltipComp>
-                      
-                      <TooltipComp hoverText='Profile Page'>
-                          <Link href={"/profile"} aria-label="redirect to profile page " >
-                                  <UserCircle2 className='h-10 w-10 '/>
-                              </Link>
-                
-                      </TooltipComp>
-
-                  </div>
-
-              </div>  
-
-            
-              
+                <TooltipComp hoverText="Profile Page">
+                  <Link
+                    href={"/profile"}
+                    aria-label="redirect to profile page "
+                  >
+                    <UserCircle2 className="h-10 w-10 " />
+                  </Link>
+                </TooltipComp>
+              </div>
             </div>
+          </div>
 
-     {children}
-
-            </div>
-           
+          {children}
+        </div>
+      </div>
     </div>
-</div>
-    
-  )
-}
+  );
+};
 
-export default SideBarNav
-
-
-
-
-
-
-
-
-
-
-
+export default SideBarNav;
 
 // "use client"
 // import { Swiper, SwiperSlide } from 'swiper/react';
@@ -186,7 +173,6 @@ export default SideBarNav
 // import { ModeToggle } from "./ToggleThemeButton"
 
 // import { Navigation, Pagination, EffectCoverflow,Scrollbar} from 'swiper/modules';
-
 
 // import 'swiper/css';
 // import 'swiper/css/effect-coverflow';
@@ -196,13 +182,11 @@ export default SideBarNav
 // import Image from 'next/image';
 // import { BeanIcon, ChevronLeftCircle, ChevronRightCircle } from 'lucide-react';
 
-
-
 // const SideBarNav = () => {
 //   return (
 //     <div className=' fixed top-0  left-0 h-screen w-[900px] bg-slate-600'>
 //         <ModeToggle/>
-//         <Swiper 
+//         <Swiper
 //           effect={'coverflow'}
 //           grabCursor={true}
 //           centeredSlides={true}
@@ -223,7 +207,7 @@ export default SideBarNav
 //       prevEl: '.swiper-button-prev',
 //       clickable: true,
 //     }}
-       
+
 //           modules={[EffectCoverflow, Pagination, Navigation,Scrollbar]}
 //           className="swiper_container"
 
@@ -257,18 +241,18 @@ export default SideBarNav
 //         </SwiperSlide>
 //         <div className="slider-controler">
 //           <div className="swiper-button-prev !block !text-white !text-3xl before:hidden slider-arrow">
-            
-//               <ChevronLeftCircle  size={120} className='!w-5 bg-black 
+
+//               <ChevronLeftCircle  size={120} className='!w-5 bg-black
 //                rounded-full p-1 !h-5'/>
 //           </div>
 //           <div className="swiper-button-next !block !text-white !text-3xl  slider-arrow">
-//           <ChevronRightCircle  size={120} className='!w-5 bg-black 
+//           <ChevronRightCircle  size={120} className='!w-5 bg-black
 //            rounded-full p-1 !h-5'/>
 //           </div>
 //           <div className="swiper-pagination"></div>
 //         </div>
 //     </Swiper>
- 
+
 //     </div>
 //   )
 // }

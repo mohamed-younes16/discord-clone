@@ -118,7 +118,7 @@ export const findServer= async (id:string,chatOptions: { limit: number })=>{
     const Server: ServerDocument | null = await Servers.findById(id)
     .sort({ 'channels.chat.createdAt': -1 }) // Sort the channels based on createdAt in descending order
     .populate('channels.chat.creator', 'username imageUrl')
-    .populate('members.member', 'imageUrl username name _id')
+    .populate('members.member', 'imageUrl username name active _id')
     .limit(chatOptions.limit);
     
     return Server;
@@ -454,6 +454,24 @@ export const UserLeaves = async (serverId:string) => {
 
 
 
+export const checkState = async (state:boolean)=>{
+  try {
+
+
+    ConnectToDB()
+
+
+ 
+  const userfromdb:UserDocument = await getCurrentProfile()
+    await Users.findByIdAndUpdate(userfromdb._id , {active:state})
+
+
+  } catch (error) {
+    console.log(error)
+    return{ valid: false, message:"error happend" }
+  }
+}
+
 
 
 
@@ -465,9 +483,8 @@ export const addChannelToServer = async (serverId:string,name:string,type:"text"
   const isadmin = await isAdmin(serverId)
 
 
-  const currentus =   auth()
-
-  const userfromdb:UserDocument = await getuserfromDB(currentus.userId ||"")
+ 
+  const userfromdb:UserDocument = await getCurrentProfile()
 
 
   
@@ -591,7 +608,7 @@ export const DeleteMessageDB = async (channelId: any, serverId: any,
 
   try {
     ConnectToDB();
-    console.log(channelId ,messageId)
+   
     const { userId } =getAuth(req)
     const userfromdb: UserDocument = await getuserfromDB(userId || "");
     
@@ -695,6 +712,28 @@ export const getChat = async (serverId:string,channelId:string,limit:number)=> {
     return{ valid: false, message:"error happend" }
   }
 }
+
+export const getAUser = async (name: string, type: "Online" | "All" | "Pending" | "Blocked") => {
+
+  try {
+    
+    ConnectToDB()
+
+      const similarUsers = await Users.find({ username: { $regex: new RegExp(name, 'i') } })
+
+     
+      return  similarUsers ?  
+      { valid: true, users: JSON.parse(JSON.stringify(similarUsers)) } :
+      { valid: false, message: "No user found" }
+
+  
+
+  } catch (error) {
+    console.log(error)
+    return { valid: false, message: "Error happened" }
+  }
+}
+
 export const updateChannel = async (serverId:string,channelId:string,values:any)=>{
   try {
     
@@ -709,7 +748,7 @@ export const updateChannel = async (serverId:string,channelId:string,values:any)
     if( !isnameUnique) {
     
 
-    const Theserver = await Servers.findOneAndUpdate(
+    await Servers.findOneAndUpdate(
       {   _id:  serverId.toString(),"channels._id":channelId},
         {
           $set: {
@@ -750,7 +789,7 @@ export const deletechannelDB = async (serverId:string,channelId:string,)=>{
   
     
 
-    const Theserver = await Servers.findOneAndUpdate(
+    await Servers.findOneAndUpdate(
       {   _id:  serverId.toString()},
         {
           $pull: {channels:{_id:channelId}}

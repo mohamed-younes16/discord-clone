@@ -1,6 +1,19 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
-// Define the user schema
+export interface UserDocument extends Document {
+  id: string;
+  name: string;
+  username: string;
+  imageUrl?: string;
+  bio?: string;
+  onboarded: boolean;
+  servers: Schema.Types.Mixed[];
+  createdAt: Date;
+  active:boolean;
+  
+}
+
+
 const userSchema = new Schema({
   id: { type: String, required: true },
   name: { type: String, required: true },
@@ -18,19 +31,10 @@ const userSchema = new Schema({
     type: Schema.Types.Date,
     default: new Date(),
   },
+  active:{type: Boolean, default:false}
 });
 
 // Define the user document interface
-export interface UserDocument extends Document {
-  id: string;
-  name: string;
-  username: string;
-  imageUrl?: string;
-  bio?: string;
-  onboarded: boolean;
-  servers: Schema.Types.Mixed[];
-  createdAt: Date;
-}
 
 // Create the Users model
 const Users= mongoose.models.Users || mongoose.model("Users", userSchema);

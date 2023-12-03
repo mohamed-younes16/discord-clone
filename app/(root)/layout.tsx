@@ -4,8 +4,8 @@ import '../globals.css'
 import { ClerkProvider,  } from '@clerk/nextjs'
 import '@radix-ui/themes/styles.css';
 import { ReactNode } from 'react';
-import SideBarNav from '@/components/SideBarNav';
-import { ConnectToDB, getCurrentProfile,  } from '@/lib/db-actions';
+
+import {  checkState, getCurrentProfile,  } from '@/lib/db-actions';
 import { UserObject } from '@/index';
 import { redirect } from 'next/navigation';
 
@@ -24,7 +24,7 @@ const Userdata:UserObject = await getCurrentProfile()
 
 
 if (!Userdata?.onboarded ) redirect("/profile")
-
+checkState(true)
 
   return ( 
 

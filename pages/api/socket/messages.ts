@@ -25,8 +25,11 @@ const Handler = async (
 
   (await EditMessageDB(channelId,serverId,messageId,message,req) )
   :"" 
+const socket = res.socket?.server?.io
 
- res.socket?.server?.io?.emit(`message-server-${serverId}-channel-${channelId}`,sending)
+
+
+socket.emit(`message-server-${serverId}-channel-${channelId}`,sending)
 
 res.status(200).json({message:"success________"})
 

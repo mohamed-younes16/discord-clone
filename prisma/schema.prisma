@@ -1,11 +1,71 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "mongodb"
-  url      = env("DATABASE_URL")
+  url      = "mongodb+srv://younes77:younes-db@main-cluster.dq6o2i8.mongodb.net/test?retryWrites=true&w=majority"
+}
+
+model Member {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  member   User   @relation(fields: [id], references: [id])
+  userType String
+  Server   Server @relation(fields: [serverId], references: [id])
+  serverId String @db.ObjectId
+}
+
+model Chat {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  creator   String
+  text      String
+  file      File     @relation(fields: [fileId], references: [id])
+  createdAt DateTime
+  likes     Int
+  fileId    String   @db.ObjectId
+  Channel   Channel  @relation(fields: [channelId], references: [id])
+  channelId String   @db.ObjectId
+}
+
+model File {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  url      String
+  fileType String
+
+  Chat Chat[]
+}
+
+model Server {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  name           String    @unique
+  imageUrl       String
+  invitationLink String
+  members        Member[]
+  channels       Channel[]
+  createdAt      DateTime
+
+  userId String @db.ObjectId
+}
+
+model Channel {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  type      String
+  chat      Chat[]
+  creator   String
+  createdAt DateTime
+  Server    Server   @relation(fields: [serverId], references: [id])
+  serverId  String   @db.ObjectId
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  username  String   @unique
+  imageUrl  String?
+  bio       String?
+  onboarded Boolean  @default(false)
+  createdAt DateTime @default(now())
+  active    Boolean  @default(false)
+  Member    Member[]
 }
