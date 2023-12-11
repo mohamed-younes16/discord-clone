@@ -7,7 +7,7 @@ export interface UserDocument extends Document {
   imageUrl?: string;
   bio?: string;
   onboarded: boolean;
-  servers: Schema.Types.Mixed[];
+  freinds: Schema.Types.ObjectId;
   createdAt: Date;
   active:boolean;
   
@@ -21,12 +21,11 @@ const userSchema = new Schema({
   imageUrl: String,
   bio: String,
   onboarded: { type: Boolean, default: false },
-  servers: [
-    {
-      type: Schema.Types.Mixed,
-      ref: "Servers",
-    },
-  ],
+  freinds: [{  
+  freindId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Users",
+}}],
   createdAt: {
     type: Schema.Types.Date,
     default: new Date(),

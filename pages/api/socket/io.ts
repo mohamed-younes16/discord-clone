@@ -3,8 +3,6 @@ import { NextApiRequest } from "next";
 import { Server as ServerIO } from "socket.io";
 
 import { NextApiResponseServerIo } from "@/index";
-import { getCurrentProfile } from "@/lib/db-actions";
-import { getAuth } from "@clerk/nextjs/server";
 
 export const config = {
   api: {
@@ -13,7 +11,6 @@ export const config = {
 };
 
 const ioHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
-
   if (!res.socket.server.io) {
     const path = "/api/socket/io";
     const httpServer: NetServer = res.socket.server as any;
@@ -21,11 +18,15 @@ const ioHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
       path: path,
       // @ts-ignore
       addTrailingSlash: false,
+      allowEIO3: true,
+    });
+    io.engine.on("connection_error", (err) => {
+      console.log(err,"##########################################");
     });
     res.socket.server.io = io;
   }
 
   res.end();
-}
+};
 
 export default ioHandler;

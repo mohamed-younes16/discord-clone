@@ -1,12 +1,23 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    experimental:{serverActions:true,swcMinify:true},
+    experimental:{serverActions:true},
     images:{
         formats:["image/avif","image/webp"],
         domains:["swiperjs.com","utfs.io","s3.amazonaws.com","*"],
     
-    },
-    swcMinify:true,
+    }, 
+    //  webpack: (
+    //     config,
+    //     { buildId, dev, isServer, defaultLoaders, nextRuntime, webpack }
+    //   ) => {
+    //     config.module.rules.push({
+    //       test: /\.mjs$/,
+    //       include: /node_modules/,
+    //       type: "javascript/auto",
+    //     });
+    //     return config;
+    //   },
+
 
 }
 

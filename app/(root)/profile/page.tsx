@@ -19,7 +19,7 @@ import TooltipComp from '@/components/ui/TooltipComp';
 
 const Page =async () => {
   
-  const CurrentUserData :UserObject = await getCurrentProfile()
+  const CurrentUserData :UserObject = await getCurrentProfile(false)
 
 
 return (<>

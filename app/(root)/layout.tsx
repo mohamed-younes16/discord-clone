@@ -20,7 +20,7 @@ export const metadata = {
 export default async function RootLayout({ children }:{children:ReactNode}) {
 
 
-const Userdata:UserObject = await getCurrentProfile()
+const Userdata:UserObject = await getCurrentProfile(false)
 
 
 if (!Userdata?.onboarded ) redirect("/profile")

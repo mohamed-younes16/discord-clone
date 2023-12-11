@@ -69,14 +69,14 @@ module.exports = {
           to: { height: 0 },
         },
         "scale": {
-          from: { scale: 1 , opacity: 1 },
+          from: {  opacity: 1 },
           to: { scale: 0 ,opacity: 0.5},
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "scale": "scale 1s ease-out",
+        "scale": "scale 2s ease-out",
       },
     },
   },

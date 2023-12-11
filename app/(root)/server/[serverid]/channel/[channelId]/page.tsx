@@ -6,7 +6,7 @@ getCurrentProfile,
 isServerAdmin,
 } from "@/lib/db-actions";
 
-import { MonitorX, ServerCrashIcon, UserPlus } from "lucide-react";
+import { Loader2, MonitorX, ServerCrashIcon, UserPlus } from "lucide-react";
 
 import { redirect } from "next/navigation";
 import { UserObject } from "@/index";
@@ -41,6 +41,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import ChannelForm from "@/components/Forms/CreateChannel";
 import ManageServers from "@/components/CreateServer";
 import ChannelHandler from "@/components/Forms/ChannelHandler";
+import { Suspense } from "react";
 const TextChat = dynamic(() => import("@/components/Forms/TextChat"), {
 ssr: false,
 });
@@ -61,15 +62,18 @@ const channlesType = currentServer && [
 ];
 const isAdmin = await isServerAdmin(serverid);
 
-const Userdata: UserObject = await getCurrentProfile();
+const Userdata: UserObject = await getCurrentProfile(false);
 
 
 
 if (!Userdata?.onboarded) redirect("/profile");
 
 return (
-    <div className="">
-    {belongToServer && currentChannel ? (
+ 
+        <Suspense fallback={<div className="fixed inset-0 flexcenter">
+            <Loader2 className="animate-spin h-16 w-16 "/> 
+            </div> }>
+ {belongToServer && currentChannel ? (
         <div className="  flex  w-full h-full">
         <SideBarNav allservers={JSON.parse(JSON.stringify(allservers))}>
             <div
@@ -322,7 +326,9 @@ return (
         </div>
         </>
     )}
-    </div>
+        </Suspense>
+   
+ 
 );
 };
 

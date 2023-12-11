@@ -82,12 +82,14 @@ const TextChat = ({
   }, [chat]);
 
   useEffect(() => {
+
     setSocket(
       new (io as any)(process.env.NEXT_PUBLIC_SITE_URL!, {
         path: "/api/socket/io",
         addTrailingSlash: false,
       })
     );
+
   }, []);
   useEffect(() => {
     toast.dismiss();
@@ -97,6 +99,7 @@ const TextChat = ({
     const socket = new (io as any)(process.env.NEXT_PUBLIC_SITE_URL!, {
       path: "/api/socket/io",
       addTrailingSlash: false,
+      allowEIO3: true
     });
 
     socket.on("connect", () => {
@@ -117,7 +120,7 @@ const TextChat = ({
         setChat(message);
       }
     );
-
+    
   const ChannelSchema = z.object({
     message: z
       .string()
