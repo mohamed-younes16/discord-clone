@@ -26,11 +26,16 @@ import { toast } from "sonner";
 
 import "@uploadthing/react/styles.css";
 
-import { addUpdateUser, getCurrentProfile } from "@/lib/db-actions";
+import {
+  addUpdateUser,
+  getCurrentProfile,
+  getCurrentProfilepage,
+} from "@/lib/db-actions";
 
 import { useRouter } from "next/navigation";
 import { UserObject } from "@/index";
 import axios from "axios";
+import { currentUser } from "@clerk/nextjs";
 
 const ProfileForm = ({ userData }: { userData: UserObject }) => {
   const router = useRouter();
@@ -49,14 +54,28 @@ const ProfileForm = ({ userData }: { userData: UserObject }) => {
     try {
       toast.loading("uploading.....", { dismissible: false });
 
-      const currentUser = await getCurrentProfile(false);
-      // console.log({ ...values, ...currentUser });
-      // const adding = await axios.post("http://localhost:5000/register", {
-      //   ...values,
-      //   ...currentUser,
-      // });
-      // console.log(adding.data);
+      const currentUser: { user: UserObject; email: string } =
+        await getCurrentProfilepage();
+      delete currentUser.user._id;
+      const data = {
+        ...values,
+        ...currentUser.user,
+        email: currentUser.email,
+      };
+      console.log(data);
+      const adding = axios.post(
+        `http://${window && window.location.hostname}:5000/register`,
+        data
+      );
+      adding
+        .then((e) => toast.success(e.data.message))
+        .catch((e) => {
+          console.log(e, "#################");
+          toast.error(e.response.data.message);
+        });
+
       // const uploadUser  = await addUpdateUser(values)
+
       // toast.dismiss()
       // uploadUser
       // ?  toast.success("uploaded",{duration:3000})

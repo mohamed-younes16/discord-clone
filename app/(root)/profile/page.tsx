@@ -3,8 +3,8 @@ import { Toaster } from 'sonner'
 
 import "@uploadthing/react/styles.css";
 
-import { getCurrentProfile,  } from '@/lib/db-actions';
-import { SignOutButton,  } from '@clerk/nextjs';
+import { getCurrentProfile, getCurrentUser,  } from '@/lib/db-actions';
+import { SignOutButton, currentUser,  } from '@clerk/nextjs';
 
 import { HomeIcon, LucideLogOut } from 'lucide-react';
 import Link from 'next/link';
@@ -12,14 +12,20 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { UserObject } from '@/index';
 import ProfileForm from '@/components/Forms/ProfileForm';
 import TooltipComp from '@/components/ui/TooltipComp';
+import axios from 'axios';
+
 
 
 
 
 
 const Page =async () => {
+  const clerkUser= await currentUser()
+  const CurrentUserData:UserObject =await getCurrentUser (clerkUser?.id ||"")
+
   
-  const CurrentUserData :UserObject = await getCurrentProfile(false)
+  
+
 
 
 return (<>
@@ -27,7 +33,7 @@ return (<>
     dark:text-white
     min-h-screen dark:bg-[url(/assets/magicdark.png)] 
     bg-cover bg-[url(/assets/magiclight.png)]">
- <div className=' w-[80dvw]  p-4 rounded-2xl  mt-6 border-gray-400 border backdrop-blur-xl '> 
+ <div className=' w-[80dvw]  p-4 rounded-2xl  mt-6 border-neutral-600 border backdrop-blur-md '> 
  <Toaster richColors closeButton position='top-center'/>
 
     <div className="flex items-center  gap-6">

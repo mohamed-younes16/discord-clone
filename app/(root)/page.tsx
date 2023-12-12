@@ -20,12 +20,11 @@ export default async function Home() {
 
 
 
-      <div className="">
+    
         <div className="w-full backdrop-blur-lg relative h-screen">
-         
          <SearchFreind />
         </div>
-      </div>     
+  
       </Suspense>
     </main>
   );

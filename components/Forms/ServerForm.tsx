@@ -81,7 +81,7 @@ const ServerForm = ({data,submitText,actionType,serverId}:{serverId?:string,data
    
 <Form {...form}  >
   
-    <form  onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+    <form  onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-4xl">
 
 
     

@@ -3,6 +3,7 @@ import { ServerSetup, UserSetup } from "@/index";
 import Servers, { ServerDocument } from "@/models/Servers";
 import Users, { UserDocument } from "@/models/UsersModel";
 import { auth, currentUser, getAuth } from "@clerk/nextjs/server";
+import axios from "axios";
 import mongoose from "mongoose";
 import { NextApiRequest } from "next";
 import { v4 } from "uuid";
@@ -14,7 +15,14 @@ export const ConnectToDB = async () => {
     console.log(error);
   }
 };
-
+export const getCurrentUser  =async(id:string)=> {
+  const userData = await  axios(`http://localhost:5000/login`,
+{method:'post',data:{
+ data:{id}
+}
+})
+return userData.data.user
+}
 export const getuserfromDB = async (id: string) => {
   try {
     ConnectToDB();
@@ -25,14 +33,31 @@ export const getuserfromDB = async (id: string) => {
     return "user not found";
   }
 };
+export const getCurrentProfilepage = async () => {
+  try {
 
+    ConnectToDB();
+   
+
+
+ const userd = await currentUser()
+
+    const user =  await Users.findOne({ id: userd?.id })
+    .select("username id name imageUrl onboarded active bio createdAt ");
+
+    return JSON.parse(JSON.stringify(({user,email:userd?.emailAddresses[0].emailAddress})))
+
+  } catch (error) {
+    console.log(error);
+    return "user not found";
+  }
+};
 export const getCurrentProfile = async (populated:boolean) => {
   try {
 
     ConnectToDB();
    
     const  userd  = auth();
- const g = await currentUser()
 
     const user = populated
       ? await Users.findOne({ id: userd.userId }).populate("freinds.freindId")
