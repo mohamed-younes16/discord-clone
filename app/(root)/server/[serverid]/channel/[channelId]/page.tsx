@@ -249,12 +249,12 @@ return (
                     key={m.member._id}
                     className="  w-full flex items-center gap-4 "
                     >
-                    <div className="w-12  h-12 relative rounded-full  object-cover">
+                    <div className="  !h-[50px] !w-[50px]  relative rounded-full    object-cover">
                         <Image
                         fill
                         src={m.member.imageUrl || ""}
                         alt=""
-                        className=" rounded-full"
+                        className="rounded-full  !min-h-[50px] !min-w-[50px]  "
                         />
                         {m.member.active && (
                         <div className=" absolute z-10 h-3 w-3 rounded-full bg-green-500 bottom-0 left-0" />

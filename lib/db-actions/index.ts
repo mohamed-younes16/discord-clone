@@ -159,7 +159,6 @@ export const findServer = async ({
   operationType: "findGeneral" | "findSpecific";
 }) => {
   try {
-    ConnectToDB();
 
     // const Server: ServerDocument | null = await Servers.findById(serverId)
     //   .sort({ "channels.chat.createdAt": -1 }) // Sort the channels based on createdAt in descending order
@@ -178,21 +177,16 @@ export const findServer = async ({
 };
 export const findServerbyQuery = async (serverinvitation: string) => {
   try {
-    ConnectToDB();
 
-    const currentus = auth();
 
-    const userfromdb = await getuserfromDB(currentus.userId || "");
+    const {userId} = auth();
 
-    const Theserver = await Servers.findOne({
-      invitationLink: serverinvitation,
-    }).select("_id name imageUrl");
 
-    if (userfromdb)
-      return {
-        servername: Theserver?.name || "",
-        imageUrl: Theserver?.imageUrl || "",
-      };
+    const serverdata = await axios.get(`${apiUrl}/servers/access`, {
+      data: { invitationLink: serverinvitation, operationType: "findInvitation",userId },
+    })
+
+return serverdata.data.serversBelongsTo
   } catch (error) {
     console.log(error);
   }
@@ -281,40 +275,16 @@ export const deleteServer = async (id: string) => {
 
 export const addingMember = async (serverinvitation: string) => {
   try {
-    ConnectToDB();
 
-    const currentus = auth();
 
-    const userfromdb = await getuserfromDB(currentus.userId || "");
+    const {userId} = auth();
 
-    const isAlreadyIn = await Servers.find({
-      invitationLink: serverinvitation,
-      "members.member": userfromdb._id,
-    });
-    const Theserver = await Servers.findOne({
-      invitationLink: serverinvitation,
-    }).select("_id name");
 
-    if (isAlreadyIn.length == 0) {
-      const adding = await Servers.findOneAndUpdate(
-        { invitationLink: serverinvitation },
-        { $push: { members: { member: userfromdb._id, userType: "member" } } }
-      );
+    const serverdata = await axios.patch(`${apiUrl}/servers/update`, {
+      invitationLink: serverinvitation, operationType: "addingMember",userId ,
+    })
 
-      return {
-        message: "added",
-        serverId: Theserver?._id.toString() || "",
-        servername: Theserver?.name || "",
-      };
-    }
-
-    if (isAlreadyIn.length > 0) {
-      return {
-        message: "exist",
-        serverId: Theserver?._id.toString() || "",
-        servername: Theserver?.name || "",
-      };
-    }
+return serverdata.data.serversBelongsTo
   } catch (error) {
     console.log(error);
   }

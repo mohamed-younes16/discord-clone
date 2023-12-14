@@ -6,25 +6,34 @@ import { Toaster, toast } from "sonner";
 import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { Separator } from "@radix-ui/react-dropdown-menu";
+import axios from "axios";
 
 const Page = ({
   params: { invitationid },
 }: {
   params: { invitationid: string };
 }) => {
+  
   const [servername, setServerName] = useState("");
   const [serverImage, setserverImage] = useState("");
   const [isjoning, setisjoning] = useState(false);
   const Router = useRouter();
+  const env = process.env.NODE_ENV;
+  const apiUrl =
+    env == "development"
+      ? "http://localhost:5000"
+      : "https://dicord-api.onrender.com";
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const getname = async () => {
-      const serverdata = await findServerbyQuery(invitationid);
-      setServerName(serverdata?.servername || "");
+      console.log("gggggggggggggggg")
+      const serverdata = await findServerbyQuery(invitationid)
+
+      setServerName(serverdata?.name || "");
       setserverImage(serverdata?.imageUrl || "");
     };
 
@@ -33,34 +42,35 @@ const Page = ({
 
   const addingmember = async () => {
     setisjoning(true);
-    toast.loading("joining...");
 
-    const adding = await addingMember(invitationid);
 
-    setServerName(adding?.servername || "");
 
-    if (adding?.message == "added") {
-      toast.dismiss();
-      toast.success(<p className="text-xl font-semibold"> Joined</p>, {
-        className: "text-3xl",
-      });
+     const adding = await addingMember(invitationid);
 
-      setTimeout(() => {
-        setisjoning(false);
-        Router.push(`/server/${adding?.serverId}`);
-        Router.refresh();
-      }, 500);
-    } else if (adding?.message == "exist") {
-      toast.dismiss();
+    // setServerName(adding?.servername || "");
 
-      toast.message(<p className="text-2xl font-semibold"> already in </p>);
+    // if (adding?.message == "added") {
+    //   toast.dismiss();
+    //   toast.success(<p className="text-xl font-semibold"> Joined</p>, {
+    //     className: "text-xl",
+    //   });
 
       setTimeout(() => {
         setisjoning(false);
         Router.push(`/server/${adding?.serverId}`);
         Router.refresh();
       }, 500);
-    }
+    // } else if (adding?.message == "exist") {
+    //   toast.dismiss();
+
+    //   toast.message(<p className="text-2xl font-semibold"> already in </p>);
+
+    //   setTimeout(() => {
+    //     setisjoning(false);
+    //     Router.push(`/server/${adding?.serverId}`);
+    //     Router.refresh();
+    //   }, 500);
+    // }
   };
 
   return (

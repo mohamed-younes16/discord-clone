@@ -81,18 +81,10 @@ const ProfileForm = ({ userData }: { userData?: UserObject }) => {
           toast.error(e.response.data.message);
         });
       router.refresh();
-
-      // const uploadUser  = await addUpdateUser(values)
-
-      // toast.dismiss()
-      // uploadUser
-      // ?  toast.success("uploaded",{duration:3000})
-      // :  toast.error("failed to upload",{duration:3000})
-
-      // setTimeout(() => {
-
-      //     router.push("/")
-      // }, 400);
+      toast.dismiss()
+      setTimeout(() => {
+          router.push("/")
+      }, 400);
     } catch (error) {
       console.log(error);
     }

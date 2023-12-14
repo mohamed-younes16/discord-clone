@@ -9,20 +9,27 @@ import ServerLinks from "./ServersLinks";
 import { ReactNode, useEffect, useState } from "react";
 import { useStore } from "@/store";
 import ManageServers from "./CreateServer";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 
 const SideBarNav = ({
   allservers,
   children,
-  userId
+  userId,
 }: {
   allservers: any;
   children?: ReactNode;
-  userId:string
+  userId: string;
 }) => {
-
   const [visible, setvisible] = useState(true);
+  const router  = useRouter()
   const { SideBarOpen, setSideBarOpen } = useStore();
+  const env = process.env.NODE_ENV;
+  const apiUrl =
+    env == "development"
+      ? "http://localhost:5000"
+      : "https://dicord-api.onrender.com";
 
   const isPcUser = () => {
     const userAgent = navigator.userAgent.toLowerCase();
@@ -40,30 +47,21 @@ const SideBarNav = ({
     }
   };
 
-  // useEffect(() => {
-  //   socket.on("connect", () => {
-  //     console.log("Connected to server");
-  //   });
+  useEffect(() => {
+    axios.get(`${apiUrl}/state?state=online&userId=${userId}`);
+    router.refresh()
+    const handleWindowClose = async () => {
+      axios.get(`${apiUrl}/state?state=offline&userId=${userId}`);
+    
+    };
 
-  //   socket.on("disconnect", () => {
-  //     console.log("Disconnected from server");
-  //   });
+    window.addEventListener("unload", handleWindowClose);
 
-  //   const handleWindowClose = async (e: BeforeUnloadEvent) => {
-  //     checkState(false);
-  //   };
+    return () => {
+      window.removeEventListener("unload", handleWindowClose);
 
-  //   window.addEventListener("beforeunload", handleWindowClose);
-
-  //   return () => {
-     
-
-  //     socket && socket.disconnect();
-  //     window.removeEventListener("beforeunload", handleWindowClose);
-  //   };
-  // }, []);
-
-
+    };
+  }, []);
 
   useEffect(() => {
     function trackMousePosition(event: { clientX: number }) {
@@ -82,9 +80,6 @@ const SideBarNav = ({
       document.removeEventListener("pointermove", trackMousePosition);
   }, []);
 
-
-
-  
   return (
     <div
       className={`transition-all relative z-50  duration-700  ${
@@ -127,7 +122,11 @@ ${SideBarOpen ? "translate-x-0" : "-translate-x-full"}
                 </ScrollArea>
 
                 <TooltipComp hoverText="Create Server">
-                  <ManageServers userId={userId} actionType="create" submitText="create" />
+                  <ManageServers
+                    userId={userId}
+                    actionType="create"
+                    submitText="create"
+                  />
                 </TooltipComp>
               </div>
 
