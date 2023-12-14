@@ -40,6 +40,9 @@ import Image from "next/image";
 import axios from "axios";
 
 const SearchFreind = () => {
+  const env = process.env.NODE_ENV
+const apiUrl = env =="development" ?"http://localhost:5000":"https://dicord-api.onrender.com"
+
   const [freinds, setFreinds] = useState<UserDocument[]>([]);
   const [loading, setIsLoading] = useState<boolean>(false);
 
@@ -83,7 +86,7 @@ const SearchFreind = () => {
   
       if (watch().name.length > 0) {
         timeoutId = setTimeout(async () => {
-          const user = await axios.post("http://localhost:5000/login", {
+          const user = await axios.post(`${apiUrl}/login`, {
             "username": "yehhs",
             "pass": "mohamed2007",
             data : {

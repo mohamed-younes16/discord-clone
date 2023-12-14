@@ -12,7 +12,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { UserObject } from '@/index';
 import ProfileForm from '@/components/Forms/ProfileForm';
 import TooltipComp from '@/components/ui/TooltipComp';
-import axios from 'axios';
+
 
 
 
@@ -21,12 +21,7 @@ import axios from 'axios';
 
 const Page =async () => {
   const clerkUser= await currentUser()
-  const CurrentUserData:UserObject =await getCurrentUser (clerkUser?.id ||"")
-
-  
-  
-
-
+  const CurrentUserData:UserObject|null =await getCurrentUser (clerkUser?.id ||"")
 
 return (<>
     <div className="fixed inset-0  flexcenter left-0 top-0  text-black  
@@ -50,7 +45,7 @@ return (<>
     </div>
             
   
-  {CurrentUserData?.onboarded &&    <TooltipProvider>
+  { clerkUser &&    <TooltipProvider>
 
     <Tooltip delayDuration={200}>
     <TooltipTrigger>
@@ -72,7 +67,7 @@ return (<>
 
 
 
-<ProfileForm userData={JSON.parse(JSON.stringify(CurrentUserData)) }/>
+<ProfileForm userData={JSON.parse(JSON.stringify(CurrentUserData)) ||null }/>
 
 </div></div>
 

@@ -4,7 +4,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useForm } from "react-hook-form";
-import Lenis from '@studio-freight/lenis'
+import Lenis from "@studio-freight/lenis";
 import * as z from "zod";
 import axios from "axios";
 import {
@@ -50,31 +50,26 @@ const TextChat = ({
   const [origin, setorigin] = useState<string>("");
   const bottomRef = useRef<HTMLDivElement>(null);
   const [socket, setSocket] = useState<any>(null);
-  const wrapper:any = useRef();
-  const content:any = useRef();
+  const wrapper: any = useRef();
+  const content: any = useRef();
   toast.dismiss();
   useEffect(() => {
-    
     const lenis = new Lenis({
-      wrapper:wrapper.current,
-      duration:1.2,
-      
-      content:content.current,
-    
-    
-    })
-    
-    function raf(time:any) {
-      lenis.raf(time)
-      requestAnimationFrame(raf)
+      wrapper: wrapper.current,
+      duration: 1.2,
+
+      content: content.current,
+    });
+
+    function raf(time: any) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
     }
-    
-    requestAnimationFrame(raf)
-  }, [])
+
+    requestAnimationFrame(raf);
+  }, []);
 
   useEffect(() => {
-
-
     toast.dismiss();
     if (bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: "smooth" });
@@ -82,14 +77,12 @@ const TextChat = ({
   }, [chat]);
 
   useEffect(() => {
-
     setSocket(
       new (io as any)(process.env.NEXT_PUBLIC_SITE_URL!, {
         path: "/api/socket/io",
         addTrailingSlash: false,
       })
     );
-
   }, []);
   useEffect(() => {
     toast.dismiss();
@@ -99,7 +92,7 @@ const TextChat = ({
     const socket = new (io as any)(process.env.NEXT_PUBLIC_SITE_URL!, {
       path: "/api/socket/io",
       addTrailingSlash: false,
-      allowEIO3: true
+      allowEIO3: true,
     });
 
     socket.on("connect", () => {
@@ -120,7 +113,7 @@ const TextChat = ({
         setChat(message);
       }
     );
-    
+
   const ChannelSchema = z.object({
     message: z
       .string()
@@ -163,29 +156,30 @@ const TextChat = ({
   }
 
   return (
-    <div className="flex-col flex  h-screen  w-full" > 
-     <Toaster richColors />
-     
- <div    id="text-wrapper" ref={wrapper}  className="chat overflow-hidden   flex px-4 flex-col max-h-[85%] h-[85%]  gap-10 ">
-<div ref={content} id="text-content" >
-  {chat &&
-          chat.map((e, i) => (
-            <MessageComp
-              origin={origin}
-              channelId={channelId}
-              userId={userId}
-              serverId={serverId}
-              data={e}
-              key={i}
-            />
-          ))}
-        <div ref={bottomRef} />
-</div>
-        
+    <div className="flex-col flex  h-screen  w-full">
+      <Toaster richColors />
+
+      <div
+        id="text-wrapper"
+        ref={wrapper}
+        className="chat overflow-hidden   flex px-4 flex-col max-h-[85%] h-[85%]  gap-10 "
+      >
+        <div ref={content} id="text-content">
+          {chat &&
+            chat.map((e, i) => (
+              <MessageComp
+                origin={origin}
+                channelId={channelId}
+                userId={userId}
+                serverId={serverId}
+                data={e}
+                key={i}
+              />
+            ))}
+          <div ref={bottomRef} />
+        </div>
       </div>
-     
-    
-     
+
       <div className="p-4 max-h-[15%] h-[15%] ">
         <Form {...form}>
           <form className="space-y-8">

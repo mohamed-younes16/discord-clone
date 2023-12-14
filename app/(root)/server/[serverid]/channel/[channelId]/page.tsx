@@ -1,9 +1,7 @@
 import {
 findServer,
-findServerBelongByID,
 findServersBelong,
 getCurrentProfile,
-isServerAdmin,
 } from "@/lib/db-actions";
 
 import { Loader2, MonitorX, ServerCrashIcon, UserPlus } from "lucide-react";
@@ -42,40 +40,56 @@ import ChannelForm from "@/components/Forms/CreateChannel";
 import ManageServers from "@/components/CreateServer";
 import ChannelHandler from "@/components/Forms/ChannelHandler";
 import { Suspense } from "react";
+import { ServerDocument } from "@/models/Servers";
 const TextChat = dynamic(() => import("@/components/Forms/TextChat"), {
 ssr: false,
 });
 
 const page = async ({
-params: { serverid, channelId },
+params: { serverId, channelId },
 }: {
-params: { serverid: string; channelId: string };
+params: { serverId: string; channelId: string };
 }) => {
-const currentServer = await findServer(serverid, { limit: 6 });
-const belongToServer = await findServerBelongByID(serverid);
-const allservers = await findServersBelong();
+const Userdata:UserObject = await getCurrentProfile(false);
+
+
+const currentServer:any = await findServer({
+    serverId,
+    chatLimit: 6,
+    userId: Userdata.id,
+    operationType: "findSpecific",
+});
+
+
+const allservers = await findServersBelong("findGeneral");
+
+console.log(currentServer,)
 const currentChannel = currentServer?.channels.find(
     (e) => e.name === channelId
-);
+)
+
 const channlesType = currentServer && [
     ...new Set(currentServer?.channels.map((e: any) => e.type)),
 ];
-const isAdmin = await isServerAdmin(serverid);
-
-const Userdata: UserObject = await getCurrentProfile(false);
-
+const isAdmin = currentServer?.members.some((e)=>e.memberId ===Userdata.id)
 
 
 if (!Userdata?.onboarded) redirect("/profile");
 
 return (
- 
-        <Suspense fallback={<div className="fixed inset-0 flexcenter">
-            <Loader2 className="animate-spin h-16 w-16 "/> 
-            </div> }>
- {belongToServer && currentChannel ? (
+    <Suspense
+    fallback={
+        <div className="fixed inset-0 flexcenter">
+        <Loader2 className="animate-spin h-16 w-16 " />
+        </div>
+    }
+    >
+    {currentChannel ? (
         <div className="  flex  w-full h-full">
-        <SideBarNav allservers={JSON.parse(JSON.stringify(allservers))}>
+        <SideBarNav
+            userId={Userdata.id}
+            allservers={JSON.parse(JSON.stringify(allservers))}
+        >
             <div
             className="w-60  bg-gray-400 
                 dark:bg-[#191919fc] h-screen"
@@ -113,9 +127,10 @@ return (
                     <>
                     <Separator className="my-2" />
 
-                    <ManageUsers serverid={serverid || ""} />
+                    <ManageUsers serverId={serverId || ""} />
 
                     <ManageServers
+                        userId={Userdata.id}
                         icon={
                         <p
                             className=" flex justify-between items-center 
@@ -132,15 +147,15 @@ return (
                         }}
                         submitText="Update"
                         actionType="update"
-                        serverId={serverid || ""}
+                        serverId={serverId || ""}
                     />
                     <div className="my-2" />
                     <DeleteLeaveServerButton
                         actionType="delete"
-                        serverid={serverid}
+                        serverId={serverId}
                     />
                     <div className="my-2" />
-                    <ChannelForm actionType="create" serverId={serverid} />
+                    <ChannelForm actionType="create" serverId={serverId} />
                     </>
                 ) : (
                     <>
@@ -148,7 +163,7 @@ return (
 
                     <DeleteLeaveServerButton
                         actionType="leave"
-                        serverid={serverid}
+                        serverId={serverId}
                     />
                     </>
                 )}
@@ -166,7 +181,7 @@ return (
                         <ChannelForm
                         actionType="create"
                         icon={<PlusIcon />}
-                        serverId={serverid || ""}
+                        serverId={serverId || ""}
                         />
                     )}
                     </div>
@@ -187,7 +202,7 @@ return (
                             `}
                         >
                             <Link
-                            href={`/server/${serverid}/channel/${el.name}`}
+                            href={`/server/${serverId}/channel/${el.name}`}
                             className=" w-full  py-2 "
                             >
                             <div
@@ -210,7 +225,7 @@ return (
                             {el.name !== "general" ? (
                             <ChannelHandler
                                 channel={JSON.stringify(el)}
-                                serverId={serverid || ""}
+                                serverId={serverId || ""}
                             />
                             ) : (
                             <Lock />
@@ -235,7 +250,12 @@ return (
                     className="  w-full flex items-center gap-4 "
                     >
                     <div className="w-12  h-12 relative rounded-full  object-cover">
-                        <Image fill src={m.member.imageUrl || ""} alt=""  className=" rounded-full"/>
+                        <Image
+                        fill
+                        src={m.member.imageUrl || ""}
+                        alt=""
+                        className=" rounded-full"
+                        />
                         {m.member.active && (
                         <div className=" absolute z-10 h-3 w-3 rounded-full bg-green-500 bottom-0 left-0" />
                         )}
@@ -269,7 +289,7 @@ return (
                 data={JSON.parse(JSON.stringify(currentChannel.chat))}
                 userId={Userdata._id.toString()}
                 channelId={channelId}
-                serverId={serverid}
+                serverId={serverId}
             />
             ) : currentChannel.type == "video" ? (
             <LiveVidAud
@@ -304,7 +324,7 @@ return (
             />
             )}
 
-            {!belongToServer && currentServer && currentChannel ? (
+            {!currentServer && !currentChannel ? (
             <>
                 <MonitorX size={120} />
                 <p className=" text-2xl font-bold text-center max-md:text-lg">
@@ -326,9 +346,7 @@ return (
         </div>
         </>
     )}
-        </Suspense>
-   
- 
+    </Suspense>
 );
 };
 

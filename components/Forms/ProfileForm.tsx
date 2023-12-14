@@ -27,18 +27,24 @@ import { toast } from "sonner";
 import "@uploadthing/react/styles.css";
 
 import {
-  addUpdateUser,
-  getCurrentProfile,
+
   getCurrentProfilepage,
 } from "@/lib/db-actions";
 
 import { useRouter } from "next/navigation";
 import { UserObject } from "@/index";
 import axios from "axios";
-import { currentUser } from "@clerk/nextjs";
+import { useEffect } from "react";
 
-const ProfileForm = ({ userData }: { userData: UserObject }) => {
+const ProfileForm = ({ userData }: { userData?: UserObject }) => {
   const router = useRouter();
+  useEffect(() => {
+    console.log(
+      `https://dicord-api.onrender.com/register?onboarded=${
+        userData?.onboarded
+      }`
+    );
+  }, []);
 
   const form = useForm<z.infer<typeof SetupSchema>>({
     resolver: zodResolver(SetupSchema),
@@ -54,25 +60,27 @@ const ProfileForm = ({ userData }: { userData: UserObject }) => {
     try {
       toast.loading("uploading.....", { dismissible: false });
 
-      const currentUser: { user: UserObject; email: string } =
-        await getCurrentProfilepage();
-      delete currentUser.user._id;
+      const currentClerkUser = await getCurrentProfilepage();
+
       const data = {
         ...values,
-        ...currentUser.user,
-        email: currentUser.email,
+        ...currentClerkUser,
       };
-      console.log(data);
+
       const adding = axios.post(
-        `http://${window && window.location.hostname}:5000/register`,
+        `http://${window && window.location.hostname}:5000/register?onboarded=${
+          userData?.onboarded
+        }`,
         data
       );
+      toast.dismiss()
       adding
         .then((e) => toast.success(e.data.message))
         .catch((e) => {
           console.log(e, "#################");
           toast.error(e.response.data.message);
         });
+      router.refresh();
 
       // const uploadUser  = await addUpdateUser(values)
 

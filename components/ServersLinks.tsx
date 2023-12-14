@@ -31,16 +31,16 @@ const ServerLinks = ({ data }: { data: any }) => {
         </div>
       </TooltipComp>
 
-      {data?.map((e: ServerDataType) => (
-        <TooltipComp hoverText={e.name} key={e._id}>
+      {data?.map((e) => (
+        <TooltipComp hoverText={e.name} key={e.id}>
           <div>
             <Link
               className="w-16 hover:scale-90 transition-all h-16 
                     relative  rounded-full flexcenter   "
-              href={`/server/${e._id.toString()}/channel/general`}
+              href={`/server/${e.id.toString()}/channel/general`}
               aria-label="redirect to server page  "
             >
-              <CurrentServer id={e._id.toString()} />
+              <CurrentServer id={e.id.toString()} />
               <Image
                 src={e.imageUrl}
                 height={50}

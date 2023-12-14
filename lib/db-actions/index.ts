@@ -3,10 +3,15 @@ import { ServerSetup, UserSetup } from "@/index";
 import Servers, { ServerDocument } from "@/models/Servers";
 import Users, { UserDocument } from "@/models/UsersModel";
 import { auth, currentUser, getAuth } from "@clerk/nextjs/server";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import mongoose from "mongoose";
 import { NextApiRequest } from "next";
 import { v4 } from "uuid";
+const env = process.env.NODE_ENV;
+const apiUrl =
+  env == "development"
+    ? "http://localhost:5000"
+    : "https://dicord-api.onrender.com";
 
 export const ConnectToDB = async () => {
   try {
@@ -15,14 +20,17 @@ export const ConnectToDB = async () => {
     console.log(error);
   }
 };
-export const getCurrentUser  =async(id:string)=> {
-  const userData = await  axios(`http://localhost:5000/login`,
-{method:'post',data:{
- data:{id}
-}
-})
-return userData.data.user
-}
+export const getCurrentUser = async (id: string) => {
+  const userData = await axios(`${apiUrl}/login`, {
+    method: "post",
+    data: {
+      data: { id },
+    },
+  });
+
+  return userData?.data?.user || null;
+};
+
 export const getuserfromDB = async (id: string) => {
   try {
     ConnectToDB();
@@ -33,37 +41,44 @@ export const getuserfromDB = async (id: string) => {
     return "user not found";
   }
 };
+export const getCurrentServerCreate = async () => {
+  try {
+    const clerkUser = await currentUser();
+    return clerkUser;
+  } catch (error) {
+    console.log(error);
+  }
+};
 export const getCurrentProfilepage = async () => {
   try {
-
     ConnectToDB();
-   
 
+    const clerkUser = await currentUser();
 
- const userd = await currentUser()
-
-    const user =  await Users.findOne({ id: userd?.id })
-    .select("username id name imageUrl onboarded active bio createdAt ");
-
-    return JSON.parse(JSON.stringify(({user,email:userd?.emailAddresses[0].emailAddress})))
-
+    return JSON.parse(
+      JSON.stringify({
+        id: clerkUser?.id,
+        email: clerkUser?.emailAddresses[0].emailAddress,
+        onboarded: true,
+        active: true,
+      })
+    );
   } catch (error) {
     console.log(error);
     return "user not found";
   }
 };
-export const getCurrentProfile = async (populated:boolean) => {
+export const getCurrentProfile = async (populated: boolean) => {
   try {
-
     ConnectToDB();
-   
-    const  userd  = auth();
+
+    const userd = auth();
 
     const user = populated
       ? await Users.findOne({ id: userd.userId }).populate("freinds.freindId")
       : await Users.findOne({ id: userd.userId });
 
-    return user
+    return user;
   } catch (error) {
     console.log(error);
     return "user not found";
@@ -97,15 +112,18 @@ export const findusers = async () => {
   }
 };
 
-export const findServersBelong = async () => {
+export const findServersBelong = async (operationType:"findGeneral"|"findSpecific") => {
   try {
     ConnectToDB();
-    const currentus = auth();
+    const { userId } = auth();
 
-    const userfromdb = await getuserfromDB(currentus.userId || "");
-    const allServers = await Servers.find({ "members.member": userfromdb._id });
+    // const userfromdb = await getuserfromDB(userId || "");
+    // const allServers = await Servers.find({ "members.member": userfromdb._id });
+    const allServers = await axios.get(`${apiUrl}/servers/access`, {
+      data: { userId ,operationType},
+    });
 
-    return allServers;
+    return allServers.data.serversBelongsTo;
   } catch (error) {
     console.log(error);
   }
@@ -113,7 +131,6 @@ export const findServersBelong = async () => {
 
 export const findServerBelongByID = async (serverId: string) => {
   try {
-    
     ConnectToDB();
     const currentus = auth();
 
@@ -130,20 +147,31 @@ export const findServerBelongByID = async (serverId: string) => {
   }
 };
 
-export const findServer = async (
-  id: string,
-  chatOptions: { limit: number }
-) => {
+export const findServer = async ({
+  serverId,
+  chatLimit,
+  userId,
+  operationType,
+}: {
+  serverId: string;
+  chatLimit: number;
+  userId: string;
+  operationType: "findGeneral" | "findSpecific";
+}) => {
   try {
     ConnectToDB();
 
-    const Server: ServerDocument | null = await Servers.findById(id)
-      .sort({ "channels.chat.createdAt": -1 }) // Sort the channels based on createdAt in descending order
-      .populate("channels.chat.creator", "username imageUrl")
-      .populate("members.member", "imageUrl username name active _id")
-      .limit(chatOptions.limit);
-
-    return Server;
+    // const Server: ServerDocument | null = await Servers.findById(serverId)
+    //   .sort({ "channels.chat.createdAt": -1 }) // Sort the channels based on createdAt in descending order
+    //   .populate("channels.chat.creator", "username imageUrl")
+    //   .populate("members.member", "imageUrl username name active _id")
+    //   .limit(chatLimit);
+    const allServers: AxiosResponse<{ serversBelongsTo: ServerDocument[] }> =
+      await axios.get(`${apiUrl}/servers/access`, {
+        data: { userId, serverId, chatLimit, operationType },
+      });
+    console.log(allServers.data.serversBelongsTo);
+    return allServers.data.serversBelongsTo
   } catch (error) {
     console.log(error);
   }
@@ -239,7 +267,7 @@ export const deleteServer = async (id: string) => {
     const isPermitted = await isServerAdmin(id);
 
     if (isPermitted) {
-      await Servers.findByIdAndDelete(id)
+      await Servers.findByIdAndDelete(id);
 
       return { valid: true, message: "deleted" };
     }
@@ -664,11 +692,10 @@ export const getChat = async (
 export const addFreind = async (freindId: string) => {
   try {
     ConnectToDB();
-    const userfromdb: UserDocument = await getCurrentProfile(true)
-    
-    if (userfromdb) {
+    const userfromdb: UserDocument = await getCurrentProfile(true);
 
-    await Users.findByIdAndUpdate(
+    if (userfromdb) {
+      await Users.findByIdAndUpdate(
         userfromdb._id,
         {
           $push: {
@@ -676,17 +703,17 @@ export const addFreind = async (freindId: string) => {
           },
         },
         { new: true }
-      )
-     const gg =   await Users.findByIdAndUpdate(
+      );
+      const gg = await Users.findByIdAndUpdate(
         freindId,
         {
           $push: {
-            freinds: { freindId: new mongoose.Types.ObjectId( userfromdb._id) },
+            freinds: { freindId: new mongoose.Types.ObjectId(userfromdb._id) },
           },
         },
         { new: true }
       );
-      console.log(gg)
+      console.log(gg);
       return { valid: true, message: "Freind Added" };
     }
   } catch (error) {
@@ -699,15 +726,13 @@ export const getAUser = async (
   type: "Online" | "All" | "Pending" | "Blocked"
 ) => {
   try {
-
     ConnectToDB();
 
-   
     const userfromdb: UserDocument = await getCurrentProfile(true);
-    
+
     const similarUsers = await Users.find({
       username: { $regex: new RegExp(name, "i") },
-      _id: { $ne: userfromdb._id } // Exclude the current user
+      _id: { $ne: userfromdb._id }, // Exclude the current user
     });
 
     return similarUsers

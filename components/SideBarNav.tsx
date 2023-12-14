@@ -6,30 +6,20 @@ import TooltipComp from "./ui/TooltipComp";
 
 import { ScrollArea } from "./ui/scroll-area";
 import ServerLinks from "./ServersLinks";
-import ManageServers from "./CreateServer";
-
-import { io } from "socket.io-client";
 import { ReactNode, useEffect, useState } from "react";
-
 import { useStore } from "@/store";
-import { checkState } from "@/lib/db-actions";
+import ManageServers from "./CreateServer";
 
 
 const SideBarNav = ({
   allservers,
   children,
+  userId
 }: {
   allservers: any;
   children?: ReactNode;
+  userId:string
 }) => {
-  const socket = new (io as any)(process.env.NEXT_PUBLIC_SITE_URL!, {
-    path: "/api/socket/io",
-    addTrailingSlash: false,
-  });
-
-  socket.on("connect", () => {
-    socket.emit("disconnect-manually");
-  });
 
   const [visible, setvisible] = useState(true);
   const { SideBarOpen, setSideBarOpen } = useStore();
@@ -50,28 +40,28 @@ const SideBarNav = ({
     }
   };
 
-  useEffect(() => {
-    socket.on("connect", () => {
-      console.log("Connected to server");
-    });
+  // useEffect(() => {
+  //   socket.on("connect", () => {
+  //     console.log("Connected to server");
+  //   });
 
-    socket.on("disconnect", () => {
-      console.log("Disconnected from server");
-    });
+  //   socket.on("disconnect", () => {
+  //     console.log("Disconnected from server");
+  //   });
 
-    const handleWindowClose = async (e: BeforeUnloadEvent) => {
-      checkState(false);
-    };
+  //   const handleWindowClose = async (e: BeforeUnloadEvent) => {
+  //     checkState(false);
+  //   };
 
-    window.addEventListener("beforeunload", handleWindowClose);
+  //   window.addEventListener("beforeunload", handleWindowClose);
 
-    return () => {
+  //   return () => {
      
 
-      socket && socket.disconnect();
-      window.removeEventListener("beforeunload", handleWindowClose);
-    };
-  }, []);
+  //     socket && socket.disconnect();
+  //     window.removeEventListener("beforeunload", handleWindowClose);
+  //   };
+  // }, []);
 
 
 
@@ -137,7 +127,7 @@ ${SideBarOpen ? "translate-x-0" : "-translate-x-full"}
                 </ScrollArea>
 
                 <TooltipComp hoverText="Create Server">
-                  <ManageServers actionType="create" submitText="create" />
+                  <ManageServers userId={userId} actionType="create" submitText="create" />
                 </TooltipComp>
               </div>
 
