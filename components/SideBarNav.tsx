@@ -12,7 +12,6 @@ import ManageServers from "./CreateServer";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-
 const SideBarNav = ({
   allservers,
   children,
@@ -23,7 +22,7 @@ const SideBarNav = ({
   userId: string;
 }) => {
   const [visible, setvisible] = useState(true);
-  const router  = useRouter()
+  const router = useRouter();
   const { SideBarOpen, setSideBarOpen } = useStore();
   const env = process.env.NODE_ENV;
   const apiUrl =
@@ -49,17 +48,15 @@ const SideBarNav = ({
 
   useEffect(() => {
     axios.get(`${apiUrl}/state?state=online&userId=${userId}`);
-    router.refresh()
+    router.refresh();
     const handleWindowClose = async () => {
       axios.get(`${apiUrl}/state?state=offline&userId=${userId}`);
-    
     };
 
     window.addEventListener("unload", handleWindowClose);
 
     return () => {
       window.removeEventListener("unload", handleWindowClose);
-
     };
   }, []);
 
@@ -113,8 +110,8 @@ ${SideBarOpen ? "translate-x-0" : "-translate-x-full"}
           onClick={() => setSideBarOpen(!SideBarOpen)}
         ></button>
 
-        <div className="flex h-full">
-          <div className="flex h-full">
+        <div className="flex shadow-xl  shadow-black h-full">
+          <div className="flex z-50 shadow-xl shadow-black  h-full">
             <div className="flex h-full p-2 flex-col  w-[90px]   justify-between">
               <div className="flexcenter flex-col">
                 <ScrollArea>

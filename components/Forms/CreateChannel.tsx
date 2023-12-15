@@ -48,11 +48,13 @@ const ChannelForm = ({
   icon,
   actionType,
   channel = "",
+  isAdmin
 }: {
   serverId: string;
   icon?: ReactNode;
   actionType: "create" | "update";
   channel?: string;
+  isAdmin:boolean
 }) => {
   const channelDocument: ChannelDocument | null =
     actionType == "update" ? JSON.parse(channel) : null;
@@ -84,7 +86,9 @@ const ChannelForm = ({
           ? (await addChannelToServer(
               serverId || "",
               values.name,
-              values.type
+              values.type,
+              isAdmin
+              
             )) || { valid: false, message: "check your connection" }
           : (await updateChannel(
               serverId,

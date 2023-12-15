@@ -77,7 +77,6 @@ const ProfileForm = ({ userData }: { userData?: UserObject }) => {
       adding
         .then((e) => toast.success(e.data.message))
         .catch((e) => {
-          console.log(e, "#################");
           toast.error(e.response.data.message);
         });
       router.refresh();
@@ -100,7 +99,7 @@ const ProfileForm = ({ userData }: { userData?: UserObject }) => {
             <FormItem className=" flex justify-center  gap-20 flex-wrap max-md:gap-10 ">
               <UploadDropzone
                 endpoint="imageUploader"
-                onUploadProgress={(e) => console.log(e)}
+
                 appearance={{
                   container: ` max-md:!px-2 max-md:!py-6 transition-all hover:scale-105 dark:border-black
                      bg-white cursor-pointer dark:bg-neutral-300 `,

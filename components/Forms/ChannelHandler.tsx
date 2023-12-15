@@ -1,10 +1,6 @@
 "use client";
-
 import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-
 import { GripVertical, PenSquare } from "lucide-react";
-import { useRouter } from "next/navigation";
-
 import ChannelForm from "./CreateChannel";
 import {
   Popover,
@@ -13,14 +9,17 @@ import {
 } from "@/components/ui/popover";
 import DeleteChannelButton from "./DeleteChannelButton";
 
+
 const ChannelHandler = ({
   serverId,
   channel,
+  isAdmin
 }: {
   serverId: string;
   channel: string;
+  isAdmin:boolean
 }) => {
-  const router = useRouter();
+
 
   return (
     <Popover>
@@ -35,6 +34,7 @@ const ChannelHandler = ({
 
       <PopoverContent className=" w-fit">
         <ChannelForm
+        isAdmin={isAdmin}
           icon={
             <div className="w-full gap-12 flex justify-between ">
               {" "}

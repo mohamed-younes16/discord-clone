@@ -112,7 +112,9 @@ export const findusers = async () => {
   }
 };
 
-export const findServersBelong = async (operationType:"findGeneral"|"findSpecific") => {
+export const findServersBelong = async (
+  operationType: "findGeneral" | "findSpecific"
+) => {
   try {
     ConnectToDB();
     const { userId } = auth();
@@ -120,7 +122,7 @@ export const findServersBelong = async (operationType:"findGeneral"|"findSpecifi
     // const userfromdb = await getuserfromDB(userId || "");
     // const allServers = await Servers.find({ "members.member": userfromdb._id });
     const allServers = await axios.get(`${apiUrl}/servers/access`, {
-      data: { userId ,operationType},
+      data: { userId, operationType },
     });
 
     return allServers.data.serversBelongsTo;
@@ -159,7 +161,6 @@ export const findServer = async ({
   operationType: "findGeneral" | "findSpecific";
 }) => {
   try {
-
     // const Server: ServerDocument | null = await Servers.findById(serverId)
     //   .sort({ "channels.chat.createdAt": -1 }) // Sort the channels based on createdAt in descending order
     //   .populate("channels.chat.creator", "username imageUrl")
@@ -169,24 +170,25 @@ export const findServer = async ({
       await axios.get(`${apiUrl}/servers/access`, {
         data: { userId, serverId, chatLimit, operationType },
       });
-    console.log(allServers.data.serversBelongsTo);
-    return allServers.data.serversBelongsTo
+
+    return allServers.data.serversBelongsTo;
   } catch (error) {
     console.log(error);
   }
 };
 export const findServerbyQuery = async (serverinvitation: string) => {
   try {
-
-
-    const {userId} = auth();
-
+    const { userId } = auth();
 
     const serverdata = await axios.get(`${apiUrl}/servers/access`, {
-      data: { invitationLink: serverinvitation, operationType: "findInvitation",userId },
-    })
+      data: {
+        invitationLink: serverinvitation,
+        operationType: "findInvitation",
+        userId,
+      },
+    });
 
-return serverdata.data.serversBelongsTo
+    return serverdata.data.serversBelongsTo;
   } catch (error) {
     console.log(error);
   }
@@ -256,14 +258,18 @@ export const isServerAdmin = async (id: string) => {
   }
 };
 
-export const deleteServer = async (id: string) => {
+export const deleteServer = async (
+  serverId: string,
+  isAdmin: boolean,
+  userId: string
+) => {
   try {
-    const isPermitted = await isServerAdmin(id);
+    if (isAdmin) {
+      const deletingOperation = await axios.delete(`${apiUrl}/servers/delete`, {
+        data: { serverId, userId, isAdmin },
+      });
 
-    if (isPermitted) {
-      await Servers.findByIdAndDelete(id);
-
-      return { valid: true, message: "deleted" };
+      return { valid: true, message: deletingOperation.data.message };
     }
 
     return { valid: false, message: "check your connection" };
@@ -275,16 +281,19 @@ export const deleteServer = async (id: string) => {
 
 export const addingMember = async (serverinvitation: string) => {
   try {
+    const { userId } = auth();
 
-
-    const {userId} = auth();
-
-
-    const serverdata = await axios.patch(`${apiUrl}/servers/update`, {
-      invitationLink: serverinvitation, operationType: "addingMember",userId ,
-    })
-
-return serverdata.data.serversBelongsTo
+    let serverdata = axios.patch(`${apiUrl}/servers/update`, {
+      invitationLink: serverinvitation,
+      operationType: "addingMember",
+      userId,
+    });
+    return serverdata
+      .then((data) => {
+        console.log(data);
+        return JSON.parse(JSON.stringify(data.data));
+      })
+      .catch((error) => error.response.data);
   } catch (error) {
     console.log(error);
   }
@@ -401,31 +410,27 @@ export const deleteUserFromMembers = async (
     return false;
   }
 };
-export const UserLeaves = async (serverId: string) => {
+export const UserLeaves = async (
+  serverId: string,
+  isAdmin: boolean,
+  memberId: string
+) => {
   try {
     ConnectToDB();
 
-    const currentus = auth();
+    const { userId } = auth();
 
-    const userfromdb = await getuserfromDB(currentus.userId || "");
+    const userfromdb = await getuserfromDB(userId || "");
 
-    const isDeletedAdmin = await Servers.findOne({
-      _id: serverId,
-      members: { member: userfromdb._id, userType: "admin" },
-    });
+    if (!isAdmin) {
+      let serverdata = await axios.patch(`${apiUrl}/servers/update`, {
+        operationType: "leaveMember",
+        userId,
+        serverId,
+        memberId,
+      });
 
-    if (!isDeletedAdmin) {
-      await Servers.findOneAndUpdate(
-        { _id: serverId },
-        {
-          $pull: {
-            members: { member: userfromdb._id },
-            userType: { $ne: "admin" },
-          },
-        }
-      );
-
-      return { valid: true, message: "leaved" };
+      return serverdata && { valid: true, message: "leaved" };
     }
 
     return { valid: false, message: "not authorized" };
@@ -450,43 +455,23 @@ export const checkState = async (state: boolean) => {
 export const addChannelToServer = async (
   serverId: string,
   name: string,
-  type: "text" | "video" | "audio"
+  type: "text" | "video" | "audio",
+  isAdmin:boolean
 ) => {
   try {
-    ConnectToDB();
+if (isAdmin) {
+   const { userId } = auth();
 
-    const isadmin = await isAdmin(serverId);
+    const Theserver = await axios.post(`${apiUrl}/servers/create`, {
+      serverId,userId ,isAdmin,operationType:"createChannel",name,type,
+    });
 
-    const userfromdb: UserDocument = await getCurrentProfile(false);
 
-    if (isadmin) {
-      const isnameUnique = await Servers.findOne({
-        _id: serverId,
-        "channels.name": name,
-      });
-
-      if (!isnameUnique) {
-        const Theserver = await Servers.findByIdAndUpdate(
-          serverId.toString(),
-          {
-            $push: {
-              channels: {
-                name,
-                type: type.toString(),
-                chat: [],
-                creator: userfromdb._id,
-              },
-            },
-          },
-          { new: true }
-        );
-
-        return { valid: true, message: "added channel" };
-      }
-
-      return { valid: false, message: "channel already exists" };
-    }
-    return { valid: false, message: "unauthorized or check connection" };
+ return { valid: true, message: "added channel" };
+}
+ 
+return { valid: false, message: "Not Allowed " };
+   
   } catch (error) {
     console.log(error);
     return { valid: false, message: "error happend" };

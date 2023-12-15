@@ -16,17 +16,23 @@ import { redirect, useRouter } from "next/navigation";
 const DeleteLeaveServerButton = ({
   serverId,
   actionType,
+  isAdmin,
+  userId,
+  memberId
 }: {
   serverId: string;
   actionType: "leave" | "delete";
+  isAdmin:boolean;
+  userId:string;
+  memberId:string
 }) => {
   const router = useRouter();
-  const deleteServ = async () => {
+  const deleteServerHandler = async () => {
     if (actionType == "delete") {
       try {
         toast.loading(actionType == "delete" ? "deleting....." : "leaving....");
 
-        const idDeleted = (await deleteServer(serverId)) || {
+        const idDeleted = (await deleteServer(serverId,isAdmin,userId)) || {
           valid: false,
           message: "check your connection",
         };
@@ -34,7 +40,7 @@ const DeleteLeaveServerButton = ({
         if (idDeleted?.valid) {
           toast.success(idDeleted?.message, { duration: 3000 });
           setTimeout(() => {
-            window.location.reload();
+            router.push('/')
           }, 500);
         } else {
           setTimeout(() => {
@@ -53,7 +59,7 @@ const DeleteLeaveServerButton = ({
           duration: 1000,
         });
 
-        const LeaveServer = (await UserLeaves(serverId)) || {
+        const LeaveServer = (await UserLeaves(serverId,isAdmin,memberId)) || {
           valid: false,
           message: "check your connection",
         };
@@ -81,7 +87,7 @@ const DeleteLeaveServerButton = ({
       <DialogTrigger className="w-full">
         {" "}
         <p
-          className=" p-1  text-red-600 flex justify-between items-center 
+          className="p-1 text-red-600 flex justify-between items-center 
 hover:bg-white  rounded-md transition-all !bg-opacity-20"
         >
           {actionType} Server
@@ -94,7 +100,7 @@ hover:bg-white  rounded-md transition-all !bg-opacity-20"
           <DialogTitle>Are you sure absolutely sure?</DialogTitle>
           <DialogDescription>
             <Button
-              onClick={() => deleteServ()}
+              onClick={() => deleteServerHandler()}
               className=" mt-4 flex gap-4 "
               variant={"destructive"}
             >

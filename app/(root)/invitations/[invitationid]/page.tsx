@@ -2,7 +2,6 @@
 
 import { addingMember, findServerbyQuery } from "@/lib/db-actions";
 import { Toaster, toast } from "sonner";
-
 import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
@@ -10,7 +9,7 @@ import { useEffect, useState } from "react";
 import { Check, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { Separator } from "@radix-ui/react-dropdown-menu";
-import axios from "axios";
+
 
 const Page = ({
   params: { invitationid },
@@ -30,7 +29,7 @@ const Page = ({
 
   useEffect(() => {
     const getname = async () => {
-      console.log("gggggggggggggggg")
+
       const serverdata = await findServerbyQuery(invitationid)
 
       setServerName(serverdata?.name || "");
@@ -46,20 +45,30 @@ const Page = ({
 
 
      const adding = await addingMember(invitationid);
-
+console.log(adding)
     // setServerName(adding?.servername || "");
 
-    // if (adding?.message == "added") {
-    //   toast.dismiss();
-    //   toast.success(<p className="text-xl font-semibold"> Joined</p>, {
-    //     className: "text-xl",
-    //   });
+    if (adding?.serversBelongsTo) {
 
-      setTimeout(() => {
+      toast.dismiss();
+      toast.message(<p className="flexcenter"> {adding.message}</p>)
+        setTimeout(() => {
         setisjoning(false);
-        Router.push(`/server/${adding?.serverId}`);
+        Router.push(`/server/${adding?.serversBelongsTo.id}`);
         Router.refresh();
       }, 500);
+    }
+    if (!adding?.serversBelongsTo) {
+
+      toast.dismiss();
+      toast.message(<p className="flexcenter"> {adding.message}</p>)
+        setTimeout(() => {
+        setisjoning(false);
+        Router.push(`/`);
+        Router.refresh();
+      }, 500);
+    }
+  
     // } else if (adding?.message == "exist") {
     //   toast.dismiss();
 

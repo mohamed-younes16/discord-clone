@@ -21,7 +21,7 @@ const ioHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
       allowEIO3: true,
     });
     io.engine.on("connection_error", (err) => {
-      console.log(err,"##########################################");
+      console.log(err);
     });
     res.socket.server.io = io;
   }

@@ -40,7 +40,6 @@ import ChannelForm from "@/components/Forms/CreateChannel";
 import ManageServers from "@/components/CreateServer";
 import ChannelHandler from "@/components/Forms/ChannelHandler";
 import { Suspense } from "react";
-import { ServerDocument } from "@/models/Servers";
 const TextChat = dynamic(() => import("@/components/Forms/TextChat"), {
 ssr: false,
 });
@@ -50,28 +49,31 @@ params: { serverId, channelId },
 }: {
 params: { serverId: string; channelId: string };
 }) => {
-const Userdata:UserObject = await getCurrentProfile(false);
+const Userdata: UserObject = await getCurrentProfile(false);
 
-
-const currentServer:any = await findServer({
+const currentServer: any = await findServer({
     serverId,
     chatLimit: 6,
     userId: Userdata.id,
     operationType: "findSpecific",
 });
 
-
 const allservers = await findServersBelong("findGeneral");
 
-console.log(currentServer,)
 const currentChannel = currentServer?.channels.find(
     (e) => e.name === channelId
-)
+);
 
 const channlesType = currentServer && [
     ...new Set(currentServer?.channels.map((e: any) => e.type)),
 ];
-const isAdmin = currentServer?.members.some((e)=>e.memberId ===Userdata.id)
+
+const isAdmin = currentServer?.members.some(
+    (e) => e.memberId === Userdata.id && e.userType === "admin"
+);
+const memberId = currentServer?.members.find(
+    (e) => e.memberId === Userdata.id 
+).id
 
 
 if (!Userdata?.onboarded) redirect("/profile");
@@ -108,17 +110,8 @@ return (
                 </div>
                 </PopoverTrigger>
 
-                <PopoverContent className="w-48 cursor-pointer ">
-                <p
-                    className=" p-1   dark:text-indigo-400 
-                                flex justify-between
-                                items-center  hover:bg-white  rounded-md transition-all !bg-opacity-20"
-                >
-                    Share Server
-                    <UserPlus />
-                </p>
-                <div className="my-2" />
-
+                <PopoverContent className="w-48 p-3 cursor-pointer ">
+            
                 <InviteButton
                     serverInvitaion={currentServer?.invitationLink || ""}
                 />
@@ -127,7 +120,12 @@ return (
                     <>
                     <Separator className="my-2" />
 
-                    <ManageUsers serverId={serverId || ""} />
+                    <ManageUsers
+                        userId={Userdata.id}
+                        membersData={currentServer.members}
+                
+                        serverId={serverId || ""}
+                    />
 
                     <ManageServers
                         userId={Userdata.id}
@@ -151,17 +149,23 @@ return (
                     />
                     <div className="my-2" />
                     <DeleteLeaveServerButton
+                    isAdmin={isAdmin}
                         actionType="delete"
                         serverId={serverId}
+                        userId={Userdata.id}
+                        memberId={memberId}
                     />
                     <div className="my-2" />
-                    <ChannelForm actionType="create" serverId={serverId} />
+                    <ChannelForm isAdmin={isAdmin}  actionType="create" serverId={serverId} />
                     </>
                 ) : (
                     <>
                     <Separator className="my-2" />
 
                     <DeleteLeaveServerButton
+                    userId={Userdata.id}
+                    memberId={memberId}
+                    isAdmin={isAdmin}
                         actionType="leave"
                         serverId={serverId}
                     />
@@ -179,6 +183,7 @@ return (
                     </p>
                     {isAdmin && (
                         <ChannelForm
+                        isAdmin={isAdmin}
                         actionType="create"
                         icon={<PlusIcon />}
                         serverId={serverId || ""}
@@ -224,6 +229,7 @@ return (
                             </Link>
                             {el.name !== "general" ? (
                             <ChannelHandler
+                            isAdmin={isAdmin}
                                 channel={JSON.stringify(el)}
                                 serverId={serverId || ""}
                             />

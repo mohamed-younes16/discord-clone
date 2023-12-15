@@ -69,6 +69,8 @@ const ServerForm = ({
           : axios.patch(`${apiUrl}/servers/update`, {
               serverData: values,
               userId,
+              serverId,
+              operationType:"editingServer"
             });
       toast.dismiss();
       uploadServer

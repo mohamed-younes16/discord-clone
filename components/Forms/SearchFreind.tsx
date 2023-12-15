@@ -101,15 +101,13 @@ const apiUrl = env =="development" ?"http://localhost:5000":"https://dicord-api.
               
             }
           });
-          console.log(user.data.check);
-          // setFreinds(users?.users || []);
+
           setIsLoading(false);
         }, 300); // Set your desired timeout value in milliseconds
       }
     });
   
     return () => {
-      console.log(timeoutId)
       sub.unsubscribe();
       clearTimeout(timeoutId); // Clear the timeout when the component unmounts
     };
@@ -269,7 +267,6 @@ const apiUrl = env =="development" ?"http://localhost:5000":"https://dicord-api.
                           onClick={async (ev) => {
                             ev.currentTarget.disabled = true;
                             toast.loading("", { duration: 90000 });
-                            console.log("Click");
                             const adding = await addFreind(e._id);
                             toast.dismiss();
                             adding?.valid

@@ -1,5 +1,4 @@
 import { Users } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,16 +10,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-
-import { getMembers, isServerAdmin } from "@/lib/db-actions";
 import Image from "next/image";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import MembersHandler from "./MembersHandler";
 import { Toaster } from "sonner";
 
-const ManageUsers = async ({ serverId }: { serverId: string }) => {
-  const membersData = await getMembers(serverId);
-  const Isadmin = await isServerAdmin(serverId);
+const ManageUsers = async ({
+  serverId,
+  userId,
+  membersData
+}: {
+  userId: string;
+  serverId: string;
+  membersData:any[]
+}) => {
 
   return (
     <div>
@@ -46,7 +49,7 @@ const ManageUsers = async ({ serverId }: { serverId: string }) => {
                   membersData?.map((e) => {
                     return (
                       <div
-                        key={e.member._id.toString()}
+                        key={e.member.id.toString()}
                         className="flex w-full items-start gap-4  my-6"
                       >
                         {e.member?.imageUrl && (
@@ -75,8 +78,8 @@ const ManageUsers = async ({ serverId }: { serverId: string }) => {
                             </p>
                           </div>
                         </div>
-                        {Isadmin?.member._id.toString() !==
-                          e.member._id.toString() && (
+                        {userId !==
+                          e.member.id.toString() && (
                           <MembersHandler
                             serverId={serverId}
                             memberstring={JSON.stringify(e)}
