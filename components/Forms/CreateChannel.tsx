@@ -87,7 +87,7 @@ const ChannelForm = ({
       const uploadServer =
         actionType == "create"
           ? (await addChannelToServer(
-              serverId || "",
+              serverId,
               values.name,
               values.type,
               isAdmin
