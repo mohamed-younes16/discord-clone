@@ -9,47 +9,28 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { changeUserType, deleteUserFromMembers } from "@/lib/db-actions";
-import { Member } from "@/models/Servers";
-import { Check, GripVertical, ShieldAlert, UserX } from "lucide-react";
+import { changeMemberType, deleteUserFromMembers } from "@/lib/db-actions";
+
+import { Check, GripVertical, Loader2, ShieldAlert, UserX } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+
+import { Member } from "..";
+import { useState } from "react";
+
 
 const MembersHandler = ({
-  memberstring,
-  serverId,
+   member,
+  serverId,userId,isAdmin
 }: {
-  memberstring: string;
+  member: Member;
   serverId: string;
+  userId:string;
+  isAdmin:boolean
 }) => {
+
   const router = useRouter();
-  const member: Member = JSON.parse(memberstring);
-  // const changeUser = async (
-  //   member: any,
-  //   type: "editor" | "member",
-  //   serverId: string
-  // ) => {
-  //   try {
-  //     toast.loading("changing permissions.....");
+const [Handling ,setIsHandling] = useState<boolean>(false)
 
-    
-  //     // if (changing) {
-  //     //   toast.success("changed successfully");
-  //     //   router.refresh();
-  //     // }
-  //   } catch (error) {}
-  // };
-  // const deletemember = async (member: any, serverId: string) => {
-  //   try {
-  //     toast.loading("deleteing member .....");
-  //     const deleting = await deleteUserFromMembers(member.id, serverId);
-
-  //     if (deleting) {
-  //       toast.success("deleted successfully");
-  //       router.refresh();
-  //     }
-  //   } catch (error) {}
-  // };
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -57,7 +38,7 @@ const MembersHandler = ({
           className="w-10 h-10 rounded-full hover:bg-gray-300
                 cursor-pointer transition-all flexcenter !bg-opacity-20"
         >
-          <GripVertical size={20} strokeWidth={3} />
+      { !Handling ? ( <GripVertical size={20} strokeWidth={3} />):<Loader2 className="animate-spin"/>  }
         </div>
       </DropdownMenuTrigger>
 
@@ -71,24 +52,33 @@ const MembersHandler = ({
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
             <DropdownMenuItem
-              onClick={() =>{
-                // member.userType == "member"
-                //   ? changeUser(member.member, "editor", serverId)
-                //   : ""
-                }
+            onClick={async() =>{
+              setIsHandling(true)
+              if ( member.userType === "member") 
+              {
+              await  changeMemberType(member.id,"moderator",serverId,isAdmin,userId)
+              setIsHandling(false)
+              router.refresh()
               }
+
+              }}
               className=" flex justify-between  "
             >
               <p>Moderator</p>
 
-              {member.userType == "editor" && <Check />}
+              {member.userType === "moderator" && <Check />}
             </DropdownMenuItem>
 
             <DropdownMenuItem
-              onClick={() =>{
-                // member.userType == "editor"
-                //   ? changeUser(member.member, "member", serverId)
-                //   : ""
+              onClick={async() =>{
+                setIsHandling(true)
+             if ( member.userType === "moderator") 
+             {
+            await  changeMemberType(member.id,"member",serverId,isAdmin,userId)
+            setIsHandling(false)
+              router.refresh()
+              }
+                  
               }}
               className=" flex justify-between  "
             >
@@ -101,8 +91,8 @@ const MembersHandler = ({
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() =>{
-            //  deletemember(member.member, serverId)
-            
+             deleteUserFromMembers(member.id,serverId ,userId,isAdmin,)
+            router.refresh()
             }}
           className=" flex justify-between  "
         >
@@ -112,7 +102,7 @@ const MembersHandler = ({
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  );
+  )
 };
 
 export default MembersHandler;

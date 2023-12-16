@@ -130,7 +130,7 @@ return (
                     <ManageUsers
                         userId={Userdata.id}
                         membersData={currentServer.members}
-                
+                        isAdmin={isAdmin}
                         serverId={serverId || ""}
                     />
 

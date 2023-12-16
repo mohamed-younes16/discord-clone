@@ -53,15 +53,14 @@ const TextChat = ({
   const [connected, setIsconnected] = useState(false);
   const [chat, setChat] = useState<Chat[]>(data.toReversed() || []);
   const bottomRef = useRef<any>(null);
-  const socket = useMemo(() => io(apiUrl), []);
+  const socket = useMemo(() => io(apiUrl,{autoConnect:false}), []);
   const wrapper: any = useRef();
   const content: any = useRef();
-  const [messagesToShow, setMessagesToShow] = useState(9);
-  const [fetchingMessages, setFetchingMessages] = useState(true);
+  const [messagesToShow, setMessagesToShow] = useState(10);
+  const [fetchingMessages, setFetchingMessages] = useState(false);
+  const [isMax, setIsMax] = useState(false);
   const targetRef = useRef(null);
 
-  const path = usePathname();
-  const router = useRouter();
 
   useEffect(() => {
     const lenis = new Lenis({
@@ -77,8 +76,6 @@ const TextChat = ({
     }
 
     requestAnimationFrame(raf);
-
-
   }, []);
 
   useEffect(() => {
@@ -86,71 +83,46 @@ const TextChat = ({
     if (bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: "instant" });
     }
+
+    socket && socket.connect();
+    socket &&
+      socket.on(
+        `message-server-${serverId}-channel-${channelId}`,
+        (message: Chat[]) => {
+          toast.dismiss();
+  
+          setChat(message.toReversed());
+  
+        }
+      );
+  
+  
+    socket?.on("connect", () => {
+      setIsconnected(true);
+  
+    });
+  
+    return ()=> {
+      socket?.disconnect()
+    }
   }, []);
 
+
   useEffect(() => {
-    const change = async () => {
-   
-      const data = await findServer({
-        serverId,
-        chatLimit: messagesToShow,
-        userId,
-        operationType: "findChannel",
-        channelId,
-      });
-      setChat(data.chat.toReversed());
-      setFetchingMessages(false)
+  
+    const handleWindowClose = async (e:BeforeUnloadEvent) => {
+    
+     
     };
 
-    change();
-  }, [messagesToShow]);
-  useEffect(() => {
-    const options = {
-      root: null,
-      rootMargin: "0px",
-      threshold: 0.9,
-    };
-
-    const callback = async (entries: any) => {
-      setTimeout(() => {
-        entries.forEach(async (entry: any) => {
-          if (entry.isIntersecting) {
-
-            if ((messagesToShow <= chat.length) && (!fetchingMessages)) { 
-              setFetchingMessages(true)
-              setMessagesToShow((s) => s + 2);
-            }
-          }
-        });
-      }, 500);
-    };
-
-    const observer = new IntersectionObserver(callback, options);
-
-    if (targetRef?.current) {
-      observer.observe(targetRef.current);
-    }
-
+    window.addEventListener("unload", handleWindowClose);
+    window.addEventListener("beforeunload", handleWindowClose);
     return () => {
-      // Cleanup: disconnect the observer when the component unmounts
-      observer.disconnect();
+
+      window.addEventListener("beforeunload", handleWindowClose);
+      window.removeEventListener("unload", handleWindowClose);
     };
-  }, [chat.length,messagesToShow]);
-
-  socket && socket.connect();
-  socket &&
-    socket.on(
-      `message-server-${serverId}-channel-${channelId}`,
-      (message: Chat[]) => {
-        toast.dismiss();
-
-        setChat(message.toReversed());
-      }
-    );
-
-  socket?.on("connect", () => {
-    setIsconnected(true);
-  });
+  }, []);
   const ChannelSchema = z.object({
     message: z
       .string()
@@ -162,6 +134,26 @@ const TextChat = ({
     fileType: z.enum(["pdf", "image"]),
   });
 
+  useEffect(()=>{
+  
+  setFetchingMessages(true);
+
+    const change = async () => {
+      const data = await findServer({
+        serverId,
+        chatLimit: messagesToShow,
+        userId,
+        operationType: "findChannel",
+        channelId,
+      });
+      setChat(data.chat.toReversed());
+      setFetchingMessages(false);
+    setIsMax((messagesToShow > chat.length  ))
+    };
+
+    change();
+
+  },[chat.length,messagesToShow])
   const form = useForm<z.infer<typeof ChannelSchema>>({
     resolver: zodResolver(ChannelSchema),
     defaultValues: {
@@ -198,13 +190,24 @@ const TextChat = ({
   return (
     <div className="flex-col flex  h-screen  w-full">
       <Toaster richColors />
-    
+
       <div
         id="text-wrapper"
         ref={wrapper}
         className="chat overflow-hidden relative  flex px-4 flex-col max-h-[85%] h-[85%]  gap-10 "
       >
-      
+        {(!fetchingMessages && !isMax) && <Button
+    onClick={() => {    
+      setMessagesToShow((s) => s + 10);
+
+    }}
+
+          variant={"default"}
+          className="absolute font-semibold text-lg -translate-x-1/2 left-1/2 top-6 p-3"
+        >
+          Show More
+        </Button>}
+       
         <div ref={content} id="text-content">
           <div ref={targetRef} className="" />
           {chat &&
@@ -302,24 +305,24 @@ const TextChat = ({
         </Form>
         <div className="flex flex-col pb-3 ">
           <div>
-             {connected ? (
-            <Badge
-              variant="outline"
-              className="  text-green-600 border-green-600"
-            >
-              {" "}
-              connected{" "}
-            </Badge>
-          ) : (
-            <Badge variant="outline" className=" text-red-600 border-red-600">
-              {" "}
-              wait for connection{" "}
-            </Badge>
-          )}
+            {connected ? (
+              <Badge
+                variant="outline"
+                className="  text-green-600 border-green-600"
+              >
+                {" "}
+                connected{" "}
+              </Badge>
+            ) : (
+              <Badge variant="outline" className=" text-red-600 border-red-600">
+                {" "}
+                wait for connection{" "}
+              </Badge>
+            )}
           </div>
-          { fetchingMessages && (<Loader2 className=" self-center h-10 w-10   animate-spin"/>)}
-
-         
+          {fetchingMessages && (
+            <Loader2 className=" self-center h-10 w-10   animate-spin" />
+          )}
         </div>
       </div>
     </div>

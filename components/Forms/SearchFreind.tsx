@@ -34,16 +34,16 @@ import { Toaster, toast } from "sonner";
 import { useStore } from "@/store";
 import { useEffect, useState } from "react";
 
-import { UserDocument } from "@/models/UsersModel";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import axios from "axios";
+import { User } from "@/index";
 
 const SearchFreind = () => {
   const env = process.env.NODE_ENV
 const apiUrl = env =="development" ?"http://localhost:5000":"https://dicord-api.onrender.com"
 
-  const [freinds, setFreinds] = useState<UserDocument[]>([]);
+  const [freinds, setFreinds] = useState<User[]>([]);
   const [loading, setIsLoading] = useState<boolean>(false);
 
   const ChannelSchema = z.object({

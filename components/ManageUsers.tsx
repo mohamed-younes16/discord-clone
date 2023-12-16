@@ -18,13 +18,15 @@ import { Toaster } from "sonner";
 const ManageUsers = async ({
   serverId,
   userId,
-  membersData
+  membersData,
+  isAdmin
 }: {
   userId: string;
   serverId: string;
-  membersData:any[]
+  membersData:any[];
+  isAdmin: boolean;
 }) => {
-
+console.log(serverId)
   return (
     <div>
       <Dialog>
@@ -39,7 +41,7 @@ const ManageUsers = async ({
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              <h1 className=" text-2xl font-bold "> Manage Users</h1>
+              <p className=" text-2xl font-bold "> Manage Users</p>
             </DialogTitle>
             <DialogDescription>
               <ScrollArea className=" h-[400px] ">
@@ -81,8 +83,10 @@ const ManageUsers = async ({
                         {userId !==
                           e.member.id.toString() && (
                           <MembersHandler
+                          isAdmin={isAdmin}
+                          userId={userId}
                             serverId={serverId}
-                            memberstring={JSON.stringify(e)}
+                            member={e}
                           />
                         )}
                       </div>

@@ -1,11 +1,7 @@
 "use server";
 
-import Servers from "@/models/Servers";
-import Users, { UserDocument } from "@/models/UsersModel";
-import { auth, currentUser, getAuth } from "@clerk/nextjs/server";
+import { auth, currentUser,  } from "@clerk/nextjs/server";
 import axios from "axios";
-import mongoose from "mongoose";
-import { NextApiRequest } from "next";
 
 const env = process.env.NODE_ENV;
 const apiUrl =
@@ -150,31 +146,30 @@ export const addingMember = async (serverinvitation: string) => {
   }
 };
 
-export const changeUserType = async (
+export const changeMemberType = async (
   memberId: string,
-  type: "editor" | "member",
+  userType: "moderator" | "member",
   serverId: string,
-  isAdmin: boolean
+  isAdmin: boolean,
+  userId:string
 ) => {
   try {
     if (isAdmin) {
-      const server: any = await Servers.findById(serverId);
-      const memberIndex = server.members.findIndex(
-        (member: any) => member.member.toString() === memberId
-      );
-
-      if (
-        memberIndex !== -1 &&
-        server.members[memberIndex].userType !== "admin"
-      ) {
-        server.members[memberIndex].userType = type;
-        await server.save();
-
-        return true;
-      }
+      await axios.patch(`${apiUrl}/servers/update`, {
+        memberId,
+        operationType: "changeMemberType",
+        userType,
+        isAdmin,
+        userId,
+        serverId
+      });
+      // return Theserver.then((data) => {
+      //   return JSON.parse(JSON.stringify({ ...data.data, valid: true }));
+      // }).catch((error) => ({ ...error.response.data, valid: false }));
     }
-    return false;
-  } catch (error) {
+    }
+
+  catch (error) {
     console.log(error);
   }
 };
@@ -182,21 +177,20 @@ export const changeUserType = async (
 export const deleteUserFromMembers = async (
   memberId: string,
   serverId: string,
+  userId:string,
   isAdmin: boolean
 ) => {
   try {
-    const { userId } = auth();
-
     if (isAdmin) {
-      const server = await Servers.findOneAndUpdate(
-        { _id: serverId },
-        {
-          $pull: { members: { member: memberId }, userType: { $ne: "admin" } },
-        },
-        { new: true }
-      );
+      await axios.delete(`${apiUrl}/servers/delete`, {data:{
+        memberId,
+        operationType: "deleteMember",
+        isAdmin,
+        userId,
+        serverId
+      }
 
-      return true;
+      });
     }
 
     return false;

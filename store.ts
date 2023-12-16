@@ -7,7 +7,7 @@ type Store = {
   }
   
  export  const useStore = create<Store>()(persist( (set) => ({
-    SideBarOpen:true ,
+    SideBarOpen:false ,
     setSideBarOpen: (v:boolean) => set(() => ({ SideBarOpen:v })),
   }),{name:"data",
   storage: createJSONStorage(() => sessionStorage)}) 
