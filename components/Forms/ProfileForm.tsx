@@ -29,6 +29,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 
 import { User } from "@/index";
+import { X } from "lucide-react";
 
 const env = process.env.NODE_ENV;
 const apiUrl =
@@ -60,9 +61,7 @@ const ProfileForm = ({ userData }: { userData?: User }) => {
       };
 
       const adding = axios.post(
-        `${apiUrl}/register?onboarded=${
-          userData?.onboarded
-        }`,
+        `${apiUrl}/register?onboarded=${userData?.onboarded}`,
         data
       );
       toast.dismiss();
@@ -71,10 +70,10 @@ const ProfileForm = ({ userData }: { userData?: User }) => {
         .catch((e) => {
           toast.error(e.response.data.message);
         });
-      router.refresh();
+
       toast.dismiss();
       setTimeout(() => {
-        router.push("/");
+        router.refresh();
       }, 400);
     } catch (error) {
       console.log(error);
@@ -89,38 +88,47 @@ const ProfileForm = ({ userData }: { userData?: User }) => {
           name="imageUrl"
           render={({ field }) => (
             <FormItem className=" flex justify-center  gap-20 flex-wrap max-md:gap-10 ">
-              <UploadDropzone
-                endpoint="imageUploader"
-                appearance={{
-                  container: ` max-md:!px-2 max-md:!py-6 transition-all hover:scale-105 dark:border-black
-                     bg-white cursor-pointer dark:bg-neutral-300 `,
-                  label: `text-xl `,
-                }}
-                onClientUploadComplete={(e) => field.onChange(e?.[0].url)}
-              />
-
-              <FormLabel
-                className=" mr-8 relative overflow-hidden
+              {field.value ? (
+                <FormLabel
+                  className=" mr-8 relative 
              w-[250px] flex justify-center items-center m-0 !h-[250px] 
             bg-gray-900 rounded-full flexcenter "
-              >
-                {field?.value ? (
-                  <Image
-                    src={field.value}
-                    className="object-cover"
-                    alt="image of you"
-                    fill
-                  />
-                ) : (
-                  <Image
-                    src="/assets/profile.svg"
-                    className=" object-contain"
-                    alt="image"
-                    height={70}
-                    width={70}
-                  />
-                )}
-              </FormLabel>
+                >
+                  {field?.value ? (
+                    <>
+                      <X onClick={()=>field.onChange("")}
+                      
+                      className="absolute cursor-pointer transition-all  
+                      hover:scale-105 bg-red-500 top-2 right-2 
+                      rounded-full p-2 h-10 w-10 z-50"></X>
+                      <Image
+                        src={field.value}
+                        className="object-cover rounded-full"
+                        alt="image of you"
+                        fill
+                      />
+                    </>
+                  ) : (
+                    <Image
+                      src="/assets/profile.svg"
+                      className=" object-contain"
+                      alt="image"
+                      height={70}
+                      width={70}
+                    />
+                  )}
+                </FormLabel>
+              ) : (
+                <UploadDropzone
+                  endpoint="imageUploader"
+                  appearance={{
+                    container: ` max-md:!px-2 max-md:!py-6 transition-all hover:scale-105 dark:border-black
+                    bg-white cursor-pointer dark:bg-neutral-300 `,
+                    label: `text-xl `,
+                  }}
+                  onClientUploadComplete={(e) => field.onChange(e?.[0].url)}
+                />
+              )}
 
               {/* <FormControl className="account-form_image-input cursor-pointer
              border-white border-4 w-fit  h-24  flexcenter border-dashed ">
