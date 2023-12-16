@@ -19,27 +19,24 @@ import {
 
 import { Input, InputProps } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
 import Image from "next/image";
 import { UploadDropzone } from "@/utils/uploadthing";
 import { toast } from "sonner";
-
 import "@uploadthing/react/styles.css";
-
-import {
-
-  getCurrentProfilepage,
-} from "@/lib/db-actions";
-
+import { getCurrentProfilepage } from "@/lib/db-actions";
 import { useRouter } from "next/navigation";
 
 import axios from "axios";
-import { useEffect } from "react";
+
 import { User } from "@/index";
 
+const env = process.env.NODE_ENV;
+const apiUrl =
+  env == "development"
+    ? "http://localhost:5000"
+    : "https://dicord-api.onrender.com";
 const ProfileForm = ({ userData }: { userData?: User }) => {
   const router = useRouter();
-
 
   const form = useForm<z.infer<typeof SetupSchema>>({
     resolver: zodResolver(SetupSchema),
@@ -63,21 +60,21 @@ const ProfileForm = ({ userData }: { userData?: User }) => {
       };
 
       const adding = axios.post(
-        `http://${window && window.location.hostname}:5000/register?onboarded=${
+        `${apiUrl}/register?onboarded=${
           userData?.onboarded
         }`,
         data
       );
-      toast.dismiss()
+      toast.dismiss();
       adding
         .then((e) => toast.success(e.data.message))
         .catch((e) => {
           toast.error(e.response.data.message);
         });
       router.refresh();
-      toast.dismiss()
+      toast.dismiss();
       setTimeout(() => {
-          router.push("/")
+        router.push("/");
       }, 400);
     } catch (error) {
       console.log(error);
@@ -94,7 +91,6 @@ const ProfileForm = ({ userData }: { userData?: User }) => {
             <FormItem className=" flex justify-center  gap-20 flex-wrap max-md:gap-10 ">
               <UploadDropzone
                 endpoint="imageUploader"
-
                 appearance={{
                   container: ` max-md:!px-2 max-md:!py-6 transition-all hover:scale-105 dark:border-black
                      bg-white cursor-pointer dark:bg-neutral-300 `,
