@@ -27,7 +27,7 @@ export default async function Home() {
 
     
         <div className="w-full backdrop-blur-lg relative h-screen">
-         <SearchFreind />
+         <SearchFreind userId={Userdata.id} />
         </div>
   
       </Suspense>

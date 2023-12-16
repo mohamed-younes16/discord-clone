@@ -63,7 +63,22 @@ export const findServersBelong = async (
     console.log(error);
   }
 };
+export const getFreinds = async (
+ username
+) => {
+  try {
 
+    const { userId } = auth();
+
+    // const userfromdb = await getuserfromDB(userId || "");
+    // const allServers = await Servers.find({ "members.member": userfromdb.id });
+    const allServers = await axios.get(`${apiUrl}/users/access?username=${username}&userId=${userId}`, );
+
+    return allServers.data
+  } catch (error) {
+    console.log(error);
+  }
+};
 export const findServer = async ({
   serverId,
   chatLimit,

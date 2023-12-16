@@ -39,13 +39,7 @@ import { User } from "@/index";
 
 const ProfileForm = ({ userData }: { userData?: User }) => {
   const router = useRouter();
-  useEffect(() => {
-    console.log(
-      `https://dicord-api.onrender.com/register?onboarded=${
-        userData?.onboarded
-      }`
-    );
-  }, []);
+
 
   const form = useForm<z.infer<typeof SetupSchema>>({
     resolver: zodResolver(SetupSchema),

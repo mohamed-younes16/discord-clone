@@ -38,10 +38,15 @@ import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import axios from "axios";
 import { User } from "@/index";
+import { getFreinds } from "@/lib/db-actions";
+import _ from "lodash"; 
 
-const SearchFreind = () => {
-  const env = process.env.NODE_ENV
-const apiUrl = env =="development" ?"http://localhost:5000":"https://dicord-api.onrender.com"
+const SearchFreind = ({userId}:{userId:string}) => {
+  const env = process.env.NODE_ENV;
+  const apiUrl =
+    env == "development"
+      ? "http://localhost:5000"
+      : "https://dicord-api.onrender.com";
 
   const [freinds, setFreinds] = useState<User[]>([]);
   const [loading, setIsLoading] = useState<boolean>(false);
@@ -75,43 +80,34 @@ const apiUrl = env =="development" ?"http://localhost:5000":"https://dicord-api.
   ];
   useEffect(() => {
     let timeoutId;
-  
-    const sub = watch(async (v) => {
-      setIsLoading(true);
-  
-      if (watch().name.length == 0) {
-        setFreinds([]);
-        clearTimeout(timeoutId); // Clear the timeout when the watch value changes
-      }
-  
-      if (watch().name.length > 0) {
-        timeoutId = setTimeout(async () => {
-          const user = await axios.post(`${apiUrl}/login`, {
-            "username": "yehhs",
-            "pass": "mohamed2007",
-            data : {
-              "bio":"idk",
-              "createdAt":"2023-10-27T13:31:26.639Z"
-              ,"imageUrl":"https://utfs.io/f/c8d117ff-2bcd-444e-8f2f-efac8660934b-43bfjs.png",
-            
-              "name":"mohamed",
-              "onboarded":true,"username":"younes_med",
-              "active":true,
-              email:"younes_med@prisma.",
-              
-            }
-          });
 
-          setIsLoading(false);
-        }, 300); // Set your desired timeout value in milliseconds
+    const debouncedSearch = _.debounce(async () => {
+      setIsLoading(true);
+
+      if (watch().name.length === 0) {
+        setFreinds([]);
       }
-    });
-  
+
+      if (watch().name.length > 0) {
+        try {
+          const username = watch().name;
+          const user = await axios.get(`${apiUrl}/users/access?username=${username}&userId=${userId}`);
+          setFreinds(user.data.users);
+          setIsLoading(false);
+        } catch (error) {
+          console.error("Error fetching users:", error);
+          setIsLoading(false);
+        }
+      }
+    }, 800);
+
+    const sub = watch(debouncedSearch);
+
     return () => {
       sub.unsubscribe();
-      clearTimeout(timeoutId); // Clear the timeout when the component unmounts
+      debouncedSearch.cancel(); // Cancel the debounce function on component unmount
     };
-  }, [watch]);
+  }, [watch, userId]);
 
   return (
     <div
@@ -155,15 +151,16 @@ const apiUrl = env =="development" ?"http://localhost:5000":"https://dicord-api.
             <p className=" text-xl font-bold ">Freinds</p>
           </div>
           <div className="flexcenter   h-12 ">
-            {freindsList.map((e) => (
-              <div key={e} className=" flexcenter">
-                {" "}
-                <Separator
+            {freindsList.map((e) => ( 
+              <> <Separator
                   orientation="vertical"
                   className="mx-3  h-12  bg-zinc-700 "
                 />
+              <div key={e} className="w-24 flexcenter">
+                {" "}
+              
                 <button
-                  className={`p-1 text-lg rounded-md
+                  className={`p-1 w-full text-lg rounded-md
                       hover:bg-zinc-400 transition-all
                         !bg-opacity-30
 
@@ -176,6 +173,7 @@ const apiUrl = env =="development" ?"http://localhost:5000":"https://dicord-api.
                   {e}
                 </button>
               </div>
+              </>
             ))}
           </div>
         </div>
@@ -214,7 +212,7 @@ const apiUrl = env =="development" ?"http://localhost:5000":"https://dicord-api.
         )
       ) : (
         <>
-          <div className=" p-6 flex-col">
+          <div className=" p-6 flex-col flex ">
             {freinds?.map((e) => (
               <Popover key={e.id}>
                 <PopoverTrigger>
