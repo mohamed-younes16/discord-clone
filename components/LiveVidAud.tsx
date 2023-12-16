@@ -10,11 +10,12 @@ import {
 import { useEffect, useState } from 'react';
 
 import { Loader2 } from 'lucide-react';
-import { UserDocument } from '@/models/UsersModel';
+import { User } from '..';
 
 
 
-export default function LiveVidAud({user , chatId , audio,}:{user:UserDocument,chatId:string,audio:boolean,}) {
+
+export default function LiveVidAud({user , chatId , audio,}:{user:User,chatId:string,audio:boolean,}) {
 
   const [token, setToken] = useState("");
 
