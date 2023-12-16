@@ -39,24 +39,27 @@ import {
 import { GitBranch } from "lucide-react";
 
 import { Separator } from "../ui/separator";
-import { addChannelToServer, updateChannel } from "@/lib/db-actions";
+import { addChannelToServer, updateCHANNEL, } from "@/lib/db-actions";
 import { ReactNode } from "react";
-import { ChannelDocument } from "@/index";
+import { Channel } from "@/index";
+
 
 const ChannelForm = ({
   serverId,
   icon,
   actionType,
   channel = "",
-  isAdmin
+  isAdmin,
+  channelId
 }: {
   serverId: string;
   icon?: ReactNode;
   actionType: "create" | "update";
   channel?: string;
-  isAdmin:boolean
+  isAdmin:boolean;
+  channelId?:string
 }) => {
-  const channelDocument: ChannelDocument | null =
+  const channelDocument:Channel | null =
     actionType == "update" ? JSON.parse(channel) : null;
 
   const ChannelSchema = z.object({
@@ -88,13 +91,12 @@ const ChannelForm = ({
               values.name,
               values.type,
               isAdmin
-              
-            )) || { valid: false, message: "check your connection" }
-          : (await updateChannel(
-              serverId,
-              channelDocument?._id || "",
-              values
-            )) || { valid: false, message: "check your connection" };
+            )) 
+          :  (await updateCHANNEL(
+            channelId || "",
+            isAdmin,
+            values
+          )) || { valid: false, message: "check your connection" };
       toast.dismiss();
 
       if (uploadServer?.valid) {
@@ -134,7 +136,7 @@ const ChannelForm = ({
 
         <DialogHeader>
           <DialogTitle>
-            <h1 className=" text-2xl font-bold "> {actionType} Channel</h1>
+            <p className=" text-2xl font-bold "> {actionType} Channel</p>
           </DialogTitle>
 
           <DialogDescription>

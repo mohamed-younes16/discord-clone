@@ -1,16 +1,17 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
-export interface UserDocument extends Document {
+export interface UserDocument  {
   id: string;
   name: string;
   username: string;
-  imageUrl?: string;
-  bio?: string;
+  imageUrl: string;
+  bio: string;
   onboarded: boolean;
-  freinds: Schema.Types.ObjectId;
   createdAt: Date;
-  active:boolean;
-  
+  updatedAt: Date;
+  active: boolean;
+  email: string;
+
 }
 
 

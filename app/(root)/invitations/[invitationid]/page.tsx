@@ -45,8 +45,6 @@ const Page = ({
 
 
      const adding = await addingMember(invitationid);
-console.log(adding)
-    // setServerName(adding?.servername || "");
 
     if (adding?.serversBelongsTo) {
 
@@ -64,7 +62,7 @@ console.log(adding)
       toast.message(<p className="flexcenter"> {adding.message}</p>)
         setTimeout(() => {
         setisjoning(false);
-        Router.push(`/`);
+        window.location.assign(`/`);
         Router.refresh();
       }, 500);
     }

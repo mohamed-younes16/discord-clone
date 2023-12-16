@@ -3,15 +3,16 @@ import { Toaster } from 'sonner'
 
 import "@uploadthing/react/styles.css";
 
-import { getCurrentProfile, getCurrentUser,  } from '@/lib/db-actions';
+import { getCurrentUser  } from '@/lib/db-actions';
 import { SignOutButton, currentUser,  } from '@clerk/nextjs';
 
 import { HomeIcon, LucideLogOut } from 'lucide-react';
 import Link from 'next/link';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { UserObject } from '@/index';
+
 import ProfileForm from '@/components/Forms/ProfileForm';
 import TooltipComp from '@/components/ui/TooltipComp';
+import { User } from '@/index';
 
 
 
@@ -21,7 +22,7 @@ import TooltipComp from '@/components/ui/TooltipComp';
 
 const Page =async () => {
   const clerkUser= await currentUser()
-  const CurrentUserData:UserObject|null =await getCurrentUser (clerkUser?.id ||"")
+  const CurrentUserData:User =await getCurrentUser (clerkUser?.id ||"")
 
 return (<>
     <div className="fixed inset-0  flexcenter left-0 top-0  text-black  

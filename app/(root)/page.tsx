@@ -1,6 +1,7 @@
 import SearchFreind from "@/components/Forms/SearchFreind";
 import SideBarNav from "@/components/SideBarNav";
-import { UserObject } from "@/index";
+import { User } from "@/index";
+
 import { findServersBelong, getCurrentUser } from "@/lib/db-actions";
 import { currentUser } from "@clerk/nextjs";
 import { Suspense }  from "react";
@@ -9,7 +10,7 @@ import { Suspense }  from "react";
 export default async function Home() {
   const allServers = await findServersBelong("findGeneral");
   const clerkUser= await currentUser()
-  const Userdata:UserObject =await getCurrentUser (clerkUser?.id ||"")
+  const Userdata:User =await getCurrentUser (clerkUser?.id ||"")
 
 
 

@@ -1,5 +1,4 @@
 "use client";
-
 import {
   Popover,
   PopoverContent,
@@ -7,7 +6,6 @@ import {
 } from "@/components/ui/popover";
 import { Edit, GripVertical } from "lucide-react";
 import { Button } from "../ui/button";
-import qs from "query-string";
 import {
   Dialog,
   DialogClose,
@@ -21,19 +19,26 @@ import {
 import axios from "axios";
 import { Dispatch, SetStateAction } from "react";
 import { toast } from "sonner";
+const env = process.env.NODE_ENV;
+const apiUrl =
+  env == "development"
+    ? "http://localhost:5000"
+    : "https://dicord-api.onrender.com";
 
 const MessageOpts = ({
   messageId,
   channelId,
   serverId,
   setEdit,
-  origin,
+  chatLimit,
+  userId,
 }: {
   messageId: string;
   channelId: string;
-  origin: string;
   serverId: string;
   setEdit: Dispatch<SetStateAction<boolean>>;
+  chatLimit: number;
+  userId;
 }) => {
   return (
     <Popover>
@@ -48,9 +53,7 @@ const MessageOpts = ({
       <PopoverContent className=" !w-fit" side="left">
         <Dialog>
           <DialogTrigger className=" w-full">
-            <Button variant={"destructive"} className=" w-full">
-              Delete
-            </Button>
+            <div className=" bg-red-600 rounded-lg p-2 flexcenter">Delete</div>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -62,19 +65,16 @@ const MessageOpts = ({
                       variant={"destructive"}
                       onClick={async () => {
                         toast.loading("deleteing...", { duration: 90000 });
-                        const url = qs.stringifyUrl({
-                          url: `${origin}/api/socket/messages`,
-                          query: {
-                            serverId,
-                            channelId,
-                            messageId,
-                            actionType: "delete",
-                          },
-                        });
 
-                        await axios.post(url, {
+                        await axios.post(`${apiUrl}/servers/messages`, {
                           messageId,
+                          channelId,
+                          chatLimit,
+                          operationType: "deleteMessage",
+                          userId,
+                          serverId
                         });
+                        toast.dismiss()
                       }}
                     >
                       Delete Message

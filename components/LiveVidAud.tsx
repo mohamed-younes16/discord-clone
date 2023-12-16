@@ -14,7 +14,7 @@ import { UserDocument } from '@/models/UsersModel';
 
 
 
-export default function LiveVidAud({user , chatId , audio,video}:{user:UserDocument,chatId:string,audio:boolean,video:boolean}) {
+export default function LiveVidAud({user , chatId , audio,}:{user:UserDocument,chatId:string,audio:boolean,}) {
 
   const [token, setToken] = useState("");
 

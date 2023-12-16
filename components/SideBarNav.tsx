@@ -3,7 +3,6 @@ import { ModeToggle } from "./ui/themeButton";
 import { UserCircle2 } from "lucide-react";
 import Link from "next/link";
 import TooltipComp from "./ui/TooltipComp";
-
 import { ScrollArea } from "./ui/scroll-area";
 import ServerLinks from "./ServersLinks";
 import { ReactNode, useEffect, useState } from "react";
@@ -24,6 +23,7 @@ const SideBarNav = ({
   const [visible, setvisible] = useState(true);
   const router = useRouter();
   const { SideBarOpen, setSideBarOpen } = useStore();
+
   const env = process.env.NODE_ENV;
   const apiUrl =
     env == "development"
@@ -54,8 +54,9 @@ const SideBarNav = ({
     };
 
     window.addEventListener("unload", handleWindowClose);
-
+    window.addEventListener("beforeunload", handleWindowClose);
     return () => {
+      window.addEventListener("beforeunload", handleWindowClose);
       window.removeEventListener("unload", handleWindowClose);
     };
   }, []);
@@ -77,8 +78,7 @@ const SideBarNav = ({
       document.removeEventListener("pointermove", trackMousePosition);
   }, []);
 
-  return (
-    <div
+  return (<div  suppressHydrationWarning
       className={`transition-all relative z-50  duration-700  ${
         SideBarOpen ? "lg:pl-[330px] " : ""
       }`}
@@ -147,8 +147,8 @@ ${SideBarOpen ? "translate-x-0" : "-translate-x-full"}
           {children}
         </div>
       </div>
-    </div>
-  );
+    </div>)
+  
 };
 
 export default SideBarNav;

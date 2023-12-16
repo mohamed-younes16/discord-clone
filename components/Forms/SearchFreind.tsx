@@ -33,7 +33,7 @@ import * as z from "zod";
 import { Toaster, toast } from "sonner";
 import { useStore } from "@/store";
 import { useEffect, useState } from "react";
-import { addFreind, getAUser } from "@/lib/db-actions";
+
 import { UserDocument } from "@/models/UsersModel";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
@@ -216,10 +216,10 @@ const apiUrl = env =="development" ?"http://localhost:5000":"https://dicord-api.
         <>
           <div className=" p-6 flex-col">
             {freinds?.map((e) => (
-              <Popover key={e._id}>
+              <Popover key={e.id}>
                 <PopoverTrigger>
                   <div
-                    key={e._id.toString()}
+                    key={e.id}
                     className="flex w-full items-start gap-4  my-6"
                   >
                     {e?.imageUrl && (
@@ -267,11 +267,11 @@ const apiUrl = env =="development" ?"http://localhost:5000":"https://dicord-api.
                           onClick={async (ev) => {
                             ev.currentTarget.disabled = true;
                             toast.loading("", { duration: 90000 });
-                            const adding = await addFreind(e._id);
-                            toast.dismiss();
-                            adding?.valid
-                              ? toast.success(<p>{adding?.message} </p>)
-                              : toast.error(<p>{adding?.message} </p>);
+                            // const adding = await addFreind(e.id);
+                            // toast.dismiss();
+                            // adding?.valid
+                            //   ? toast.success(<p>{adding?.message} </p>)
+                            //   : toast.error(<p>{adding?.message} </p>);
                             ev.currentTarget.disabled = false;
                           }}
                         >

@@ -32,11 +32,12 @@ import {
 } from "@/lib/db-actions";
 
 import { useRouter } from "next/navigation";
-import { UserObject } from "@/index";
+
 import axios from "axios";
 import { useEffect } from "react";
+import { User } from "@/index";
 
-const ProfileForm = ({ userData }: { userData?: UserObject }) => {
+const ProfileForm = ({ userData }: { userData?: User }) => {
   const router = useRouter();
   useEffect(() => {
     console.log(

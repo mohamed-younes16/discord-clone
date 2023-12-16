@@ -1,9 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Separator } from "./ui/separator";
-
 import TooltipComp from "./ui/TooltipComp";
-import { ServerDataType } from "..";
 import CurrentServer from "./CurrentServer";
 
 const ServerLinks = ({ data }: { data: any }) => {

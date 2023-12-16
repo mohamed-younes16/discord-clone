@@ -1,9 +1,6 @@
 "use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { useForm } from "react-hook-form";
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -14,7 +11,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
-import qs from "query-string";
+
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -24,26 +21,33 @@ import Image from "next/image";
 
 import { formatDate } from "@/lib/utils";
 
-import { PopulatedChat } from "@/index";
 import Link from "next/link";
 import { useState } from "react";
 import EmojiPicker from "./Forms/EmojiPicker";
 import MessageOpts from "./Forms/MessageOpts";
 import { Separator } from "./ui/separator";
+import { Chat } from "..";
+const env = process.env.NODE_ENV;
+const apiUrl =
+  env == "development"
+    ? "http://localhost:5000"
+    : "https://dicord-api.onrender.com";
 
 const MessageComp = ({
   data,
   serverId,
   channelId,
   userId,
-  origin,
+  chatLimit
 }: {
-  data: PopulatedChat;
+  data: Chat;
   serverId: string;
   channelId: string;
   userId: string;
-  origin: string;
+  chatLimit:number
 }) => {
+
+
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
   const messageSchema = z.object({
@@ -53,7 +57,7 @@ const MessageComp = ({
   const messageForm = useForm<z.infer<typeof messageSchema>>({
     resolver: zodResolver(messageSchema),
     defaultValues: {
-      message: data.content.text,
+      message: data?.content?.text || "",
     },
   });
 
@@ -61,17 +65,15 @@ const MessageComp = ({
     try {
       toast.loading("editing.....", { dismissible: false, duration: 90000 });
 
-      const url = qs.stringifyUrl({
-        url: `${origin}/api/socket/messages`,
-        query: {
-          serverId,
-          channelId,
-          actionType: "edit",
-          messageId: data._id,
-        },
+      await axios.post(`${apiUrl}/servers/messages`, {
+        messageId:data.id,
+        channelId,
+        chatLimit,
+        operationType: "editMessage",
+        userId,
+        messageData:values,serverId
       });
 
-      await axios.post(url, values);
       setIsEditing(false);
     } catch (error) {
       console.log(error);
@@ -82,20 +84,18 @@ const MessageComp = ({
     <div className="hover:bg-[#55555550] transition-all ">
       <div
         className={`w-full flex justify-between ${
-          data.creator._id == userId
-            ? "flex-row-reverse text-end"
-            : "text-start"
+          data.creator.memberId == userId ? "flex-row-reverse text-end" : "text-start"
         }`}
       >
         <div
           className={`w-full gap-6 my-5 flex ${
-            data.creator._id == userId
+            data.creator.member.id == userId
               ? "flex-row-reverse text-end"
               : "text-start"
           }`}
         >
           <Image
-            src={data.creator.imageUrl}
+            src={data.creator.member.imageUrl}
             className=" w-14 h-14 rounded-full bg-cover overflow-hidden "
             alt=""
             height={50}
@@ -105,7 +105,7 @@ const MessageComp = ({
           <div>
             <div
               className={` gap-6 flexcenter  ${
-                data.creator._id !== userId ? "flex-row-reverse" : ""
+                data.creator.member.id !== userId ? "flex-row-reverse" : ""
               }`}
             >
               <span className=" text-sm text-gray-800 dark:text-gray-500">
@@ -114,17 +114,17 @@ const MessageComp = ({
               </span>
               <span className=" text-white text-xl font-semibold">
                 {" "}
-                {data?.creator.username}
+                {data?.creator?.member.username}
               </span>
             </div>
-            <div className=" mt-4">
-              {data.content.file?.url &&
-                (data.content.file.fileType == "pdf" ? (
+            <div className=" mt-4 ">
+              {data?.content?.file?.url &&
+                (data?.content?.file.fileType == "pdf" ? (
                   <Link
                     target="_blank"
-                    href={data.content.file?.url}
-                    className=" flexcenter border-2 p-2 border-indigo-400 text-xl 
-                                                    rounded-2xl  text-indigo-600 hover:underline  gap-2"
+                    href={data?.content?.file?.url}
+                    className=" flexcenter border-2 p-2 border-indigo-400 text-lg 
+                        rounded-2xl  text-indigo-600 w-fit hover:underline  gap-2"
                   >
                     File Link
                     <FileText className="w-6 h-6" />
@@ -132,7 +132,7 @@ const MessageComp = ({
                 ) : (
                   <div className=" rounded-2xl object-cover  relative overflow-hidden h-48 w-80">
                     <Image
-                      src={data.content.file.url}
+                      src={data?.content?.file.url}
                       fill
                       alt="image of a message"
                     />
@@ -142,7 +142,7 @@ const MessageComp = ({
               {isEditing ? (
                 <Form {...messageForm}>
                   <form className="space-y-8">
-                    {data.content.file?.url}
+                    {data?.content?.file?.url}
 
                     <div className="flex pb-12 gap-4">
                       <FormField
@@ -155,7 +155,7 @@ const MessageComp = ({
                                 <FormControl className="flex ">
                                   <div className="flex gap-4">
                                     <Input
-                                      defaultValue={data.content.text}
+                                      
                                       className="account-form_input "
                                       type="text"
                                       {...field}
@@ -191,19 +191,20 @@ const MessageComp = ({
                 </Form>
               ) : (
                 <p className="  text-gray-500 dark:text-gray-300 mt-4">
-                  {data.content.text}
+                  {data?.content?.text}
                 </p>
               )}
             </div>
           </div>
         </div>
-        {userId.toString() === data.creator._id.toString() && (
+        {userId.toString() === data.creator.member.id.toString() && (
           <MessageOpts
-            origin={origin}
             setEdit={setIsEditing}
             serverId={serverId}
             channelId={channelId}
-            messageId={data._id.toString()}
+            messageId={data.id}
+            userId={userId}
+chatLimit={chatLimit}
           />
         )}
       </div>

@@ -8,34 +8,40 @@ export interface Member {
 }
 
 export interface Chat {
-    creator: mongoose.Types.ObjectId;
     content: {
         text: string;
-       
         file?: {
-            url:string;
-            fileType:"image"|"pdf";
+        id: string;
+        url: string;
+        fileId: string;
+        fileType:"image"|"pdf";
         }
     };
+    id: string;
+    channelId: string;
+    creatorId: string;
     createdAt: Date;
-    likes: number;
 }
-
-export interface ServerDocument extends Document {
+export interface channel{  
+    name:String;
+    type:"text"|"video"|"audio" ;
+    chat:Chat[];
+    creator: UserDocument;
+    createdAt: Date;
+    id: string;
+    serversBelongId: string;
+    creatorId: string;
+ 
+}
+export interface ServerDocument {
+    members: Member[];
+    channels:channel[];
+    updatedAt: Date;
+    id: string;
     name: string;
     imageUrl: string;
-    invitationLink: string;
-    members: Member[];
-    channels:{  
-        name:String;
-        type:"text"|"video"|"audio" ;
-        chat:Chat[];
-        creator: mongoose.Types.ObjectId;
-        createdAt: Date;
-        _id: mongoose.Types.ObjectId;
-    }[];
     createdAt: Date;
-    _id: mongoose.Types.ObjectId;
+    invitationLink: string;
 }
 
 const servermodel = new mongoose.Schema<ServerDocument>({
@@ -116,6 +122,6 @@ const servermodel = new mongoose.Schema<ServerDocument>({
     }
 });
 
-const Servers: Model<ServerDocument> = mongoose.models?.Servers || mongoose.model<ServerDocument>("Servers", servermodel);
+const Servers: Model<any> = mongoose.models?.Servers || mongoose.model<any>("Servers", servermodel);
 
 export default Servers;

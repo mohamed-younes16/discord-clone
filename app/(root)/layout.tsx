@@ -4,11 +4,11 @@ import '../globals.css'
 import { ClerkProvider, currentUser,  } from '@clerk/nextjs'
 import '@radix-ui/themes/styles.css';
 import { ReactNode } from 'react';
-import { headers } from 'next/headers';
-import {  checkState, getCurrentProfile, getCurrentUser,  } from '@/lib/db-actions';
-import { UserObject } from '@/index';
-import { redirect } from 'next/navigation';
+import {   getCurrentUser,  } from '@/lib/db-actions';
+
+
 import CheckUser from '@/components/CheckUser';
+import { User } from '@/index';
 
 
 
@@ -21,7 +21,7 @@ export const metadata = {
 export default async function RootLayout({ children }:{children:ReactNode}) {
 
   const clerkUser= await currentUser()
-  const Userdata:UserObject =await getCurrentUser (clerkUser?.id ||"")
+  const Userdata:User =await getCurrentUser (clerkUser?.id ||"")
 
 
   return ( 

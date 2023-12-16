@@ -9,17 +9,27 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { LogOutIcon, Trash2, Trash2Icon } from "lucide-react";
-import { UserLeaves, deleteServer, deletechannelDB } from "@/lib/db-actions";
+import {  Trash2,  } from "lucide-react";
+
 import { Toaster, toast } from "sonner";
 import { useRouter } from "next/navigation";
+import axios from "axios";
+const env = process.env.NODE_ENV;
+const apiUrl =
+  env == "development"
+    ? "http://localhost:5000"
+    : "https://dicord-api.onrender.com";
 
 const DeleteChannelButton = ({
   serverId,
   channelId,
+  userId,
+  isAdmin
 }: {
   serverId: string;
   channelId: string;
+  userId:string;
+  isAdmin:boolean
 }) => {
   const router = useRouter();
 
@@ -27,21 +37,24 @@ const DeleteChannelButton = ({
     try {
       toast.loading("deleting.....");
 
-      const idDeleted = (await deletechannelDB(serverId, channelId)) || {
-        valid: false,
-        message: "check your connection",
-      };
+      const idDeleted = await  axios.delete(`${apiUrl}/servers/delete`,{data: {
+        userId,isAdmin,operationType:"deleteChannel",channelId
 
-      if (idDeleted?.valid) {
-        toast.success(idDeleted?.message, { duration: 3000 });
+      }})
+
+      if (idDeleted?.data) {
+     
+
+        toast.success(idDeleted?.data.message, { duration: 3000 });
         setTimeout(() => {
+
           window.location.reload();
-        }, 500);
+        }, 800);
       } else {
         setTimeout(() => {
           toast.dismiss();
           setTimeout(() => {
-            toast.error(idDeleted?.message, { duration: 3000 });
+            toast.error(idDeleted?.data.message, { duration: 3000 });
           }, 300);
         }, 200);
       }

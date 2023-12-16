@@ -9,18 +9,19 @@ import {
 } from "@/components/ui/popover";
 import DeleteChannelButton from "./DeleteChannelButton";
 
-
 const ChannelHandler = ({
   serverId,
   channel,
-  isAdmin
+  isAdmin,
+  channelId,
+  userId
 }: {
   serverId: string;
   channel: string;
-  isAdmin:boolean
+  isAdmin: boolean;
+  channelId: string;
+  userId:string
 }) => {
-
-
   return (
     <Popover>
       <PopoverTrigger>
@@ -34,7 +35,8 @@ const ChannelHandler = ({
 
       <PopoverContent className=" w-fit">
         <ChannelForm
-        isAdmin={isAdmin}
+        channelId={channelId}
+          isAdmin={isAdmin}
           icon={
             <div className="w-full gap-12 flex justify-between ">
               {" "}
@@ -48,8 +50,11 @@ const ChannelHandler = ({
         <DropdownMenuSeparator />
         <div className=" flex justify-between text-red-600  ">
           <DeleteChannelButton
-            channelId={JSON.parse(channel)._id}
+            channelId={channelId}
             serverId={serverId}
+            isAdmin={isAdmin}
+            
+            userId={userId}
           />
         </div>
       </PopoverContent>

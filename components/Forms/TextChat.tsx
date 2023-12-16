@@ -1,8 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { useForm } from "react-hook-form";
 import Lenis from "@studio-freight/lenis";
 import * as z from "zod";
@@ -14,49 +12,61 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import qs from "query-string";
 import { Toaster, toast } from "sonner";
-
 import { Badge } from "@/components/ui/badge";
-
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Award, Loader2, Send } from "lucide-react";
 import { io } from "socket.io-client";
-import { useEffect, useRef, useState } from "react";
-import { Send } from "lucide-react";
-
 import EmojiPicker from "./EmojiPicker";
-
 import UploadFileChat from "./UploadFileChat";
 import TooltipComp from "../ui/TooltipComp";
-import { PopulatedChat } from "@/index";
-
 import MessageComp from "../MessageComp";
+import { Chat } from "@/index";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { findServer } from "@/lib/db-actions";
 
+const env = process.env.NODE_ENV;
+const apiUrl =
+  env == "development"
+    ? "http://localhost:5000"
+    : "https://dicord-api.onrender.com";
 const TextChat = ({
   serverId,
   channelId,
   data,
   userId,
+  memberId,
+  limit,
+  channelName,
 }: {
   serverId: string;
   channelId: string;
-  data: PopulatedChat[];
+  data: Chat[];
   userId: string;
+  memberId: string;
+  limit: number;
+  channelName: string;
 }) => {
   const [connected, setIsconnected] = useState(false);
-  const [chat, setChat] = useState<PopulatedChat[]>(data || []);
-  const [origin, setorigin] = useState<string>("");
-  const bottomRef = useRef<HTMLDivElement>(null);
-  const [socket, setSocket] = useState<any>(null);
+  const [chat, setChat] = useState<Chat[]>(data.toReversed() || []);
+  const bottomRef = useRef<any>(null);
+  const socket = useMemo(() => io(apiUrl), []);
   const wrapper: any = useRef();
   const content: any = useRef();
-  toast.dismiss();
+  const [messagesToShow, setMessagesToShow] = useState(9);
+  const [fetchingMessages, setFetchingMessages] = useState(true);
+  const targetRef = useRef(null);
+
+  const path = usePathname();
+  const router = useRouter();
+
   useEffect(() => {
     const lenis = new Lenis({
-      wrapper: wrapper.current,
-      duration: 1.2,
+      wrapper: wrapper?.current,
+      duration: 0.6,
 
       content: content.current,
     });
@@ -67,53 +77,80 @@ const TextChat = ({
     }
 
     requestAnimationFrame(raf);
+
+
   }, []);
 
   useEffect(() => {
     toast.dismiss();
     if (bottomRef.current) {
-      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+      bottomRef.current.scrollIntoView({ behavior: "instant" });
     }
-  }, [chat]);
-
-  useEffect(() => {
-    setSocket(
-      new (io as any)(process.env.NEXT_PUBLIC_SITE_URL!, {
-        path: "/api/socket/io",
-        addTrailingSlash: false,
-      })
-    );
   }, []);
+
   useEffect(() => {
-    toast.dismiss();
+    const change = async () => {
+   
+      const data = await findServer({
+        serverId,
+        chatLimit: messagesToShow,
+        userId,
+        operationType: "findChannel",
+        channelId,
+      });
+      setChat(data.chat.toReversed());
+      setFetchingMessages(false)
+    };
 
-    setorigin(window.location && window.location.origin);
+    change();
+  }, [messagesToShow]);
+  useEffect(() => {
+    const options = {
+      root: null,
+      rootMargin: "0px",
+      threshold: 0.9,
+    };
 
-    const socket = new (io as any)(process.env.NEXT_PUBLIC_SITE_URL!, {
-      path: "/api/socket/io",
-      addTrailingSlash: false,
-      allowEIO3: true,
-    });
+    const callback = async (entries: any) => {
+      setTimeout(() => {
+        entries.forEach(async (entry: any) => {
+          if (entry.isIntersecting) {
 
-    socket.on("connect", () => {
-      setIsconnected(true);
-    });
+            if ((messagesToShow <= chat.length) && (!fetchingMessages)) { 
+              setFetchingMessages(true)
+              setMessagesToShow((s) => s + 2);
+            }
+          }
+        });
+      }, 500);
+    };
+
+    const observer = new IntersectionObserver(callback, options);
+
+    if (targetRef?.current) {
+      observer.observe(targetRef.current);
+    }
 
     return () => {
-      socket.disconnect();
+      // Cleanup: disconnect the observer when the component unmounts
+      observer.disconnect();
     };
-  }, []);
+  }, [chat.length,messagesToShow]);
 
+  socket && socket.connect();
   socket &&
     socket.on(
       `message-server-${serverId}-channel-${channelId}`,
-      (message: PopulatedChat[]) => {
+      (message: Chat[]) => {
         toast.dismiss();
 
-        setChat(message);
+        setChat(message.toReversed());
       }
     );
 
+  socket?.on("connect", () => {
+    setIsconnected(true);
+  });
   const ChannelSchema = z.object({
     message: z
       .string()
@@ -138,16 +175,19 @@ const TextChat = ({
       toast.loading("sending.....", { dismissible: false, duration: 90000 });
 
       const url = qs.stringifyUrl({
-        url: `${origin}/api/socket/messages`,
-        query: {
-          serverId,
-          channelId,
-          type: "text",
-          actionType: "create",
-        },
+        url: `${apiUrl}/servers/messages`,
       });
 
-      await axios.post(url, values);
+      await axios.post(url, {
+        messageData: values,
+        serverId,
+        channelId,
+        operationType: "createMessage",
+        userId,
+        memberId,
+        chatLimit: messagesToShow,
+      });
+
       toast.dismiss();
       form.reset();
     } catch (error) {
@@ -158,24 +198,28 @@ const TextChat = ({
   return (
     <div className="flex-col flex  h-screen  w-full">
       <Toaster richColors />
-
+    
       <div
         id="text-wrapper"
         ref={wrapper}
-        className="chat overflow-hidden   flex px-4 flex-col max-h-[85%] h-[85%]  gap-10 "
+        className="chat overflow-hidden relative  flex px-4 flex-col max-h-[85%] h-[85%]  gap-10 "
       >
+      
         <div ref={content} id="text-content">
+          <div ref={targetRef} className="" />
           {chat &&
-            chat.map((e, i) => (
-              <MessageComp
-                origin={origin}
-                channelId={channelId}
-                userId={userId}
-                serverId={serverId}
-                data={e}
-                key={i}
-              />
-            ))}
+            chat.map((e, i) => {
+              return (
+                <MessageComp
+                  channelId={channelId}
+                  userId={userId}
+                  serverId={serverId}
+                  data={e}
+                  key={i}
+                  chatLimit={messagesToShow}
+                />
+              );
+            })}
           <div ref={bottomRef} />
         </div>
       </div>
@@ -183,7 +227,7 @@ const TextChat = ({
       <div className="p-4 max-h-[15%] h-[15%] ">
         <Form {...form}>
           <form className="space-y-8">
-            <div className="flex pb-12 gap-4">
+            <div className="flex pb-6 gap-4">
               <FormField
                 control={form.control}
                 name="fileUrl"
@@ -256,8 +300,9 @@ const TextChat = ({
             </div>
           </form>
         </Form>
-        <div>
-          {connected ? (
+        <div className="flex flex-col pb-3 ">
+          <div>
+             {connected ? (
             <Badge
               variant="outline"
               className="  text-green-600 border-green-600"
@@ -271,6 +316,10 @@ const TextChat = ({
               wait for connection{" "}
             </Badge>
           )}
+          </div>
+          { fetchingMessages && (<Loader2 className=" self-center h-10 w-10   animate-spin"/>)}
+
+         
         </div>
       </div>
     </div>

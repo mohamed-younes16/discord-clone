@@ -1,13 +1,10 @@
 import {
 findServer,
 findServersBelong,
-getCurrentProfile,
+getCurrentUser,
 } from "@/lib/db-actions";
-
-import { Loader2, MonitorX, ServerCrashIcon, UserPlus } from "lucide-react";
-
+import { Loader2, MonitorX, ServerCrashIcon, } from "lucide-react";
 import { redirect } from "next/navigation";
-import { UserObject } from "@/index";
 
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -40,22 +37,32 @@ import ChannelForm from "@/components/Forms/CreateChannel";
 import ManageServers from "@/components/CreateServer";
 import ChannelHandler from "@/components/Forms/ChannelHandler";
 import { Suspense } from "react";
+import {  Server, User } from "@/index";
+import { currentUser } from "@clerk/nextjs";
+
 const TextChat = dynamic(() => import("@/components/Forms/TextChat"), {
 ssr: false,
 });
 
 const page = async ({
 params: { serverId, channelId },
+searchParams:{limit}
 }: {
 params: { serverId: string; channelId: string };
+searchParams:{limit:string}
 }) => {
-const Userdata: UserObject = await getCurrentProfile(false);
 
-const currentServer: any = await findServer({
+    const clerkUser= await currentUser()
+    const Userdata:User =await getCurrentUser (clerkUser?.id ||"")
+  
+  
+
+const currentServer:Server = await findServer({
     serverId,
-    chatLimit: 6,
+    chatLimit: +limit || 10,
     userId: Userdata.id,
     operationType: "findSpecific",
+    channelId:"",
 });
 
 const allservers = await findServersBelong("findGeneral");
@@ -65,16 +72,16 @@ const currentChannel = currentServer?.channels.find(
 );
 
 const channlesType = currentServer && [
-    ...new Set(currentServer?.channels.map((e: any) => e.type)),
+    ...new Set(currentServer?.channels.map((e) => e.type)),
 ];
 
 const isAdmin = currentServer?.members.some(
     (e) => e.memberId === Userdata.id && e.userType === "admin"
 );
-const memberId = currentServer?.members.find(
+const currentMember = currentServer.members.find(
     (e) => e.memberId === Userdata.id 
-).id
-
+)
+const memberId = currentMember?.id
 
 if (!Userdata?.onboarded) redirect("/profile");
 
@@ -93,7 +100,7 @@ return (
             allservers={JSON.parse(JSON.stringify(allservers))}
         >
             <div
-            className="w-60  bg-gray-400 
+            className="w-64  bg-gray-400 
                 dark:bg-[#191919fc] h-screen"
             >
             <Popover>
@@ -153,7 +160,7 @@ return (
                         actionType="delete"
                         serverId={serverId}
                         userId={Userdata.id}
-                        memberId={memberId}
+                        memberId={memberId || ""}
                     />
                     <div className="my-2" />
                     <ChannelForm isAdmin={isAdmin}  actionType="create" serverId={serverId} />
@@ -164,7 +171,7 @@ return (
 
                     <DeleteLeaveServerButton
                     userId={Userdata.id}
-                    memberId={memberId}
+                    memberId={memberId || ""}
                     isAdmin={isAdmin}
                         actionType="leave"
                         serverId={serverId}
@@ -196,14 +203,14 @@ return (
                         el.type == e && (
                         <div
                             className={`flex justify-between
-                            transition-all px-4 dark:hover:!text-white
+                            transition-all p-2 my-1 items-center rounded-md dark:hover:!text-white
                             dark:text-neutral-400 text-neutral-700
                             ${
                             channelId == el.name
                                 ? "bg-neutral-700 !text-white  dark:bg-neutral-500"
                                 : ""
                             }
-                            items-center dark:hover:bg-gray-400 hover:bg-gray-500 text-lg 
+                            items-center dark:hover:bg-neutral-800 hover:bg-neutral-500 text-lg 
                             `}
                         >
                             <Link
@@ -211,7 +218,7 @@ return (
                             className=" w-full  py-2 "
                             >
                             <div
-                                className="flex
+                                className="flex items-center
                                     text-base
                                     gap-4"
                             >
@@ -229,6 +236,8 @@ return (
                             </Link>
                             {el.name !== "general" ? (
                             <ChannelHandler
+                            userId={Userdata.id}
+                            channelId={el.id}
                             isAdmin={isAdmin}
                                 channel={JSON.stringify(el)}
                                 serverId={serverId || ""}
@@ -252,7 +261,7 @@ return (
                     <Separator className=" my-4" />
 
                     <div
-                    key={m.member._id}
+                    key={m.member.id}
                     className="  w-full flex items-center gap-4 "
                     >
                     <div className="  !h-[50px] !w-[50px]  relative rounded-full    object-cover">
@@ -292,24 +301,27 @@ return (
         <div className=" w-full h-screen  backdrop-blur-sm  bg-[#27272794] ">
             {currentServer && currentChannel.type == "text" ? (
             <TextChat
+            channelName={currentChannel.name}
+                limit={+limit ||10}
                 data={JSON.parse(JSON.stringify(currentChannel.chat))}
-                userId={Userdata._id.toString()}
-                channelId={channelId}
+                userId={Userdata.id.toString()}
+                channelId={currentChannel.id}
                 serverId={serverId}
+                memberId={memberId ||""}
             />
             ) : currentChannel.type == "video" ? (
             <LiveVidAud
                 audio={false}
-                video={true}
+            
                 user={JSON.parse(JSON.stringify(Userdata))}
-                chatId={currentChannel._id.toString()}
+                chatId={currentChannel.id}
             />
             ) : (
             <LiveVidAud
                 audio={true}
-                video={false}
+             
                 user={JSON.parse(JSON.stringify(Userdata))}
-                chatId={currentChannel._id.toString()}
+                chatId={currentChannel.id}
             />
             )}
         </div>
