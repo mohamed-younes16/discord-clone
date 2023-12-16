@@ -24,36 +24,32 @@ const MembersHandler = ({
 }) => {
   const router = useRouter();
   const member: Member = JSON.parse(memberstring);
-  const changeUser = async (
-    member: any,
-    type: "editor" | "member",
-    serverId: string
-  ) => {
-    try {
-      toast.loading("changing permissions.....");
+  // const changeUser = async (
+  //   member: any,
+  //   type: "editor" | "member",
+  //   serverId: string
+  // ) => {
+  //   try {
+  //     toast.loading("changing permissions.....");
 
-      const changing = await changeUserType(
-        member._id.toString(),
-        type,
-        serverId
-      );
-      if (changing) {
-        toast.success("changed successfully");
-        router.refresh();
-      }
-    } catch (error) {}
-  };
-  const deletemember = async (member: any, serverId: string) => {
-    try {
-      toast.loading("deleteing member .....");
-      const deleting = await deleteUserFromMembers(member._id, serverId);
+    
+  //     // if (changing) {
+  //     //   toast.success("changed successfully");
+  //     //   router.refresh();
+  //     // }
+  //   } catch (error) {}
+  // };
+  // const deletemember = async (member: any, serverId: string) => {
+  //   try {
+  //     toast.loading("deleteing member .....");
+  //     const deleting = await deleteUserFromMembers(member.id, serverId);
 
-      if (deleting) {
-        toast.success("deleted successfully");
-        router.refresh();
-      }
-    } catch (error) {}
-  };
+  //     if (deleting) {
+  //       toast.success("deleted successfully");
+  //       router.refresh();
+  //     }
+  //   } catch (error) {}
+  // };
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -75,10 +71,11 @@ const MembersHandler = ({
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
             <DropdownMenuItem
-              onClick={() =>
-                member.userType == "member"
-                  ? changeUser(member.member, "editor", serverId)
-                  : ""
+              onClick={() =>{
+                // member.userType == "member"
+                //   ? changeUser(member.member, "editor", serverId)
+                //   : ""
+                }
               }
               className=" flex justify-between  "
             >
@@ -88,11 +85,11 @@ const MembersHandler = ({
             </DropdownMenuItem>
 
             <DropdownMenuItem
-              onClick={() =>
-                member.userType == "editor"
-                  ? changeUser(member.member, "member", serverId)
-                  : ""
-              }
+              onClick={() =>{
+                // member.userType == "editor"
+                //   ? changeUser(member.member, "member", serverId)
+                //   : ""
+              }}
               className=" flex justify-between  "
             >
               <p>member</p>
@@ -103,7 +100,10 @@ const MembersHandler = ({
         </DropdownMenuSub>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          onClick={() => deletemember(member.member, serverId)}
+          onClick={() =>{
+            //  deletemember(member.member, serverId)
+            
+            }}
           className=" flex justify-between  "
         >
           <UserX size={20} color="red" />
