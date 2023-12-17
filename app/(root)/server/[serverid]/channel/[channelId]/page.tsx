@@ -1,9 +1,9 @@
 import {
-findServer,
-findServersBelong,
-getCurrentUser,
+  findServer,
+  findServersBelong,
+  getCurrentUser,
 } from "@/lib/db-actions";
-import { Loader2, MonitorX, ServerCrashIcon, } from "lucide-react";
+import { Loader2, MonitorX, ServerCrashIcon } from "lucide-react";
 import { redirect } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
@@ -15,19 +15,19 @@ import dynamic from "next/dynamic";
 import SideBarNav from "@/components/SideBarNav";
 import LiveVidAud from "@/components/LiveVidAud";
 import {
-Popover,
-PopoverContent,
-PopoverTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from "@/components/ui/popover";
 import { InviteButton } from "@/components/InviteButton";
 import {
-ChevronDown,
-Hash,
-Lock,
-Mic,
-PlusIcon,
-Settings,
-Video,
+  ChevronDown,
+  Hash,
+  Lock,
+  Mic,
+  PlusIcon,
+  Settings,
+  Video,
 } from "lucide-react";
 import ManageUsers from "@/components/ManageUsers";
 import { Separator } from "@/components/ui/separator";
@@ -37,219 +37,219 @@ import ChannelForm from "@/components/Forms/CreateChannel";
 import ManageServers from "@/components/CreateServer";
 import ChannelHandler from "@/components/Forms/ChannelHandler";
 import { Suspense } from "react";
-import {  Server, User } from "@/index";
+import { Server, User } from "@/index";
 import { currentUser } from "@clerk/nextjs";
 
 const TextChat = dynamic(() => import("@/components/Forms/TextChat"), {
-ssr: false,
+  ssr: false,
 });
 
 const page = async ({
-params: { serverId, channelId },
-searchParams:{limit}
+  params: { serverId, channelId },
+  searchParams: { limit },
 }: {
-params: { serverId: string; channelId: string };
-searchParams:{limit:string}
+  params: { serverId: string; channelId: string };
+  searchParams: { limit: string };
 }) => {
+  const clerkUser = await currentUser();
+  const Userdata: User = await getCurrentUser(clerkUser?.id || "");
 
-    const clerkUser= await currentUser()
-    const Userdata:User =await getCurrentUser (clerkUser?.id ||"")
-  
-  
-
-const currentServer:Server = await findServer({
+  const currentServer: Server = await findServer({
     serverId,
     chatLimit: +limit || 10,
     userId: Userdata.id,
     operationType: "findSpecific",
-    channelId:"",
-});
+    channelId: "",
+  });
 
-const allservers = await findServersBelong("findGeneral");
+  const allservers = await findServersBelong("findGeneral");
 
-const currentChannel = currentServer?.channels.find(
+  const currentChannel = currentServer?.channels.find(
     (e) => e.name === channelId
-);
+  );
 
-const channlesType = currentServer && [
+  const channlesType = currentServer && [
     ...new Set(currentServer?.channels.map((e) => e.type)),
-];
+  ];
 
-const isAdmin = currentServer?.members.some(
+  const isAdmin = currentServer?.members.some(
     (e) => e.memberId === Userdata.id && e.userType === "admin"
-);
-const currentMember = currentServer.members.find(
-    (e) => e.memberId === Userdata.id 
-)
-const memberId = currentMember?.id
+  );
+  const currentMember = currentServer.members.find(
+    (e) => e.memberId === Userdata.id
+  );
+  const memberId = currentMember?.id;
 
-if (!Userdata?.onboarded) redirect("/profile");
+  if (!Userdata?.onboarded) redirect("/profile");
 
-return (
+  return (
     <Suspense
-    fallback={
+      fallback={
         <div className="fixed inset-0 flexcenter">
-        <Loader2 className="animate-spin h-16 w-16 " />
+          <Loader2 className="animate-spin h-16 w-16 " />
         </div>
-    }
+      }
     >
-    {currentChannel ? (
+      {currentChannel ? (
         <div className="  flex  w-full h-full">
-        <SideBarNav
+          <SideBarNav
             userId={Userdata.id}
             allservers={JSON.parse(JSON.stringify(allservers))}
-        >
+          >
             <div
-            className="w-64  bg-gray-400 
+              className="w-64  bg-gray-400 
                 dark:bg-[#191919fc] h-screen"
             >
-            <Popover>
+              <Popover>
                 <PopoverTrigger className="w-full">
-                <div
+                  <div
                     role="button"
                     className=" px-4 w-full text-start flex justify-between 
                             text-xl font-semibold items-center py-2 bg-gray-500
                             dark:bg-[#1d1e20] text-gray-800 dark:text-gray-200"
-                >
+                  >
                     {currentServer?.name}
 
                     <ChevronDown />
-                </div>
+                  </div>
                 </PopoverTrigger>
 
                 <PopoverContent className="w-48 p-3 cursor-pointer ">
-            
-                <InviteButton
+                  <InviteButton
                     serverInvitaion={currentServer?.invitationLink || ""}
-                />
+                  />
 
-                {isAdmin ? (
+                  {isAdmin ? (
                     <>
-                    <Separator className="my-2" />
+                      <Separator className="my-2" />
 
-                    <ManageUsers
+                      <ManageUsers
                         userId={Userdata.id}
                         membersData={currentServer.members}
                         isAdmin={isAdmin}
-                        serverId={serverId || ""}
-                    />
+                        serverId={currentServer.id}
+                      />
 
-                    <ManageServers
+                      <ManageServers
                         userId={Userdata.id}
                         icon={
-                        <p
+                          <p
                             className=" flex justify-between items-center 
                                                 p-1 hover:bg-white rounded-md transition-all !bg-opacity-20"
-                        >
+                          >
                             Edit Server
                             <Settings />
-                        </p>
+                          </p>
                         }
                         text="Edit Server"
                         data={{
-                        imageUrl: currentServer?.imageUrl,
-                        name: currentServer?.name,
+                          imageUrl: currentServer?.imageUrl,
+                          name: currentServer?.name,
                         }}
                         submitText="Update"
                         actionType="update"
-                        serverId={serverId || ""}
-                    />
-                    <div className="my-2" />
-                    <DeleteLeaveServerButton
-                    isAdmin={isAdmin}
+                        serverId={currentServer.id}
+                      />
+                      <div className="my-2" />
+                      <DeleteLeaveServerButton
+                        isAdmin={isAdmin}
                         actionType="delete"
-                        serverId={serverId}
+                        serverId={currentServer.id}
                         userId={Userdata.id}
                         memberId={memberId || ""}
-                    />
-                    <div className="my-2" />
-                    <ChannelForm isAdmin={isAdmin}  actionType="create" serverId={serverId} />
-                    </>
-                ) : (
-                    <>
-                    <Separator className="my-2" />
-
-                    <DeleteLeaveServerButton
-                    userId={Userdata.id}
-                    memberId={memberId || ""}
-                    isAdmin={isAdmin}
-                        actionType="leave"
-                        serverId={serverId}
-                    />
-                    </>
-                )}
-                </PopoverContent>
-            </Popover>
-
-            <ScrollArea className="flex px-3 flex-col">
-                {channlesType?.map((e: string) => (
-                <>
-                    <div className="flex items-center  w-full justify-between">
-                    <p className="  text-lg font-semibold  w-full">
-                        {e} Channels
-                    </p>
-                    {isAdmin && (
-                        <ChannelForm
+                      />
+                      <div className="my-2" />
+                      <ChannelForm
                         isAdmin={isAdmin}
                         actionType="create"
-                        icon={<PlusIcon />}
-                        serverId={serverId || ""}
+                        serverId={currentServer.id}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <Separator className="my-2" />
+
+                      <DeleteLeaveServerButton
+                        userId={Userdata.id}
+                        memberId={memberId || ""}
+                        isAdmin={isAdmin}
+                        actionType="leave"
+                        serverId={currentServer.id}
+                      />
+                    </>
+                  )}
+                </PopoverContent>
+              </Popover>
+
+              <ScrollArea className="flex px-3 flex-col">
+                {channlesType?.map((e: string) => (
+                  <>
+                    <div className="flex items-center  w-full justify-between">
+                      <p className="  text-lg font-semibold  w-full">
+                        {e} Channels
+                      </p>
+                      {isAdmin && (
+                        <ChannelForm
+                          isAdmin={isAdmin}
+                          actionType="create"
+                          icon={<PlusIcon />}
+                          serverId={currentServer.id}
                         />
-                    )}
+                      )}
                     </div>
 
                     {currentServer?.channels.map((el) => {
-                    return (
+                      return (
                         el.type == e && (
-                        <div
+                          <div
                             className={`flex justify-between
                             transition-all p-2 my-1 items-center rounded-md dark:hover:!text-white
                             dark:text-neutral-400 text-neutral-700
                             ${
-                            channelId == el.name
+                              channelId == el.name
                                 ? "bg-neutral-700 !text-white  dark:bg-neutral-500"
                                 : ""
                             }
                             items-center dark:hover:bg-neutral-800 hover:bg-neutral-500 text-lg 
                             `}
-                        >
+                          >
                             <Link
-                            href={`/server/${serverId}/channel/${el.name}`}
-                            className=" w-full  py-2 "
+                              href={`/server/${currentServer.id}/channel/${el.name}`}
+                              className=" w-full  py-2 "
                             >
-                            <div
+                              <div
                                 className="flex items-center
                                     text-base
                                     gap-4"
-                            >
+                              >
                                 {e == "text" ? (
-                                <Hash size={20} />
+                                  <Hash size={20} />
                                 ) : e == "audio" ? (
-                                <Mic size={20} />
+                                  <Mic size={20} />
                                 ) : e == "video" ? (
-                                <Video size={20} />
+                                  <Video size={20} />
                                 ) : (
-                                ""
+                                  ""
                                 )}
                                 <p>{el.name}</p>
-                            </div>
+                              </div>
                             </Link>
                             {el.name !== "general" ? (
-                            <ChannelHandler
-                            userId={Userdata.id}
-                            channelId={el.id}
-                            isAdmin={isAdmin}
+                              <ChannelHandler
+                                userId={Userdata.id}
+                                channelId={el.id}
+                                isAdmin={isAdmin}
                                 channel={JSON.stringify(el)}
-                                serverId={serverId || ""}
-                            />
+                                serverId={currentServer.id}
+                              />
                             ) : (
-                            <Lock />
+                              <Lock />
                             )}
-                        </div>
+                          </div>
                         )
-                    );
+                      );
                     })}
-                </>
+                  </>
                 ))}
 
                 <Separator className=" my-6" />
@@ -257,115 +257,113 @@ return (
                 <h2 className=" text-lg font-semibold ">Members</h2>
 
                 {currentServer?.members.map((m) => (
-                <>
+                  <>
                     <Separator className=" my-4" />
 
                     <div
-                    key={m.member.id}
-                    className="  w-full flex items-center gap-4 "
+                      key={m.member.id}
+                      className="  w-full flex items-center gap-4 "
                     >
-                    <div className="  !h-[50px] !w-[50px]  relative rounded-full    object-cover">
+                      <div className="  !h-[50px] !w-[50px]  relative rounded-full    object-cover">
                         <Image
-                        fill
-                        src={m.member.imageUrl || ""}
-                        alt=""
-                        className="rounded-full  !min-h-[50px] !min-w-[50px]  "
+                          fill
+                          src={m.member.imageUrl || ""}
+                          alt=""
+                          className="rounded-full  !min-h-[50px] !min-w-[50px]  "
                         />
                         {m.member.active && (
-                        <div className=" absolute z-10 h-3 w-3 rounded-full bg-green-500 bottom-0 left-0" />
+                          <div className=" absolute z-10 h-3 w-3 rounded-full bg-green-500 bottom-0 left-0" />
                         )}
-                    </div>
-                    <div className=" flex justify-between  items-center">
+                      </div>
+                      <div className=" flex justify-between  items-center">
                         <div>
-                        <p
+                          <p
                             className=" text-start text-xl dark:text-white 
                             font-semibold "
-                        >
+                          >
                             {m.member.username}
-                        </p>
-                        <p
+                          </p>
+                          <p
                             className=" text-start text-xl dark:text-gray-500
                             font-semibold "
-                        >
+                          >
                             {m.member.name}
-                        </p>
+                          </p>
                         </div>
+                      </div>
                     </div>
-                    </div>
-                </>
+                  </>
                 ))}
-            </ScrollArea>
+              </ScrollArea>
             </div>
-        </SideBarNav>
+          </SideBarNav>
 
-        <div className=" w-full h-screen  backdrop-blur-sm  bg-[#27272794] ">
+          <div className=" w-full h-screen  backdrop-blur-sm  bg-[#27272794] ">
             {currentServer && currentChannel.type == "text" ? (
-            <TextChat
-            channelName={currentChannel.name}
-                limit={+limit ||10}
+              <TextChat
+                channelName={currentChannel.name}
+                limit={+limit || 10}
                 data={JSON.parse(JSON.stringify(currentChannel.chat))}
                 userId={Userdata.id.toString()}
                 channelId={currentChannel.id}
-                serverId={serverId}
-                memberId={memberId ||""}
-            />
+                serverId={currentServer.id}
+                memberId={memberId || ""}
+              />
             ) : currentChannel.type == "video" ? (
-            <LiveVidAud
+              <LiveVidAud
                 audio={false}
-            
                 user={JSON.parse(JSON.stringify(Userdata))}
                 chatId={currentChannel.id}
-            />
+              />
             ) : (
-            <LiveVidAud
+              <LiveVidAud
                 audio={true}
-             
                 user={JSON.parse(JSON.stringify(Userdata))}
                 chatId={currentChannel.id}
-            />
+              />
             )}
+          </div>
         </div>
-        </div>
-    ) : (
+      ) : (
         <>
-        <div
+          <div
             className="flexcenter backdrop-blur-md  bg-black 
         !bg-opacity-75 flex-col gap-6  w-full h-screen"
-        >
+          >
             {currentServer && (
-            <Image
+              <Image
                 height={60}
                 width={60}
                 className="!h-20 !w-20  border border-white rounded-full bg-cover "
                 alt="image of user"
                 src={currentServer?.imageUrl || ""}
-            />
+              />
             )}
 
             {!currentServer && !currentChannel ? (
-            <>
+              <>
                 <MonitorX size={120} />
                 <p className=" text-2xl font-bold text-center max-md:text-lg">
-                You are not invited to The server{" "}
+                  You are not invited to The server{" "}
                 </p>
-            </>
+              </>
             ) : (
-            <>
+              <>
                 <ServerCrashIcon size={150} strokeWidth={1} />
                 <p className=" text-2xl font-bold">Server Not Found </p>
-            </>
+              </>
             )}
 
             <div className="flexcenter gap-6">
-            <Button>
+              <Button>
                 <Link href={"/"}> return to main page</Link>
-            </Button>
+              </Button>
             </div>
-        </div>
+          </div>
         </>
-    )}
+      )}
     </Suspense>
-);
+  );
 };
 
 export default page;
