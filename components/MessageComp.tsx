@@ -96,7 +96,7 @@ const MessageComp = ({
         >
           <Image
             src={data.creator.member.imageUrl}
-            className=" w-14 h-14 rounded-full bg-cover overflow-hidden "
+            className=" w-14 h-14 rounded-full object-cover overflow-hidden "
             alt=""
             height={50}
             width={50}

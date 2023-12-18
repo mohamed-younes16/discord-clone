@@ -97,7 +97,7 @@ const page = async ({
             allservers={JSON.parse(JSON.stringify(allservers))}
           >
             <div
-              className="w-64  bg-gray-400 
+              className="w-fit  bg-gray-400 
                 dark:bg-[#191919fc] h-screen"
             >
               <Popover>
@@ -203,7 +203,7 @@ const page = async ({
                         el.type == e && (
                           <div
                             className={`flex justify-between
-                            transition-all p-2 my-1 items-center rounded-md dark:hover:!text-white
+                            transition-all max-md:p-1 p-2 my-1 items-center rounded-md dark:hover:!text-white
                             dark:text-neutral-400 text-neutral-700
                             ${
                               channelId == el.name
@@ -220,10 +220,17 @@ const page = async ({
                               <div
                                 className="flex items-center
                                     text-base
-                                    gap-4"
+                                    gap-4
+                                    max-w-[180px]
+                                   
+                                    
+                                    "
                               >
                                 {e == "text" ? (
-                                  <Hash size={20} />
+                                  <Hash
+                                    size={20}
+                                    className="min-h-[20px] min-w-[20px]"
+                                  />
                                 ) : e == "audio" ? (
                                   <Mic size={20} />
                                 ) : e == "video" ? (
@@ -264,12 +271,12 @@ const page = async ({
                       key={m.member.id}
                       className="  w-full flex items-center gap-4 "
                     >
-                      <div className="  !h-[50px] !w-[50px]  relative rounded-full    object-cover">
+                      <div className="!h-[50px] !w-[50px]  relative rounded-full    object-cover">
                         <Image
                           fill
                           src={m.member.imageUrl || ""}
-                          alt=""
-                          className="rounded-full  !min-h-[50px] !min-w-[50px]  "
+                          alt={`${m.member.username} photo`}
+                          className="rounded-full object-cover !min-h-[50px] !min-w-[50px]  "
                         />
                         {m.member.active && (
                           <div className=" absolute z-10 h-3 w-3 rounded-full bg-green-500 bottom-0 left-0" />
@@ -278,13 +285,13 @@ const page = async ({
                       <div className=" flex justify-between  items-center">
                         <div>
                           <p
-                            className=" text-start text-xl dark:text-white 
+                            className=" text-start text-xl max-md:text-lg dark:text-white 
                             font-semibold "
                           >
                             {m.member.username}
                           </p>
                           <p
-                            className=" text-start text-xl dark:text-gray-500
+                            className=" text-start text-xl  max-md:text-lg dark:text-gray-500
                             font-semibold "
                           >
                             {m.member.name}

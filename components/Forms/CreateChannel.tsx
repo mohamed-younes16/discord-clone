@@ -65,7 +65,7 @@ const ChannelForm = ({
   const ChannelSchema = z.object({
     name: z
       .string()
-      .min(4, { message: "must be at least 4 characters long" })
+      .min(4, { message: "must be at least 4 characters long" }).max(12)
       .refine((e) => e.toLocaleLowerCase() !== "general", {
         message: "you can't create an channel with name 'General'",
       }),
