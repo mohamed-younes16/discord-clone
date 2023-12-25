@@ -25,7 +25,6 @@ import UploadFileChat from "./UploadFileChat";
 import TooltipComp from "../ui/TooltipComp";
 import MessageComp from "../MessageComp";
 import { Chat } from "@/index";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { findServer } from "@/lib/db-actions";
 
 const env = process.env.NODE_ENV;
@@ -107,22 +106,6 @@ const TextChat = ({
     }
   }, []);
 
-
-  useEffect(() => {
-  
-    const handleWindowClose = async (e:BeforeUnloadEvent) => {
-    
-     
-    };
-
-    window.addEventListener("unload", handleWindowClose);
-    window.addEventListener("beforeunload", handleWindowClose);
-    return () => {
-
-      window.addEventListener("beforeunload", handleWindowClose);
-      window.removeEventListener("unload", handleWindowClose);
-    };
-  }, []);
   const ChannelSchema = z.object({
     message: z
       .string()

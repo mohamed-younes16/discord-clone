@@ -1,6 +1,6 @@
 "use server";
 
-import { auth, currentUser,  } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import axios from "axios";
 
 const env = process.env.NODE_ENV;
@@ -63,18 +63,33 @@ export const findServersBelong = async (
     console.log(error);
   }
 };
-export const getFreinds = async (
- username
+export const getFreinds = async (username) => {
+  try {
+    const { userId } = auth();
+    const allServers = await axios.get(
+      `${apiUrl}/users/access?username=${username}&userId=${userId}`
+    );
+
+    return allServers.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const handleFreindRequest = async (
+  friendRequestDecision: "accept" | "decline",
+  friendId: string
 ) => {
   try {
 
     const { userId } = auth();
+    const allServers = await axios.patch(`${apiUrl}/users/update`, {
+      userId,
+      friendRequestDecision,
+      friendId,
+      operationType: "friendRequestHandle",
+    });
 
-    // const userfromdb = await getuserfromDB(userId || "");
-    // const allServers = await Servers.find({ "members.member": userfromdb.id });
-    const allServers = await axios.get(`${apiUrl}/users/access?username=${username}&userId=${userId}`, );
-
-    return allServers.data
+    return allServers.data.message;
   } catch (error) {
     console.log(error);
   }
@@ -166,7 +181,7 @@ export const changeMemberType = async (
   userType: "moderator" | "member",
   serverId: string,
   isAdmin: boolean,
-  userId:string
+  userId: string
 ) => {
   try {
     if (isAdmin) {
@@ -176,15 +191,13 @@ export const changeMemberType = async (
         userType,
         isAdmin,
         userId,
-        serverId
+        serverId,
       });
       // return Theserver.then((data) => {
       //   return JSON.parse(JSON.stringify({ ...data.data, valid: true }));
       // }).catch((error) => ({ ...error.response.data, valid: false }));
     }
-    }
-
-  catch (error) {
+  } catch (error) {
     console.log(error);
   }
 };
@@ -192,19 +205,19 @@ export const changeMemberType = async (
 export const deleteUserFromMembers = async (
   memberId: string,
   serverId: string,
-  userId:string,
+  userId: string,
   isAdmin: boolean
 ) => {
   try {
     if (isAdmin) {
-      await axios.delete(`${apiUrl}/servers/delete`, {data:{
-        memberId,
-        operationType: "deleteMember",
-        isAdmin,
-        userId,
-        serverId
-      }
-
+      await axios.delete(`${apiUrl}/servers/delete`, {
+        data: {
+          memberId,
+          operationType: "deleteMember",
+          isAdmin,
+          userId,
+          serverId,
+        },
       });
     }
 
@@ -239,7 +252,24 @@ export const UserLeaves = async (
     return { valid: false, message: "error happend" };
   }
 };
+export const requestFreind = async (userId: string, friendId: string) => {
+  try {
+    if (userId) {
+      let serverdata = await axios.patch(`${apiUrl}/users/update`, {
+        operationType: "friendRequest",
+        userId,
+        friendId,
+      });
 
+      return serverdata.data.message;
+    }
+
+    return { valid: false, message: "not authorized" };
+  } catch (error) {
+    console.log(error);
+    return { valid: false, message: "error happend" };
+  }
+};
 export const addChannelToServer = async (
   serverId: string,
   name: string,

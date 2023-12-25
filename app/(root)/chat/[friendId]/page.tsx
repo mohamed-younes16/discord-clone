@@ -1,15 +1,16 @@
-import SearchFreind from "@/components/Forms/SearchFreind";
+
+
 import SideBarNav from "@/components/SideBarNav";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { User } from "@/index";
+
 import { findServersBelong, getCurrentUser } from "@/lib/db-actions";
 import { currentUser } from "@clerk/nextjs";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 import Link from "next/link";
-import { Suspense } from "react";
-import { Separator } from "@/components/ui/separator";
 
-export default async function Home() {
+const page = async () => {
   const allServers = await findServersBelong("findGeneral");
   const clerkUser = await currentUser();
   const Userdata: User = await getCurrentUser(clerkUser?.id || "");
@@ -19,18 +20,13 @@ export default async function Home() {
   ];
 
   return (
-    <main
-      className=" min-h-screen dark:bg-[url(/assets/magicdark.png)] 
-    bg-cover  bg-[url(/assets/cccircular.svg)] dark:bg-transparent bg-[#3e3e3efc]
-      "
-    >
-      <Suspense>
-        <SideBarNav
-          freindesRequests={Userdata.freindsRequestedFrom}
-          userId={Userdata.id}
-          allservers={JSON.parse(JSON.stringify(allServers))}
-        >
-          <div
+    <div>
+      <SideBarNav
+        freindesRequests={Userdata.freindsRequestedFrom}
+        userId={Userdata.id}
+        allservers={JSON.parse(JSON.stringify(allServers))}
+      >
+         <div
             className="w-fit  bg-gray-400 
                 dark:bg-[#191919fc] h-screen"
           >
@@ -86,12 +82,9 @@ export default async function Home() {
               ))}
             </ScrollArea>
           </div>
-        </SideBarNav>
-
-        <div className="w-full backdrop-blur-lg relative h-screen">
-          <SearchFreind userFriends={userFriends} userId={Userdata.id} />
-        </div>
-      </Suspense>
-    </main>
+      </SideBarNav>
+    </div>
   );
-}
+};
+
+export default page;

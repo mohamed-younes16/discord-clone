@@ -1,3 +1,4 @@
+import { Loader2 } from "lucide-react"
 
 
 const loading = () => {
@@ -10,12 +11,8 @@ const loading = () => {
      
 
        <div className="font-bold dark:text-primary-purple
-        mb-9 dark:text-white animate-pulse text-black text-2xl">Loading your Page...  </div>
-
-     <div className=' flex gap-1'> {[...Array(4).keys()].map((e,i)=>
-     <div key={i} style={{animationDelay:`${i*.5}s`}} 
-     className='  h-6 mx-1 rounded-full     dark:bg-white 
-      bg-black  w-6 animate-scale '></div>)}</div> 
+        mb-9 dark:text-white animate-pulse text-black text-2xl">Loading your Page...  </div>   
+        <Loader2 className="animate-spin h-[70px] w-[70px]" />
    </div>
   )
 }

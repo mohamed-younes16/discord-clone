@@ -1,10 +1,9 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-
 import { Separator } from "../ui/separator";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -19,7 +18,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
@@ -27,21 +25,28 @@ import {
 } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import * as z from "zod";
-
 import { Toaster, toast } from "sonner";
 import { useStore } from "@/store";
 import { useEffect, useState } from "react";
-
-import { Loader2 } from "lucide-react";
+import { GripVertical, Loader2, MessagesSquare } from "lucide-react";
 import Image from "next/image";
 import axios from "axios";
 import { User } from "@/index";
-import { getFreinds } from "@/lib/db-actions";
-import _ from "lodash"; 
+import _ from "lodash";
+import { requestFreind } from "@/lib/db-actions";
+import { ScrollArea } from "../ui/scroll-area";
 
-const SearchFreind = ({userId}:{userId:string}) => {
+import Link from "next/link";
+
+const SearchFreind = ({
+  userId,
+  userFriends,
+}: {
+  userId: string;
+  userFriends: User[];
+}) => {
+  console.log(userFriends);
   const env = process.env.NODE_ENV;
   const apiUrl =
     env == "development"
@@ -50,7 +55,9 @@ const SearchFreind = ({userId}:{userId:string}) => {
 
   const [freinds, setFreinds] = useState<User[]>([]);
   const [loading, setIsLoading] = useState<boolean>(false);
-
+  const [isRequseting, setisRequseting] = useState<boolean>(false);
+  const [isRequseted, setisRequseted] = useState<boolean>(false);
+  const [isSearchingMode, setisSearchingMode] = useState<boolean>(false);
   const ChannelSchema = z.object({
     name: z
       .string()
@@ -58,29 +65,22 @@ const SearchFreind = ({userId}:{userId:string}) => {
       .refine((e) => e.toLocaleLowerCase() !== "general", {
         message: "you can't create an channel with name 'General'",
       }),
-    type: z.enum(["Online", "All", "Pending", "Blocked"]),
+    type: z.enum(["All", "Blocked"]),
   });
 
   const form = useForm<z.infer<typeof ChannelSchema>>({
     resolver: zodResolver(ChannelSchema),
     defaultValues: {
       name: "",
-      type: "Online",
+      type: "All",
     },
   });
 
   const { watch } = form;
   const SideBarOpen = useStore().SideBarOpen;
 
-  const freindsList: ["Online", "All", "Pending", "Blocked"] = [
-    "Online",
-    "All",
-    "Pending",
-    "Blocked",
-  ];
+  const freindsList: ["All", "Blocked"] = ["All", "Blocked"];
   useEffect(() => {
-    let timeoutId;
-
     const debouncedSearch = _.debounce(async () => {
       setIsLoading(true);
 
@@ -91,7 +91,9 @@ const SearchFreind = ({userId}:{userId:string}) => {
       if (watch().name.length > 0) {
         try {
           const username = watch().name;
-          const user = await axios.get(`${apiUrl}/users/access?username=${username}&userId=${userId}`);
+          const user = await axios.get(
+            `${apiUrl}/users/access?username=${username}&userId=${userId}`
+          );
           setFreinds(user.data.users);
           setIsLoading(false);
         } catch (error) {
@@ -105,15 +107,15 @@ const SearchFreind = ({userId}:{userId:string}) => {
 
     return () => {
       sub.unsubscribe();
-      debouncedSearch.cancel(); // Cancel the debounce function on component unmount
+      debouncedSearch.cancel();
     };
   }, [watch, userId]);
 
   return (
     <div
-      className={` ${SideBarOpen && "pl-[90px] "} transition-all duration-700 `}
+      className={` transition-all duration-700 `}
     >
-      <Toaster richColors />
+      <Toaster richColors position="bottom-center" />
       {!(freinds.length > 0) && (
         <div
           className=" w-1/3 absolute -translate-x-1/2 top-1/2 left-1/2 -translate-y-1/2 max-md:h-2/3 max-md:w-2/3 h-1/3
@@ -122,10 +124,10 @@ const SearchFreind = ({userId}:{userId:string}) => {
       )}
 
       <div
-        className={`w-full dark:bg-[#252525]  bg-[#6e737c] transition-all duration-700 shadow-xl max-w-[calc(100dvw_-_${
+        className={`w-full dark:bg-[#252525]   bg-[#6e737c] transition-all duration-700 shadow-xl max-w-[calc(100dvw_-_${
           SideBarOpen ? "90px" : "0px"
         })] 
-      ${SideBarOpen && "overflow-x-scroll"}  overflow-y-hidden `}
+      ${SideBarOpen && "max-sm:overflow-x-scroll"}  overflow-y-hidden `}
       >
         <div className="flex p-3  items-center ">
           <div className="flexcenter w-fit mr-7 gap-2">
@@ -151,60 +153,90 @@ const SearchFreind = ({userId}:{userId:string}) => {
             <p className=" text-xl font-bold ">Freinds</p>
           </div>
           <div className="flexcenter   h-12 ">
-            {freindsList.map((e) => ( 
-              <> <Separator
+            {freindsList.map((e) => (
+              <>
+                {" "}
+                <Separator
                   orientation="vertical"
                   className="mx-3  h-12  bg-zinc-700 "
                 />
-              <div key={e} className="w-24 flexcenter">
-                {" "}
-              
-                <button
-                  className={`p-1 w-full text-lg rounded-md
+                <div key={e} className="w-24 flexcenter">
+                  {" "}
+                  <button
+                    className={`p-1 w-full text-lg rounded-md
                       hover:bg-zinc-400 transition-all
                         !bg-opacity-30
 
-                        ${e === form.watch().type && "!bg-zinc-400"}
-                        
+                        ${
+                          e === form.watch().type &&
+                          !isSearchingMode &&
+                          "!bg-zinc-400"
+                        }
                         `}
-                  key={e}
-                  onClick={() => form.setValue("type", e)}
-                >
-                  {e}
-                </button>
-              </div>
+                    key={e}
+                    onClick={() => {
+                      form.setValue("type", e);
+                      setisSearchingMode(false);
+                    }}
+                  >
+                    {e}
+                  </button>
+                </div>
               </>
             ))}
+            <>
+              <Separator
+                orientation="vertical"
+                className="mx-3  h-12  bg-zinc-700 "
+              />
+              <div className="w-28 mr-16 flexcenter">
+                <button
+                  className={`p-1 w-full text-lg rounded-md whitespace-nowrap
+                      transition-all
+                     ${
+                       isSearchingMode
+                         ? " text-green-600 !bg-opacity-30 bg-zinc-400"
+                         : " shadow-md  hover:shadow-green-500 hover:bg-green-500 bg-green-700 "
+                     }   `}
+                  onClick={() => setisSearchingMode(true)}
+                >
+                  Add Freind
+                </button>
+              </div>
+            </>
           </div>
         </div>
       </div>
+      {isSearchingMode && (
+        <Form {...form}>
+          <form className="space-y-8 p-6">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => {
+                return (
+                  <FormItem className=" flex flex-col items-start   ">
+                    <FormLabel>Freind Name</FormLabel>
+                    <FormDescription>
+                      You can add friends with their usernames{" "}
+                    </FormDescription>
+                    <FormControl className="">
+                      <Input
+                        className="account-form_input "
+                        type="text"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
+            />
+          </form>
+        </Form>
+      )}
 
-      <Form {...form}>
-        <form className="space-y-8 p-6">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => {
-              return (
-                <FormItem className=" flex flex-col items-start   ">
-                  <FormLabel>Freind Name</FormLabel>
-
-                  <FormControl className="">
-                    <Input
-                      className="account-form_input "
-                      type="text"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              );
-            }}
-          />
-        </form>
-      </Form>
-
-      {loading ? (
+      {isSearchingMode && loading ? (
         watch().name.length > 0 && (
           <div className="flexcenter px-6">
             <Loader2 className=" animate-spin h-14 w-14 " />
@@ -261,20 +293,24 @@ const SearchFreind = ({userId}:{userId:string}) => {
                         <CardDescription>{e?.bio}</CardDescription>
                       </CardHeader>
                       <CardFooter className="flex justify-end mt-6">
-                        <Button
-                          onClick={async (ev) => {
-                            ev.currentTarget.disabled = true;
-                            toast.loading("", { duration: 90000 });
-                            // const adding = await addFreind(e.id);
-                            // toast.dismiss();
-                            // adding?.valid
-                            //   ? toast.success(<p>{adding?.message} </p>)
-                            //   : toast.error(<p>{adding?.message} </p>);
-                            ev.currentTarget.disabled = false;
-                          }}
-                        >
-                          Add Freind
-                        </Button>
+                        {!isRequseted && (
+                          <Button
+                            onClick={async (ev) => {
+                              setisRequseting(true);
+                              toast.loading("", { duration: 90000 });
+                              const adding = await requestFreind(userId, e.id);
+                              toast.dismiss();
+                              toast.success(<p>{adding} </p>);
+                              setisRequseted(true);
+                            }}
+                          >
+                            {isRequseting ? (
+                              <Loader2 className="animate-spin" />
+                            ) : (
+                              "Add Freind"
+                            )}
+                          </Button>
+                        )}
                       </CardFooter>
                     </Card>
                   </div>
@@ -283,6 +319,73 @@ const SearchFreind = ({userId}:{userId:string}) => {
             ))}
           </div>
         </>
+      )}
+      {!isSearchingMode && (
+        <ScrollArea className="px-4">
+          {userFriends.map((e, i) => (
+            <>
+              <div
+                key={e.id}
+                className="flex items-center p-2 cursor-pointer hover:bg-neutral-700 rounded-lg 
+                 transition-all w-full  gap-4  "
+              >
+                <Link
+                  href={`/chat/${e.id}`}
+                  className="w-full flexcenter gap-4 overflow-auto"
+                >
+                  {e?.imageUrl && (
+                    <Image
+                      height={60}
+                      width={60}
+                      className="h-16 w-16 max-sm:w-12 max-sm:h-12 rounded-full bg-cover "
+                      alt="image of user"
+                      src={e?.imageUrl}
+                    />
+                  )}
+
+                  <div className=" flex justify-between w-full items-center">
+                    <div className="whitespace-nowrap ">
+                      <p
+                        className="overflow-auto text-start max-sm:text-base text-xl dark:text-white 
+                font-semibold "
+                      >
+                        {e.username}
+                      </p>
+                      <p
+                        className=" text-start  max-sm:text-base text-xl dark:text-gray-500
+                font-semibold "
+                      >
+                        {e.name}
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+                <Link
+                  className="p-2 rounded-full hover:bg-gray-300
+                    cursor-pointer transition-all flexcenter !bg-opacity-20"
+                    href={`/chat/${e.id}`}
+                >
+                  <MessagesSquare/>
+                </Link>
+                <Popover>
+                  <PopoverTrigger>
+                    <div
+                      className="p-2 rounded-full hover:bg-gray-300
+                    cursor-pointer transition-all flexcenter !bg-opacity-20"
+                    >
+                      <GripVertical size={20} strokeWidth={3} />
+                    </div>
+                  </PopoverTrigger>
+
+                  <PopoverContent className=" w-fit">
+                    <Button variant={"destructive"}> Delete</Button>
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <Separator className="my-4" />
+            </>
+          ))}
+        </ScrollArea>
       )}
     </div>
   );

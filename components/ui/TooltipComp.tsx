@@ -10,8 +10,8 @@ const TooltipComp = ({ children ,hoverText}:{children:ReactNode,hoverText:string
   return (
     <TooltipProvider>
 
-    <Tooltip delayDuration={200}>
-      <TooltipTrigger>
+    <Tooltip  delayDuration={200}>
+      <TooltipTrigger className='w-full'>
 
            {children}
 

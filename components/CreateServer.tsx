@@ -40,13 +40,13 @@ const ManageServers = ({
       ? "system"
       : undefined;
   return (
-    <div>
+    <>
       {" "}
-      <Dialog>
-        <DialogTrigger asChild>
+      <Dialog >
+        <DialogTrigger className="flexcenter w-full">
           {icon || (
-            <div className="bg-stone-800  rounded-full transition-all p-2 hover:bg-stone-500">
-              <PlusIcon className=" h-8 w-8  transition-all text-emerald-500 hover:text-emerald-300" />
+            <div className="bg-stone-800 flex justify-center   rounded-full transition-all  hover:bg-stone-500">
+              <PlusIcon className=" h-12 w-12  transition-all text-emerald-500 hover:text-emerald-300" />
             </div>
           )}
         </DialogTrigger>
@@ -67,7 +67,7 @@ const ManageServers = ({
           />
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 };
 

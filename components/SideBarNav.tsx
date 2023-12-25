@@ -1,6 +1,6 @@
 "use client";
 import { ModeToggle } from "./ui/themeButton";
-import { UserCircle2 } from "lucide-react";
+import { UserCircle2, UserPlus, Users } from "lucide-react";
 import Link from "next/link";
 import TooltipComp from "./ui/TooltipComp";
 import { ScrollArea } from "./ui/scroll-area";
@@ -10,19 +10,23 @@ import { useStore } from "@/store";
 import ManageServers from "./CreateServer";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { Separator } from "./ui/separator";
+import Request from "./Request";
+import { User } from "..";
 
 const SideBarNav = ({
   allservers,
   children,
   userId,
+  freindesRequests,
 }: {
   allservers: any;
   children?: ReactNode;
   userId: string;
+  freindesRequests: User[];
 }) => {
-  const [visible, setvisible] = useState(true);
   const router = useRouter();
-  const { SideBarOpen, setSideBarOpen } = useStore();
+  const { SideBarOpen, setSideBarOpen, requests, setRequests } = useStore();
 
   const env = process.env.NODE_ENV;
   const apiUrl =
@@ -30,23 +34,8 @@ const SideBarNav = ({
       ? "http://localhost:5000"
       : "https://dicord-api.onrender.com";
 
-  const isPcUser = () => {
-    const userAgent = navigator.userAgent.toLowerCase();
-
-    const pcKeywords = ["windows", "macintosh", "linux"];
-    for (const keyword of pcKeywords) {
-      if (
-        userAgent.toLowerCase().includes("android") ||
-        userAgent.toLowerCase().includes("iphone")
-      ) {
-        return false;
-      } else if (userAgent.toLowerCase().includes(keyword)) {
-        return true;
-      }
-    }
-  };
-
   useEffect(() => {
+    setRequests(freindesRequests.length);
     axios.get(`${apiUrl}/state?state=online&userId=${userId}`);
     router.refresh();
     const handleWindowClose = async () => {
@@ -61,27 +50,10 @@ const SideBarNav = ({
     };
   }, []);
 
-  useEffect(() => {
-    function trackMousePosition(event: { clientX: number }) {
-      if (isPcUser()) {
-        (event.clientX / window.innerWidth) * 100 < 10
-          ? setvisible(true)
-          : setvisible(false);
-      } else if (window.innerWidth <= 800) {
-        setvisible(true);
-      }
-    }
-
-    document.addEventListener("pointermove", trackMousePosition);
-
-    return () =>
-      document.removeEventListener("pointermove", trackMousePosition);
-  }, []);
-
-  return (<div  suppressHydrationWarning
-      className={`transition-all relative z-50  duration-700  ${
-        SideBarOpen ? "lg:pl-[330px] " : ""
-      }`}
+  return (
+    <div
+      suppressHydrationWarning
+      className={`transition-all relative z-50  duration-700 `}
     >
       <div
         suppressHydrationWarning
@@ -98,10 +70,10 @@ ${SideBarOpen ? "translate-x-0" : "-translate-x-full"}
         <button
           className={`absolute  z-[888] cursor-pointer
             bottom-[120px] bg-[url(/assets/right-arrow.svg)] flex
-             h-[60px] border-black border-[6px] w-[60px]  duration-500  !rounded-full right-0 
+             h-[60px] border-black border-[6px] w-[60px]  duration-150  !rounded-full right-0 
             active:scale-95 
 
-            ${visible || SideBarOpen ? "translate-x-full " : ""}
+            translate-x-full
 
               ${SideBarOpen ? "rotate-180" : ""}
 
@@ -110,11 +82,11 @@ ${SideBarOpen ? "translate-x-0" : "-translate-x-full"}
           onClick={() => setSideBarOpen(!SideBarOpen)}
         ></button>
 
-        <div className="flex shadow-xl  shadow-black h-full">
+        <div className="flex shadow-xl  justify-center shadow-black h-full">
           <div className="flex z-50 shadow-xl shadow-black  h-full">
-            <div className="flex h-full p-2 flex-col  w-[90px]   justify-between">
-              <div className="flexcenter flex-col">
-                <ScrollArea>
+            <div className="flex h-full p-2 flex-col items-center  w-[90px]   justify-between">
+              <div className="flexcenter  flex-col">
+                <ScrollArea className=" flex flex-col items-center ">
                   <ServerLinks data={allservers} />
                 </ScrollArea>
 
@@ -125,6 +97,23 @@ ${SideBarOpen ? "translate-x-0" : "-translate-x-full"}
                     submitText="create"
                   />
                 </TooltipComp>
+
+                {requests > 0 && (
+                  <>
+                    <Separator className="my-6" />
+
+                    <div className="  relative">
+                      {" "}
+                      <TooltipComp hoverText="Freinds Request">
+                        {/* <Link href={"/requests"}> </Link> */}
+                        <Request freindsRequests={freindesRequests} />
+                        <div className="absolute rounded-full -top-[18px] -left-[15px] h-[23px] w-[23px] bg-red-600">
+                          {requests}
+                        </div>
+                      </TooltipComp>{" "}
+                    </div>
+                  </>
+                )}
               </div>
 
               <div className="flexcenter flex-col  gap-6">
@@ -147,8 +136,8 @@ ${SideBarOpen ? "translate-x-0" : "-translate-x-full"}
           {children}
         </div>
       </div>
-    </div>)
-  
+    </div>
+  );
 };
 
 export default SideBarNav;

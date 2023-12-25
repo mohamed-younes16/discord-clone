@@ -26,7 +26,7 @@ const ManageUsers = async ({
   membersData:any[];
   isAdmin: boolean;
 }) => {
-console.log(serverId)
+
   return (
     <div>
       <Dialog>

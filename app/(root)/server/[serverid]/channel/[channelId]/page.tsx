@@ -93,6 +93,7 @@ const page = async ({
       {currentChannel ? (
         <div className="  flex  w-full h-full">
           <SideBarNav
+          freindesRequests={Userdata.freindsRequestedFrom}
             userId={Userdata.id}
             allservers={JSON.parse(JSON.stringify(allservers))}
           >

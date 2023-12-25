@@ -8,7 +8,7 @@ const ServerLinks = ({ data }: { data: any }) => {
   return (
     <div>
       <TooltipComp hoverText={"main Page"}>
-        <div>
+        
           <Link
             className="w-16 hover:scale-90 transition-all h-16 
         relative  rounded-full flexcenter   "
@@ -26,12 +26,12 @@ const ServerLinks = ({ data }: { data: any }) => {
           </Link>
 
           <Separator className="my-4" />
-        </div>
+  
       </TooltipComp>
 
       {data?.map((e) => (
-        <TooltipComp hoverText={e.name} key={e.id}>
-          <div>
+        <TooltipComp  hoverText={e.name} key={e.id}>
+          <div className="w-full flexcenter flex-col">
             <Link
               className="w-16 hover:scale-90 transition-all h-16 
                     relative  rounded-full flexcenter   "
