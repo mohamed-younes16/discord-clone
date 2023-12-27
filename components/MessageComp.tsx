@@ -165,7 +165,7 @@ const MessageComp = ({
                 {isEditing ? (
                   <Form {...messageForm}>
                     <form className="space-y-8">
-                      {data?.content?.file?.url}
+                    
 
                       <div className="flex pb-12 gap-4">
                         <FormField
