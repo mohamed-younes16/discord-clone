@@ -308,7 +308,7 @@ const page = async ({
 
           <div className=" w-full h-full  backdrop-blur-sm  ">
             <div className="flex justify-between items-center 
-            bg-zinc-400 font-bold z-50 fixed w-full text-xl px-16 h-[75px]   dark:bg-[#1d1d1def] backdrop-blur-lg ">
+            bg-zinc-400 font-bold z-30 fixed w-full text-xl px-16 h-[75px]   dark:bg-[#1d1d1def] backdrop-blur-lg ">
              <div className="flexcenter gap-4"><Hash /> {currentChannel.name}</div> 
             </div>
             

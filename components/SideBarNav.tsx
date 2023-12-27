@@ -69,7 +69,7 @@ ${SideBarOpen ? "translate-x-0" : "-translate-x-full"}
 `}
       >
         <button
-          className={`absolute  z-[888] cursor-pointer
+          className={`absolute  z-40 cursor-pointer
             bottom-[120px] bg-[url(/assets/right-arrow.svg)] flex
              h-[60px] border-black border-[6px] w-[60px]  duration-150  !rounded-full right-0 
             active:scale-95 
