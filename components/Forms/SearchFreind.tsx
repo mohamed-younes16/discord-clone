@@ -111,7 +111,7 @@ const SearchFreind = ({
   }, [watch, userId]);
 
   return (
-    <div className={` transition-all duration-700 `}>
+    <div className={` transition-all duration-150 `}>
       <Toaster richColors position="bottom-center" />
       {!(freinds.length > 0) && (
         <div
@@ -121,7 +121,7 @@ const SearchFreind = ({
       )}
 
       <div
-        className={`w-full dark:bg-[#252525]   bg-[#6e737c] transition-all duration-700 shadow-xl max-w-[calc(100dvw_-_${
+        className={`w-full dark:bg-[#252525]   bg-[#6e737c] transition-all duration-150 shadow-xl max-w-[calc(100dvw_-_${
           SideBarOpen ? "90px" : "0px"
         })] 
       ${SideBarOpen && "max-sm:overflow-x-scroll"}  overflow-y-hidden `}
@@ -323,7 +323,7 @@ const SearchFreind = ({
             <>
               <div
                 key={e.id}
-                className="flex items-center p-2 cursor-pointer hover:bg-neutral-700 rounded-lg 
+                className="flex items-center p-2 cursor-pointer hover:bg-zinc-700 rounded-lg 
                  transition-all w-full  gap-4  "
               >
                 <Link
@@ -358,7 +358,7 @@ const SearchFreind = ({
                   </div>
                 </Link>
                 <Link
-                  className="p-2 rounded-full hover:bg-gray-300
+                  className="p-2 rounded-full hover:bg-zinc-300
                     cursor-pointer transition-all flexcenter !bg-opacity-20"
                   href={`/chat/${e.id}`}
                 >
@@ -367,7 +367,7 @@ const SearchFreind = ({
                 <Popover>
                   <PopoverTrigger>
                     <div
-                      className="p-2 rounded-full hover:bg-gray-300
+                      className="p-2 rounded-full hover:bg-zinc-300
                     cursor-pointer transition-all flexcenter !bg-opacity-20"
                     >
                       <GripVertical size={20} strokeWidth={3} />

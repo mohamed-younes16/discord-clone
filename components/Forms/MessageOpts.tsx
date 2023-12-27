@@ -33,7 +33,7 @@ const MessageOpts = ({
   chatLimit,
   userId,
   target,
-  chatId
+  chatId,
 }: {
   messageId?: string;
   channelId?: string;
@@ -42,13 +42,13 @@ const MessageOpts = ({
   chatLimit: number;
   userId: string;
   target: "channels" | "freinds";
-  chatId?:string
+  chatId?: string;
 }) => {
   return (
     <Popover>
       <PopoverTrigger>
         <div
-          className="w-10 h-10 rounded-full hover:bg-gray-300
+          className="w-10 h-10 rounded-full hover:bg-zinc-300
                 cursor-pointer transition-all flexcenter !bg-opacity-20"
         >
           <GripVertical size={20} strokeWidth={3} />
@@ -87,7 +87,7 @@ const MessageOpts = ({
                               chatLimit,
                               operationType: "deleteMessage",
                               userId,
-                              chatId
+                              chatId,
                             });
                             break;
                         }

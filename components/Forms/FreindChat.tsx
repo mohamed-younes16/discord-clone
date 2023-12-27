@@ -180,7 +180,7 @@ const FriendChat = ({
             chat.map((e, i) => {
               return (
                 <MessageComp
-                chatId={chatId}
+                  chatId={chatId}
                   target="freinds"
                   userId={userId}
                   data={e}
@@ -261,7 +261,7 @@ const FriendChat = ({
                 disabled={form.formState.isSubmitting}
                 onClick={form.handleSubmit(onSubmit)}
                 className={`${
-                  form.formState.isSubmitting ? " bg-gray-500" : ""
+                  form.formState.isSubmitting ? " bg-zinc-500" : ""
                 } flexcenter gap-6`}
               >
                 <Send />

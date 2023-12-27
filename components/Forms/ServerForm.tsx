@@ -25,8 +25,6 @@ import "@uploadthing/react/styles.css";
 import { XCircle } from "lucide-react";
 import axios from "axios";
 
-
-
 const ServerForm = ({
   data,
   submitText,
@@ -70,15 +68,15 @@ const ServerForm = ({
               serverData: values,
               userId,
               serverId,
-              operationType:"editingServer"
+              operationType: "editingServer",
             });
       toast.dismiss();
       uploadServer
         .then((response) => {
           toast.success(response.data.message);
           setTimeout(() => {
-                window.location.reload();
-                }, 500);
+            window.location.reload();
+          }, 500);
         })
         .catch((error) => {
           toast.error(error.response.data.message, { dismissible: true });
@@ -105,7 +103,7 @@ const ServerForm = ({
                   endpoint="imageUploader"
                   appearance={{
                     container: ` max-md:!px-2 max-md:!py-6 transition-all hover:scale-105 dark:border-black
-                    bg-white cursor-pointer dark:bg-neutral-300 `,
+                    bg-white cursor-pointer dark:bg-zinc-300 `,
                     label: `text-xl `,
                   }}
                   onClientUploadComplete={(e) => field.onChange(e?.[0].url)}
@@ -115,7 +113,7 @@ const ServerForm = ({
               <FormLabel
                 className={` mr-8 relative 
             w-[100px] p-2  flex justify-center items-center m-0  !h-[100px] 
-            bg-gray-900 rounded-full flexcenter ${
+            bg-zinc-900 rounded-full flexcenter ${
               !(field.value.length > 0) && "!hidden"
             }`}
               >
@@ -172,7 +170,7 @@ const ServerForm = ({
           type="submit"
           disabled={form.formState.isSubmitting}
           className={`${
-            form.formState.isSubmitting ? " animate-bounce bg-gray-500" : ""
+            form.formState.isSubmitting ? " animate-bounce bg-zinc-500" : ""
           } flexcenter gap-6`}
         >
           {submitText || "Submit"}

@@ -98,7 +98,7 @@ const page = async ({
             allservers={JSON.parse(JSON.stringify(allservers))}
           >
             <div
-              className="w-fit  bg-gray-400 
+              className="w-fit  bg-zinc-400 
                 dark:bg-[#191919fc] h-screen"
             >
               <Popover>
@@ -106,7 +106,7 @@ const page = async ({
                   <div
                     role="button"
                     className=" px-4 w-full text-start flex justify-between 
-                            text-xl font-semibold items-center py-2 bg-gray-500
+                            text-xl font-semibold items-center py-2 bg-zinc-500
                             dark:bg-[#1d1e20] text-gray-800 dark:text-gray-200"
                   >
                     {currentServer?.name}
@@ -208,10 +208,10 @@ const page = async ({
                             dark:text-neutral-400 text-neutral-700
                             ${
                               channelId == el.name
-                                ? "bg-neutral-700 !text-white  dark:bg-neutral-500"
+                                ? "bg-zinc-700 !text-white  dark:bg-zinc-500"
                                 : ""
                             }
-                            items-center dark:hover:bg-neutral-800 hover:bg-neutral-500 text-lg 
+                            items-center dark:hover:bg-zinc-800 hover:bg-zinc-500 text-lg 
                             `}
                           >
                             <Link
@@ -306,7 +306,7 @@ const page = async ({
             </div>
           </SideBarNav>
 
-          <div className=" w-full h-screen  backdrop-blur-sm  bg-[#27272794] ">
+          <div className=" w-full h-screen  backdrop-blur-sm  ">
             {currentServer && currentChannel.type == "text" ? (
               <TextChat
                 channelName={currentChannel.name}

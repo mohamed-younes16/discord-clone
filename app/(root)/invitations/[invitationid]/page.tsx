@@ -10,13 +10,11 @@ import { Check, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 
-
 const Page = ({
   params: { invitationid },
 }: {
   params: { invitationid: string };
 }) => {
-  
   const [servername, setServerName] = useState("");
   const [serverImage, setserverImage] = useState("");
   const [isjoning, setisjoning] = useState(false);
@@ -29,8 +27,7 @@ const Page = ({
 
   useEffect(() => {
     const getname = async () => {
-
-      const serverdata = await findServerbyQuery(invitationid)
+      const serverdata = await findServerbyQuery(invitationid);
 
       setServerName(serverdata?.name || "");
       setserverImage(serverdata?.imageUrl || "");
@@ -42,31 +39,27 @@ const Page = ({
   const addingmember = async () => {
     setisjoning(true);
 
-
-
-     const adding = await addingMember(invitationid);
+    const adding = await addingMember(invitationid);
 
     if (adding?.serversBelongsTo) {
-
       toast.dismiss();
-      toast.message(<p className="flexcenter"> {adding.message}</p>)
-        setTimeout(() => {
+      toast.message(<p className="flexcenter"> {adding.message}</p>);
+      setTimeout(() => {
         setisjoning(false);
         Router.push(`/server/${adding?.serversBelongsTo.id}`);
         Router.refresh();
       }, 500);
     }
     if (!adding?.serversBelongsTo) {
-
       toast.dismiss();
-      toast.message(<p className="flexcenter"> {adding.message}</p>)
-        setTimeout(() => {
+      toast.message(<p className="flexcenter"> {adding.message}</p>);
+      setTimeout(() => {
         setisjoning(false);
         window.location.assign(`/`);
         Router.refresh();
       }, 500);
     }
-  
+
     // } else if (adding?.message == "exist") {
     //   toast.dismiss();
 
@@ -90,7 +83,7 @@ const Page = ({
       <Toaster position="top-center" richColors className="text-3xl" />
 
       <Card
-        className={`transition-all duration-500 
+        className={`transition-all duration-150 
        bg-zinc-800 border-none overflow-hidden outline-none
         ${
           servername

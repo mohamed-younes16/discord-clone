@@ -9,8 +9,8 @@ const layout = ({
 }) => {
   return (
     <div
-      className=" min-h-screen dark:bg-[url(/assets/magicdark.png)] 
-    bg-cover  bg-[url(/assets/cccircular.svg)] dark:bg-transparent bg-[#3e3e3efc]"
+      className=" min-h-screen dark:bg-[url(/assets/magicdark.svg)] transition-all 
+    bg-cover  bg-[url(/assets/light-bg.svg)] dark:bg-transparent bg-[#3e3e3efc]"
     >
       <Suspense>
         {children || (

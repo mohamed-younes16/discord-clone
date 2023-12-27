@@ -14,19 +14,19 @@ const ChannelHandler = ({
   channel,
   isAdmin,
   channelId,
-  userId
+  userId,
 }: {
   serverId: string;
   channel: string;
   isAdmin: boolean;
   channelId: string;
-  userId:string
+  userId: string;
 }) => {
   return (
     <Popover>
       <PopoverTrigger>
         <div
-          className="p-1 rounded-full hover:bg-gray-300
+          className="p-1 rounded-full hover:bg-zinc-300
                     cursor-pointer transition-all flexcenter !bg-opacity-20"
         >
           <GripVertical size={20} strokeWidth={3} />
@@ -35,7 +35,7 @@ const ChannelHandler = ({
 
       <PopoverContent className=" w-fit">
         <ChannelForm
-        channelId={channelId}
+          channelId={channelId}
           isAdmin={isAdmin}
           icon={
             <div className="w-full gap-12 flex justify-between ">
@@ -53,7 +53,6 @@ const ChannelHandler = ({
             channelId={channelId}
             serverId={serverId}
             isAdmin={isAdmin}
-            
             userId={userId}
           />
         </div>

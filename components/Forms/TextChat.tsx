@@ -18,7 +18,7 @@ import qs from "query-string";
 import { Toaster, toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useMemo, useRef, useState } from "react";
-import {Loader2, Send } from "lucide-react";
+import { Loader2, Send } from "lucide-react";
 import { io } from "socket.io-client";
 import EmojiPicker from "./EmojiPicker";
 import UploadFileChat from "./UploadFileChat";
@@ -52,14 +52,13 @@ const TextChat = ({
   const [connected, setIsconnected] = useState(false);
   const [chat, setChat] = useState<Chat[]>(data.toReversed() || []);
   const bottomRef = useRef<any>(null);
-  const socket = useMemo(() => io(apiUrl,{autoConnect:false}), []);
+  const socket = useMemo(() => io(apiUrl, { autoConnect: false }), []);
   const wrapper: any = useRef();
   const content: any = useRef();
   const [messagesToShow, setMessagesToShow] = useState(10);
   const [fetchingMessages, setFetchingMessages] = useState(false);
   const [isMax, setIsMax] = useState(false);
   const targetRef = useRef(null);
-
 
   useEffect(() => {
     const lenis = new Lenis({
@@ -89,21 +88,18 @@ const TextChat = ({
         `message-server-${serverId}-channel-${channelId}`,
         (message: Chat[]) => {
           toast.dismiss();
-  
+
           setChat(message.toReversed());
-  
         }
       );
-  
-  
+
     socket?.on("connect", () => {
       setIsconnected(true);
-  
     });
-  
-    return ()=> {
-      socket?.disconnect()
-    }
+
+    return () => {
+      socket?.disconnect();
+    };
   }, []);
 
   const ChannelSchema = z.object({
@@ -117,9 +113,8 @@ const TextChat = ({
     fileType: z.enum(["pdf", "image"]),
   });
 
-  useEffect(()=>{
-  
-  setFetchingMessages(true);
+  useEffect(() => {
+    setFetchingMessages(true);
 
     const change = async () => {
       const data = await findServer({
@@ -131,12 +126,11 @@ const TextChat = ({
       });
       setChat(data.chat.toReversed());
       setFetchingMessages(false);
-    setIsMax((messagesToShow > chat.length  ))
+      setIsMax(messagesToShow > chat.length);
     };
 
     change();
-
-  },[chat.length,messagesToShow])
+  }, [chat.length, messagesToShow]);
   const form = useForm<z.infer<typeof ChannelSchema>>({
     resolver: zodResolver(ChannelSchema),
     defaultValues: {
@@ -179,25 +173,24 @@ const TextChat = ({
         ref={wrapper}
         className="chat overflow-hidden relative  flex px-4 flex-col max-h-[85%] h-[85%]  gap-10 "
       >
-        {(!fetchingMessages && !isMax) && <Button
-    onClick={() => {    
-      setMessagesToShow((s) => s + 10);
+        {!fetchingMessages && !isMax && (
+          <Button
+            onClick={() => {
+              setMessagesToShow((s) => s + 10);
+            }}
+            variant={"default"}
+            className="absolute font-semibold text-lg -translate-x-1/2 left-1/2 top-6 p-3"
+          >
+            Show More
+          </Button>
+        )}
 
-    }}
-
-          variant={"default"}
-          className="absolute font-semibold text-lg -translate-x-1/2 left-1/2 top-6 p-3"
-        >
-          Show More
-        </Button>}
-       
         <div ref={content} id="text-content">
           <div ref={targetRef} className="" />
           {chat &&
             chat.map((e, i) => {
               return (
                 <MessageComp
-                  
                   channelId={channelId}
                   userId={userId}
                   serverId={serverId}
@@ -280,7 +273,7 @@ const TextChat = ({
                 disabled={form.formState.isSubmitting}
                 onClick={form.handleSubmit(onSubmit)}
                 className={`${
-                  form.formState.isSubmitting ? " bg-gray-500" : ""
+                  form.formState.isSubmitting ? " bg-zinc-500" : ""
                 } flexcenter gap-6`}
               >
                 <Send />

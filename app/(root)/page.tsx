@@ -20,8 +20,8 @@ export default async function Home() {
 
   return (
     <main
-      className=" min-h-screen dark:bg-[url(/assets/magicdark.png)] 
-    bg-cover  bg-[url(/assets/cccircular.svg)] dark:bg-transparent bg-[#3e3e3efc]
+      className=" min-h-screen dark:bg-[url(/assets/magicdark.svg)] transition-all 
+    bg-cover  bg-[url(/assets/light-bg.svg)] dark:bg-transparent bg-[#3e3e3efc]
       "
     >
       <Suspense>
@@ -32,7 +32,7 @@ export default async function Home() {
         >
           {userFriends?.length > 0 && (
             <div
-              className="w-fit  bg-gray-400 
+              className="w-fit  bg-zinc-400 
                 dark:bg-[#191919fc] h-screen"
             >
               <Separator className="my-6" />
@@ -47,7 +47,7 @@ export default async function Home() {
                   <>
                     <div
                       key={e.id}
-                      className="flex items-center p-2 cursor-pointer hover:bg-neutral-700 rounded-lg 
+                      className="flex items-center p-2 cursor-pointer hover:bg-zinc-700 rounded-lg 
                  transition-all w-full  gap-4  "
                     >
                       <Link

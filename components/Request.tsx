@@ -21,10 +21,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { handleFreindRequest } from "@/lib/db-actions";
-import { Toaster, toast } from "sonner";
+import { Toaster } from "sonner";
 import { useState } from "react";
 import { useStore } from "@/store";
-import { Button } from "./ui/button";
 
 const Request = ({ freindsRequests }: { freindsRequests: User[] }) => {
   const [requestState, setRequestState] = useState<User[]>(freindsRequests);
@@ -32,16 +31,20 @@ const Request = ({ freindsRequests }: { freindsRequests: User[] }) => {
   return (
     <>
       <Drawer>
-        <DrawerTrigger><UserPlus className="h-[35px] w-[35px]"/></DrawerTrigger>
+        <DrawerTrigger>
+          <UserPlus className="h-[35px] w-[35px]" />
+        </DrawerTrigger>
         <DrawerContent className="max-md:h-[80dvh] md:h-[60dvh] text-center ">
           <DrawerTitle className=" mt-4"> Friends Requests</DrawerTitle>
           <Toaster />
-          <ScrollArea className="my-10 rounded-md 
-        max-md:p-2 max-lg:!w-[100dvw] lg:!min-w-[800px] max-w-[1500px] mx-auto ">
+          <ScrollArea
+            className="my-10 rounded-md 
+        max-md:p-2 max-lg:!w-[100dvw] px-2 lg:!min-w-[800px] max-w-[1500px] mx-auto "
+          >
             {requestState.map((e) => (
               <div
                 key={e.id}
-                className="flex items-center p-2 hover:bg-neutral-700 rounded-lg 
+                className="flex items-center p-2 hover:bg-zinc-300 dark:hover:bg-zinc-700 rounded-lg 
                    transition-all w-full   gap-4  my-6"
               >
                 <Popover key={e.id}>

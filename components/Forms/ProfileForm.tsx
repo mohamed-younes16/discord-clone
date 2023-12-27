@@ -92,15 +92,16 @@ const ProfileForm = ({ userData }: { userData?: User }) => {
                 <FormLabel
                   className=" mr-8 relative 
              w-[250px] flex justify-center items-center m-0 !h-[250px] 
-            bg-gray-900 rounded-full flexcenter "
+            bg-zinc-900 rounded-full flexcenter "
                 >
                   {field?.value ? (
                     <>
-                      <X onClick={()=>field.onChange("")}
-                      
-                      className="absolute cursor-pointer transition-all  
+                      <X
+                        onClick={() => field.onChange("")}
+                        className="absolute cursor-pointer transition-all  
                       hover:scale-105 bg-red-500 top-2 right-2 
-                      rounded-full p-2 h-10 w-10 z-50"></X>
+                      rounded-full p-2 h-10 w-10 z-50"
+                      ></X>
                       <Image
                         src={field.value}
                         className="object-cover rounded-full"
@@ -123,7 +124,7 @@ const ProfileForm = ({ userData }: { userData?: User }) => {
                   endpoint="imageUploader"
                   appearance={{
                     container: ` max-md:!px-2 max-md:!py-6 transition-all hover:scale-105 dark:border-black
-                    bg-white cursor-pointer dark:bg-neutral-300 `,
+                    bg-white cursor-pointer dark:bg-zinc-300 `,
                     label: `text-xl `,
                   }}
                   onClientUploadComplete={(e) => field.onChange(e?.[0].url)}
@@ -193,7 +194,7 @@ const ProfileForm = ({ userData }: { userData?: User }) => {
           type="submit"
           disabled={form.formState.isSubmitting}
           className={`${
-            form.formState.isSubmitting ? " animate-bounce bg-gray-500" : ""
+            form.formState.isSubmitting ? " animate-bounce bg-zinc-500" : ""
           } flexcenter gap-6`}
         >
           Submit

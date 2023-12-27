@@ -202,7 +202,7 @@ const MessageComp = ({
                           onClick={messageForm.handleSubmit(messageOnSubmit)}
                           className={`${
                             messageForm.formState.isSubmitting
-                              ? " bg-gray-500"
+                              ? " bg-zinc-500"
                               : ""
                           } flexcenter gap-6`}
                         >
@@ -216,7 +216,7 @@ const MessageComp = ({
                     </form>
                   </Form>
                 ) : (
-                  <p className="  text-gray-500 dark:text-gray-300 mt-4">
+                  <p className="  text-neutral-800 dark:text-gray-200 mt-4">
                     {data?.content?.text}
                   </p>
                 )}
@@ -336,7 +336,7 @@ const MessageComp = ({
                           onClick={messageForm.handleSubmit(messageOnSubmit)}
                           className={`${
                             messageForm.formState.isSubmitting
-                              ? " bg-gray-500"
+                              ? " bg-zinc-500"
                               : ""
                           } flexcenter gap-6`}
                         >
@@ -350,7 +350,7 @@ const MessageComp = ({
                     </form>
                   </Form>
                 ) : (
-                  <p className="  text-gray-500 dark:text-gray-300 mt-4">
+                  <p className="  text-neutral-800 dark:text-gray-200 mt-4">
                     {data?.content?.text}
                   </p>
                 )}

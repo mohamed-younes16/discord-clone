@@ -39,10 +39,9 @@ import {
 import { GitBranch } from "lucide-react";
 
 import { Separator } from "../ui/separator";
-import { addChannelToServer, updateCHANNEL, } from "@/lib/db-actions";
+import { addChannelToServer, updateCHANNEL } from "@/lib/db-actions";
 import { ReactNode } from "react";
 import { Channel } from "@/index";
-
 
 const ChannelForm = ({
   serverId,
@@ -50,22 +49,23 @@ const ChannelForm = ({
   actionType,
   channel = "",
   isAdmin,
-  channelId
+  channelId,
 }: {
   serverId: string;
   icon?: ReactNode;
   actionType: "create" | "update";
   channel?: string;
-  isAdmin:boolean;
-  channelId?:string
+  isAdmin: boolean;
+  channelId?: string;
 }) => {
-  const channelDocument:Channel | null =
+  const channelDocument: Channel | null =
     actionType == "update" ? JSON.parse(channel) : null;
 
   const ChannelSchema = z.object({
     name: z
       .string()
-      .min(4, { message: "must be at least 4 characters long" }).max(12)
+      .min(4, { message: "must be at least 4 characters long" })
+      .max(12)
       .refine((e) => e.toLocaleLowerCase() !== "general", {
         message: "you can't create an channel with name 'General'",
       }),
@@ -86,17 +86,16 @@ const ChannelForm = ({
 
       const uploadServer =
         actionType == "create"
-          ? (await addChannelToServer(
+          ? await addChannelToServer(
               serverId,
               values.name,
               values.type,
               isAdmin
-            )) 
-          :  (await updateCHANNEL(
-            channelId || "",
-            isAdmin,
-            values
-          )) || { valid: false, message: "check your connection" };
+            )
+          : (await updateCHANNEL(channelId || "", isAdmin, values)) || {
+              valid: false,
+              message: "check your connection",
+            };
       toast.dismiss();
 
       if (uploadServer?.valid) {
@@ -193,7 +192,7 @@ const ChannelForm = ({
                   disabled={form.formState.isSubmitting}
                   className={`${
                     form.formState.isSubmitting
-                      ? " animate-bounce bg-gray-500"
+                      ? " animate-bounce bg-zinc-500"
                       : ""
                   } flexcenter gap-6`}
                 >
