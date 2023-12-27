@@ -1,11 +1,11 @@
 "use client";
 import { ModeToggle } from "./ui/themeButton";
-import { UserCircle2, UserPlus, Users } from "lucide-react";
+import { UserCircle2,} from "lucide-react";
 import Link from "next/link";
 import TooltipComp from "./ui/TooltipComp";
 import { ScrollArea } from "./ui/scroll-area";
 import ServerLinks from "./ServersLinks";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, } from "react";
 import { useStore } from "@/store";
 import ManageServers from "./CreateServer";
 import axios from "axios";
@@ -27,6 +27,7 @@ const SideBarNav = ({
 }) => {
   const router = useRouter();
   const { SideBarOpen, setSideBarOpen, requests, setRequests } = useStore();
+
 
   const env = process.env.NODE_ENV;
   const apiUrl =
@@ -50,12 +51,14 @@ const SideBarNav = ({
     };
   }, []);
 
+
   return (
     <div
       suppressHydrationWarning
       className={`transition-all relative z-50  duration-700 `}
     >
       <div
+      
         suppressHydrationWarning
         className={`fixed duration-700 top-0 transition-all 
     max-w-fit z-50   flexcenter left-0 h-screen  
@@ -64,6 +67,7 @@ const SideBarNav = ({
      flex flex-col 
 max-h-[calc(100dvh-100px)]  min-h-full justify-between 
 ${SideBarOpen ? "translate-x-0" : "-translate-x-full"}
+
 
 `}
       >

@@ -19,14 +19,13 @@ const ManageUsers = async ({
   serverId,
   userId,
   membersData,
-  isAdmin
+  isAdmin,
 }: {
   userId: string;
   serverId: string;
-  membersData:any[];
+  membersData: any[];
   isAdmin: boolean;
 }) => {
-
   return (
     <div>
       <Dialog>
@@ -51,7 +50,7 @@ const ManageUsers = async ({
                   membersData?.map((e) => {
                     return (
                       <div
-                        key={e.member.id.toString()}
+                        key={e.member.id}
                         className="flex w-full items-start gap-4  my-6"
                       >
                         {e.member?.imageUrl && (
@@ -80,11 +79,10 @@ const ManageUsers = async ({
                             </p>
                           </div>
                         </div>
-                        {userId !==
-                          e.member.id.toString() && (
+                        {userId !== e.member.id && (
                           <MembersHandler
-                          isAdmin={isAdmin}
-                          userId={userId}
+                            isAdmin={isAdmin}
+                            userId={userId}
                             serverId={serverId}
                             member={e}
                           />

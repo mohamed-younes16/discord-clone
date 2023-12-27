@@ -1,5 +1,4 @@
-
-import { Server as IoServer} from "socket.io";
+import { Server as IoServer } from "socket.io";
 import { Chat } from "./models/Servers";
 // models/User.ts
 export interface User {
@@ -37,8 +36,13 @@ export interface FreindsChatList {
   id: string;
   createdAt: Date;
   freindChatRefrence: FreindsChatObject;
+  freindChatRefrenceId: string;
   creator: User;
-  content: FreindChatContent | null;
+  creatorId: string;
+  content: FreindChatContent ;
+  creator: Member;
+
+
 }
 
 // models/FreindChatContent.ts
@@ -76,8 +80,6 @@ export interface Server {
   channels: Channel[];
 }
 
-
-
 // enums/UserType.ts
 export enum UserType {
   admin = "admin",
@@ -107,8 +109,10 @@ export interface Channel {
 export interface Chat {
   id: string;
   channel: Channel;
+  channelId: string;
   creator: Member;
-  content: Content | null;
+  creatorId: string;
+  content?: Content;
   createdAt: Date;
 }
 
@@ -119,18 +123,6 @@ export interface Content {
   text: string;
   file: File | null;
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 // export interface User {
 //   id: string;

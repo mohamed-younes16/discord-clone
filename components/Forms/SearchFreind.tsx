@@ -34,10 +34,10 @@ import Image from "next/image";
 import axios from "axios";
 import { User } from "@/index";
 import _ from "lodash";
-import { requestFreind } from "@/lib/db-actions";
+import { deleteFriend, requestFreind } from "@/lib/db-actions";
 import { ScrollArea } from "../ui/scroll-area";
-
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const SearchFreind = ({
   userId,
@@ -46,13 +46,12 @@ const SearchFreind = ({
   userId: string;
   userFriends: User[];
 }) => {
-  console.log(userFriends);
   const env = process.env.NODE_ENV;
   const apiUrl =
     env == "development"
       ? "http://localhost:5000"
       : "https://dicord-api.onrender.com";
-
+  const router = useRouter();
   const [freinds, setFreinds] = useState<User[]>([]);
   const [loading, setIsLoading] = useState<boolean>(false);
   const [isRequseting, setisRequseting] = useState<boolean>(false);
@@ -92,7 +91,7 @@ const SearchFreind = ({
         try {
           const username = watch().name;
           const user = await axios.get(
-            `${apiUrl}/users/access?username=${username}&userId=${userId}`
+            `${apiUrl}/users/access?username=${username}&userId=${userId}&operationType=findUser`
           );
           setFreinds(user.data.users);
           setIsLoading(false);
@@ -112,9 +111,7 @@ const SearchFreind = ({
   }, [watch, userId]);
 
   return (
-    <div
-      className={` transition-all duration-700 `}
-    >
+    <div className={` transition-all duration-700 `}>
       <Toaster richColors position="bottom-center" />
       {!(freinds.length > 0) && (
         <div
@@ -363,9 +360,9 @@ const SearchFreind = ({
                 <Link
                   className="p-2 rounded-full hover:bg-gray-300
                     cursor-pointer transition-all flexcenter !bg-opacity-20"
-                    href={`/chat/${e.id}`}
+                  href={`/chat/${e.id}`}
                 >
-                  <MessagesSquare/>
+                  <MessagesSquare />
                 </Link>
                 <Popover>
                   <PopoverTrigger>
@@ -378,7 +375,17 @@ const SearchFreind = ({
                   </PopoverTrigger>
 
                   <PopoverContent className=" w-fit">
-                    <Button variant={"destructive"}> Delete</Button>
+                    <Button
+                      variant={"destructive"}
+                      onClick={async () => {
+                        const deletion = await deleteFriend(userId, e.id);
+                        toast.message(deletion);
+                        router.refresh();
+                      }}
+                    >
+                      {" "}
+                      Delete
+                    </Button>
                   </PopoverContent>
                 </Popover>
               </div>

@@ -17,7 +17,7 @@ export default async function Home() {
     ...(Userdata.freindsWith || []),
     ...(Userdata.freindsOf || []),
   ];
-
+  console.log(Userdata);
   return (
     <main
       className=" min-h-screen dark:bg-[url(/assets/magicdark.png)] 
@@ -30,62 +30,64 @@ export default async function Home() {
           userId={Userdata.id}
           allservers={JSON.parse(JSON.stringify(allServers))}
         >
-          <div
-            className="w-fit  bg-gray-400 
+          {userFriends?.length > 0 && (
+            <div
+              className="w-fit  bg-gray-400 
                 dark:bg-[#191919fc] h-screen"
-          >
-            <Separator className="my-6"/>
-            <p
-              className="  max-sm:text-base
-           text-xl px-3 dark:text-gray-500 font-semibold "
             >
-              Direct messages
-            </p>
-            <ScrollArea className="flex mt-4 px-3 flex-col">
-              {userFriends.map((e, i) => (
-                <>
-                  <div
-                    key={e.id}
-                    className="flex items-center p-2 cursor-pointer hover:bg-neutral-700 rounded-lg 
+              <Separator className="my-6" />
+              <p
+                className="  max-sm:text-base
+           text-xl px-3 dark:text-gray-500 font-semibold "
+              >
+                Direct messages
+              </p>
+              <ScrollArea className="flex mt-4 px-3 flex-col">
+                {userFriends.map((e, i) => (
+                  <>
+                    <div
+                      key={e.id}
+                      className="flex items-center p-2 cursor-pointer hover:bg-neutral-700 rounded-lg 
                  transition-all w-full  gap-4  "
-                  >
-                    <Link
-                      href={`/chat/${e.id}`}
-                      className="w-full flexcenter gap-4 overflow-auto"
                     >
-                      {e?.imageUrl && (
-                        <Image
-                          height={60}
-                          width={60}
-                          className="h-16 w-16 max-sm:w-12 max-sm:h-12 rounded-full bg-cover "
-                          alt="image of user"
-                          src={e?.imageUrl}
-                        />
-                      )}
+                      <Link
+                        href={`/chat/${e.id}`}
+                        className="w-full flexcenter gap-4 overflow-auto"
+                      >
+                        {e?.imageUrl && (
+                          <Image
+                            height={60}
+                            width={60}
+                            className="h-16 w-16 max-sm:w-12 max-sm:h-12 rounded-full bg-cover "
+                            alt="image of user"
+                            src={e?.imageUrl}
+                          />
+                        )}
 
-                      <div className=" flex justify-between w-full items-center">
-                        <div className="whitespace-nowrap ">
-                          <p
-                            className="overflow-auto text-start max-sm:text-base text-xl dark:text-white 
+                        <div className=" flex justify-between w-full items-center">
+                          <div className="whitespace-nowrap ">
+                            <p
+                              className="overflow-auto text-start max-sm:text-base text-xl dark:text-white 
                 font-semibold "
-                          >
-                            {e.username}
-                          </p>
-                          <p
-                            className=" text-start  max-sm:text-base text-xl dark:text-gray-500
+                            >
+                              {e.username}
+                            </p>
+                            <p
+                              className=" text-start  max-sm:text-base text-xl dark:text-gray-500
                 font-semibold "
-                          >
-                            {e.name}
-                          </p>
+                            >
+                              {e.name}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </Link>
-                  </div>
-                  <Separator className="my-4" />
-                </>
-              ))}
-            </ScrollArea>
-          </div>
+                      </Link>
+                    </div>
+                    <Separator className="my-4" />
+                  </>
+                ))}
+              </ScrollArea>
+            </div>
+          )}
         </SideBarNav>
 
         <div className="w-full backdrop-blur-lg relative h-screen">

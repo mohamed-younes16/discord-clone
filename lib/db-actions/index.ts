@@ -67,7 +67,7 @@ export const getFreinds = async (username) => {
   try {
     const { userId } = auth();
     const allServers = await axios.get(
-      `${apiUrl}/users/access?username=${username}&userId=${userId}`
+      `${apiUrl}/users/access?username=${username}&userId=${userId}&operationType=findUser`
     );
 
     return allServers.data;
@@ -80,7 +80,6 @@ export const handleFreindRequest = async (
   friendId: string
 ) => {
   try {
-
     const { userId } = auth();
     const allServers = await axios.patch(`${apiUrl}/users/update`, {
       userId,
@@ -322,6 +321,24 @@ export const updateCHANNEL = async (
     }
 
     return { valid: false, message: "Not Allowed " };
+  } catch (error) {
+    console.log(error);
+    return { valid: false, message: "error happend" };
+  }
+};
+export const deleteFriend = async (userId: string, friendId: string) => {
+  try {
+    if (userId) {
+      let serverdata = await axios.patch(`${apiUrl}/users/update`, {
+        operationType: "deleteFriend",
+        userId,
+        friendId,
+      });
+
+      return serverdata.data.message || "failed to delete";
+    }
+
+    return { valid: false, message: "not authorized" };
   } catch (error) {
     console.log(error);
     return { valid: false, message: "error happend" };

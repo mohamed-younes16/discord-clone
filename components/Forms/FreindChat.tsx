@@ -18,13 +18,13 @@ import qs from "query-string";
 import { Toaster, toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useMemo, useRef, useState } from "react";
-import {Loader2, Send } from "lucide-react";
+import { Award, Loader2, Send } from "lucide-react";
 import { io } from "socket.io-client";
 import EmojiPicker from "./EmojiPicker";
 import UploadFileChat from "./UploadFileChat";
 import TooltipComp from "../ui/TooltipComp";
 import MessageComp from "../MessageComp";
-import { Chat } from "@/index";
+import { Chat, FreindsChatList } from "@/index";
 import { findServer } from "@/lib/db-actions";
 
 const env = process.env.NODE_ENV;
@@ -32,34 +32,28 @@ const apiUrl =
   env == "development"
     ? "http://localhost:5000"
     : "https://dicord-api.onrender.com";
-const TextChat = ({
-  serverId,
-  channelId,
+
+const FriendChat = ({
   data,
   userId,
-  memberId,
-  limit,
-  channelName,
+  friendId,
+  chatId,
 }: {
-  serverId: string;
-  channelId: string;
-  data: Chat[];
+  data: FreindsChatList[];
   userId: string;
-  memberId: string;
-  limit: number;
-  channelName: string;
+  friendId: string;
+  chatId;
 }) => {
   const [connected, setIsconnected] = useState(false);
-  const [chat, setChat] = useState<Chat[]>(data.toReversed() || []);
+  const [chat, setChat] = useState<FreindsChatList[]>(data?.toReversed() || []);
   const bottomRef = useRef<any>(null);
-  const socket = useMemo(() => io(apiUrl,{autoConnect:false}), []);
+  const socket = useMemo(() => io(apiUrl, { autoConnect: false }), []);
   const wrapper: any = useRef();
   const content: any = useRef();
   const [messagesToShow, setMessagesToShow] = useState(10);
   const [fetchingMessages, setFetchingMessages] = useState(false);
   const [isMax, setIsMax] = useState(false);
   const targetRef = useRef(null);
-
 
   useEffect(() => {
     const lenis = new Lenis({
@@ -85,25 +79,19 @@ const TextChat = ({
 
     socket && socket.connect();
     socket &&
-      socket.on(
-        `message-server-${serverId}-channel-${channelId}`,
-        (message: Chat[]) => {
-          toast.dismiss();
-  
-          setChat(message.toReversed());
-  
-        }
-      );
-  
-  
+      socket.on(`message-chat-${chatId}`, (message: FreindsChatList[]) => {
+        toast.dismiss();
+
+        setChat(message.toReversed());
+      });
+
     socket?.on("connect", () => {
       setIsconnected(true);
-  
     });
-  
-    return ()=> {
-      socket?.disconnect()
-    }
+
+    return () => {
+      socket?.disconnect();
+    };
   }, []);
 
   const ChannelSchema = z.object({
@@ -117,26 +105,23 @@ const TextChat = ({
     fileType: z.enum(["pdf", "image"]),
   });
 
-  useEffect(()=>{
-  
-  setFetchingMessages(true);
-
+  useEffect(() => {
     const change = async () => {
-      const data = await findServer({
-        serverId,
-        chatLimit: messagesToShow,
-        userId,
-        operationType: "findChannel",
-        channelId,
-      });
-      setChat(data.chat.toReversed());
-      setFetchingMessages(false);
-    setIsMax((messagesToShow > chat.length  ))
+      setFetchingMessages(true);
+      try {
+        const allServers = await axios.get(
+          `${apiUrl}/users/access?friendId=${friendId}&userId=${userId}&operationType=findChat&chatLimit=${messagesToShow}`
+        );
+        console.log(allServers.data.chatObject);
+        setFetchingMessages(false);
+        setIsMax(messagesToShow > chat.length);
+        return setChat(allServers.data.chatObject.chat.toReversed());
+      } catch (error) {
+        console.log(error);
+      }
     };
-
     change();
-
-  },[chat.length,messagesToShow])
+  }, [chat.length, messagesToShow]);
   const form = useForm<z.infer<typeof ChannelSchema>>({
     resolver: zodResolver(ChannelSchema),
     defaultValues: {
@@ -147,20 +132,17 @@ const TextChat = ({
   });
   async function onSubmit(values: z.infer<typeof ChannelSchema>) {
     try {
-      toast.loading("sending.....", { dismissible: false, duration: 90000 });
-
       const url = qs.stringifyUrl({
-        url: `${apiUrl}/servers/messages`,
+        url: `${apiUrl}/users/chat`,
       });
 
       await axios.post(url, {
         messageData: values,
-        serverId,
-        channelId,
         operationType: "createMessage",
         userId,
-        memberId,
+        friendId,
         chatLimit: messagesToShow,
+        chatId,
       });
 
       toast.dismiss();
@@ -179,32 +161,32 @@ const TextChat = ({
         ref={wrapper}
         className="chat overflow-hidden relative  flex px-4 flex-col max-h-[85%] h-[85%]  gap-10 "
       >
-        {(!fetchingMessages && !isMax) && <Button
-    onClick={() => {    
-      setMessagesToShow((s) => s + 10);
+        {
+          <Button
+            onClick={() => {
+              setMessagesToShow((s) => s + 10);
+            }}
+            variant={"default"}
+            className={`absolute font-semibold text-lg w-[0px] p-0 h-[0px] transition-all overflow-hidden -translate-x-1/2 left-1/2 top-6  ${
+              !fetchingMessages && !isMax && "w-[150px] h-[50px] "
+            }`}
+          >
+            Show More
+          </Button>
+        }
 
-    }}
-
-          variant={"default"}
-          className="absolute font-semibold text-lg -translate-x-1/2 left-1/2 top-6 p-3"
-        >
-          Show More
-        </Button>}
-       
         <div ref={content} id="text-content">
           <div ref={targetRef} className="" />
           {chat &&
             chat.map((e, i) => {
               return (
                 <MessageComp
-                  
-                  channelId={channelId}
+                chatId={chatId}
+                  target="freinds"
                   userId={userId}
-                  serverId={serverId}
                   data={e}
                   key={i}
                   chatLimit={messagesToShow}
-                  target="channels"
                 />
               );
             })}
@@ -314,4 +296,4 @@ const TextChat = ({
   );
 };
 
-export default TextChat;
+export default FriendChat;

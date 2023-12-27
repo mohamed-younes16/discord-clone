@@ -1,23 +1,49 @@
 
 
 import SideBarNav from "@/components/SideBarNav";
-import { User } from "@/index";
+import {  FreindsChatObject, User } from "@/index";
 
 import { findServersBelong, getCurrentUser } from "@/lib/db-actions";
-import { currentUser } from "@clerk/nextjs";
+import { auth, currentUser } from "@clerk/nextjs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 import Link from "next/link";
+import FriendChat from "@/components/Forms/FreindChat";
+import axios from "axios";
 
-const page = async () => {
+const env = process.env.NODE_ENV;
+const apiUrl =
+  env == "development"
+    ? "http://localhost:5000"
+    : "https://dicord-api.onrender.com";
+
+const page = async ({
+  params:{friendId}
+}: {
+  children: React.ReactNode;
+  params: { friendId: string };
+}) => {
+
   const allServers = await findServersBelong("findGeneral");
-  const clerkUser = await currentUser();
-  const Userdata: User = await getCurrentUser(clerkUser?.id || "");
+  const {userId} =  auth();
+  const Userdata: User = await getCurrentUser(userId||"");
   const userFriends = [
     ...(Userdata.freindsWith || []),
     ...(Userdata.freindsOf || []),
   ];
+   const findChatData = async () => {
+    try {
+      const { userId } = auth();
+      const allServers = await axios.get(
+        `${apiUrl}/users/access?friendId=${friendId}&userId=${userId}&operationType=findChat&chatLimit=10`
+      );
+
+      return allServers.data.chatObject
+    } catch (error) {
+      console.log(error);
+    }}
+   const  chatObjectData:FreindsChatObject = await findChatData() 
 
   return (
     <div>
@@ -83,6 +109,7 @@ const page = async () => {
             </ScrollArea>
           </div>
       </SideBarNav>
+      <FriendChat  chatId={chatObjectData.id} data={chatObjectData.chat}  userId={Userdata.id}   friendId={friendId} />
     </div>
   );
 };

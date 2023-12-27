@@ -93,7 +93,7 @@ const page = async ({
       {currentChannel ? (
         <div className="  flex  w-full h-full">
           <SideBarNav
-          freindesRequests={Userdata.freindsRequestedFrom}
+            freindesRequests={Userdata.freindsRequestedFrom}
             userId={Userdata.id}
             allservers={JSON.parse(JSON.stringify(allservers))}
           >
@@ -312,7 +312,7 @@ const page = async ({
                 channelName={currentChannel.name}
                 limit={+limit || 10}
                 data={JSON.parse(JSON.stringify(currentChannel.chat))}
-                userId={Userdata.id.toString()}
+                userId={Userdata.id}
                 channelId={currentChannel.id}
                 serverId={currentServer.id}
                 memberId={memberId || ""}

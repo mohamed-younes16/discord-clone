@@ -32,13 +32,17 @@ const MessageOpts = ({
   setEdit,
   chatLimit,
   userId,
+  target,
+  chatId
 }: {
-  messageId: string;
-  channelId: string;
-  serverId: string;
+  messageId?: string;
+  channelId?: string;
+  serverId?: string;
   setEdit: Dispatch<SetStateAction<boolean>>;
   chatLimit: number;
-  userId;
+  userId: string;
+  target: "channels" | "freinds";
+  chatId?:string
 }) => {
   return (
     <Popover>
@@ -66,15 +70,28 @@ const MessageOpts = ({
                       onClick={async () => {
                         toast.loading("deleteing...", { duration: 90000 });
 
-                        await axios.post(`${apiUrl}/servers/messages`, {
-                          messageId,
-                          channelId,
-                          chatLimit,
-                          operationType: "deleteMessage",
-                          userId,
-                          serverId
-                        });
-                        toast.dismiss()
+                        switch (target) {
+                          case "channels":
+                            await axios.post(`${apiUrl}/servers/messages`, {
+                              messageId,
+                              channelId,
+                              chatLimit,
+                              operationType: "deleteMessage",
+                              userId,
+                              serverId,
+                            });
+                            break;
+                          case "freinds":
+                            await axios.post(`${apiUrl}/users/chat`, {
+                              messageId,
+                              chatLimit,
+                              operationType: "deleteMessage",
+                              userId,
+                              chatId
+                            });
+                            break;
+                        }
+                        toast.dismiss();
                       }}
                     >
                       Delete Message
