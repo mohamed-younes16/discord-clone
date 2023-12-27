@@ -4,7 +4,7 @@ import SideBarNav from "@/components/SideBarNav";
 import {  FreindsChatObject, User } from "@/index";
 
 import { findServersBelong, getCurrentUser } from "@/lib/db-actions";
-import { auth, currentUser } from "@clerk/nextjs";
+import { auth,  } from "@clerk/nextjs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
@@ -21,7 +21,7 @@ const apiUrl =
 const page = async ({
   params:{friendId}
 }: {
-  children: React.ReactNode;
+
   params: { friendId: string };
 }) => {
 
