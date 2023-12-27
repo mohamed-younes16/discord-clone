@@ -7,7 +7,7 @@ const env = process.env.NODE_ENV;
 const apiUrl =
   env == "development"
     ? "http://localhost:5000"
-    : "https://dicord-api.onrender.com";
+    : "https://discord-api.up.railway.app";
 
 export const getCurrentUser = async (id: string) => {
   const userData = await axios(`${apiUrl}/login`, {

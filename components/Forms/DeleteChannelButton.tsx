@@ -9,7 +9,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import {  Trash2,  } from "lucide-react";
+import { Trash2 } from "lucide-react";
 
 import { Toaster, toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -18,18 +18,18 @@ const env = process.env.NODE_ENV;
 const apiUrl =
   env == "development"
     ? "http://localhost:5000"
-    : "https://dicord-api.onrender.com";
+    : "https://discord-api.up.railway.app";
 
 const DeleteChannelButton = ({
   serverId,
   channelId,
   userId,
-  isAdmin
+  isAdmin,
 }: {
   serverId: string;
   channelId: string;
-  userId:string;
-  isAdmin:boolean
+  userId: string;
+  isAdmin: boolean;
 }) => {
   const router = useRouter();
 
@@ -37,17 +37,18 @@ const DeleteChannelButton = ({
     try {
       toast.loading("deleting.....");
 
-      const idDeleted = await  axios.delete(`${apiUrl}/servers/delete`,{data: {
-        userId,isAdmin,operationType:"deleteChannel",channelId
-
-      }})
+      const idDeleted = await axios.delete(`${apiUrl}/servers/delete`, {
+        data: {
+          userId,
+          isAdmin,
+          operationType: "deleteChannel",
+          channelId,
+        },
+      });
 
       if (idDeleted?.data) {
-     
-
         toast.success(idDeleted?.data.message, { duration: 3000 });
         setTimeout(() => {
-
           window.location.reload();
         }, 800);
       } else {
