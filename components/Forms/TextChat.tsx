@@ -171,7 +171,7 @@ const TextChat = ({
       <div
         id="text-wrapper"
         ref={wrapper}
-        className="chat overflow-hidden relative  flex px-4 flex-col max-h-[85%] h-[85%]  gap-10 "
+        className="chat overflow-hidden relative pt-[100px]  flex px-4 flex-col max-h-[85%] h-[85%]  gap-10 "
       >
         {!fetchingMessages && !isMax && (
           <Button
@@ -179,7 +179,7 @@ const TextChat = ({
               setMessagesToShow((s) => s + 10);
             }}
             variant={"default"}
-            className="absolute font-semibold text-lg -translate-x-1/2 left-1/2 top-6 p-3"
+            className="absolute z-20 font-semibold text-lg -translate-x-1/2 left-1/2 top-[100px] p-3"
           >
             Show More
           </Button>

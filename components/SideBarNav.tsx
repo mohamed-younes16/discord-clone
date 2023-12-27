@@ -53,7 +53,7 @@ const SideBarNav = ({
   return (
     <div
       suppressHydrationWarning
-      className={`transition-all relative z-50  duration-150 `}
+      className={`transition-all relative z-[999]  duration-150 `}
     >
       <div
         suppressHydrationWarning
@@ -117,10 +117,10 @@ ${SideBarOpen ? "translate-x-0" : "-translate-x-full"}
                 )}
               </div>
 
-              <div className="flexcenter flex-col  gap-6">
-                <TooltipComp  hoverText="change theme">
-                  <ModeToggle />
-                </TooltipComp>
+              <div className="flexcenter flex-col  gap-10">
+                
+                  <ModeToggle  />
+                
 
                 <TooltipComp hoverText="Profile Page">
                   <Link

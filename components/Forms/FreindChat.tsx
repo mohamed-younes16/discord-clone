@@ -158,7 +158,7 @@ const FriendChat = ({
       <div
         id="text-wrapper"
         ref={wrapper}
-        className="chat overflow-hidden relative  flex px-4 flex-col max-h-[85%] h-[85%]  gap-10 "
+        className="chat overflow-hidden relative pt-[75px]  flex px-4 flex-col max-h-[85%] h-[85%]  gap-10 "
       >
         {
           <Button
@@ -166,7 +166,7 @@ const FriendChat = ({
               setMessagesToShow((s) => s + 10);
             }}
             variant={"default"}
-            className={`absolute font-semibold text-lg w-[0px] p-0 h-[0px] transition-all overflow-hidden -translate-x-1/2 left-1/2 top-6  ${
+            className={`absolute font-semibold text-lg w-[0px] p-0 h-[0px] transition-all overflow-hidden -translate-x-1/2 left-1/2 top-[75px]  ${
               !fetchingMessages && !isMax && "w-[150px] h-[50px] "
             }`}
           >

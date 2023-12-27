@@ -9,6 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import FriendChat from "@/components/Forms/FreindChat";
 import axios from "axios";
+import { Hash } from "lucide-react";
 
 const env = process.env.NODE_ENV;
 const apiUrl =
@@ -41,7 +42,10 @@ const page = async ({
     }
   };
   const chatObjectData: FreindsChatObject = await findChatData();
-
+  const chattingwith = [
+    chatObjectData.chatCreator.username,
+    chatObjectData.ChatWith.username,
+  ].find((e) => e !== Userdata.username);
   return (
     <div>
       <SideBarNav
@@ -60,7 +64,7 @@ const page = async ({
           >
             Direct messages
           </p>
-          <ScrollArea className="flex mt-4 px-3 flex-col">
+          <ScrollArea className="flex mt-4 max-sm:w-[220px] sm:w-[300px] px-3 flex-col">
             {userFriends.map((e, i) => (
               <>
                 <div
@@ -106,6 +110,14 @@ const page = async ({
           </ScrollArea>
         </div>
       </SideBarNav>
+      <div
+        className="flex justify-between items-center 
+            bg-zinc-400 font-bold z-50 fixed w-full text-xl px-16  h-[75px]     dark:bg-[#1d1d1def] backdrop-blur-lg "
+      >
+        <div className="flexcenter gap-4">
+          <Hash /> {chattingwith}
+        </div>
+      </div>
       <FriendChat
         chatId={chatObjectData.id}
         data={chatObjectData.chat}

@@ -11,7 +11,7 @@ const TooltipComp = ({ children ,hoverText}:{children:ReactNode,hoverText:string
     <TooltipProvider>
 
     <Tooltip  delayDuration={200}>
-      <TooltipTrigger className='w-full flexcenter'>
+      <TooltipTrigger className='w-full '>
 
            {children}
 

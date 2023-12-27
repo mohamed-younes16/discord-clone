@@ -35,13 +35,13 @@ export default async function Home() {
               className="w-fit  bg-zinc-400 
                 dark:bg-[#191919fc] h-screen"
             >
-              <Separator className="my-6" />
               <p
-                className="  max-sm:text-base
+                className=" mt-6 max-sm:text-base
            text-xl px-3 dark:text-gray-500 font-semibold "
               >
                 Direct messages
               </p>
+              <Separator className="my-6" />
               <ScrollArea className="flex mt-4 max-sm:w-[220px] sm:w-[300px] px-3 flex-col">
                 {userFriends.map((e, i) => (
                   <>
