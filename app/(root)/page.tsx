@@ -47,12 +47,12 @@ export default async function Home() {
                   <>
                     <div
                       key={e.id}
-                      className="flex items-center p-2 cursor-pointer hover:bg-zinc-700 rounded-lg 
-                 transition-all w-full  gap-4  "
+                      className="flex items-center overflow-x-scroll max-sm:max-w-[200px] p-2 cursor-pointer hover:bg-zinc-700 rounded-lg 
+                      transition-all w-full  gap-4 max-sm:gap-2  "
                     >
                       <Link
                         href={`/chat/${e.id}`}
-                        className="w-full flexcenter gap-4 overflow-auto"
+                        className="w-full flexcenter gap-4 min-w-[230px]"
                       >
                         {e?.imageUrl && (
                           <Image

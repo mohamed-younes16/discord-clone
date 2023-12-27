@@ -57,24 +57,25 @@ const page = async ({
           className="w-fit  bg-zinc-400 
                 dark:bg-[#191919fc] h-screen"
         >
-          <Separator className="my-6" />
+          
           <p
             className="  max-sm:text-base
-           text-xl px-3 dark:text-gray-500 font-semibold "
+           text-xl px-3 mt-6 dark:text-gray-500 font-semibold "
           >
             Direct messages
           </p>
           <ScrollArea className="flex mt-4 max-sm:w-[220px] sm:w-[300px] px-3 flex-col">
-            {userFriends.map((e, i) => (
+            <Separator className="my-4" />
+            {userFriends.map((e, ) => (
               <>
                 <div
                   key={e.id}
-                  className="flex items-center p-2 cursor-pointer hover:bg-zinc-700 rounded-lg 
-                 transition-all w-full  gap-4  "
+                  className="flex items-center overflow-x-scroll max-sm:max-w-[200px] p-2 cursor-pointer hover:bg-zinc-700 rounded-lg 
+                 transition-all w-full  gap-4 max-sm:gap-2  "
                 >
                   <Link
                     href={`/chat/${e.id}`}
-                    className="w-full flexcenter gap-4 overflow-auto"
+                    className="w-full flexcenter  min-w-[230px]  gap-4  "
                   >
                     {e?.imageUrl && (
                       <Image
