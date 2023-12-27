@@ -112,7 +112,6 @@ const FriendChat = ({
         const allServers = await axios.get(
           `${apiUrl}/users/access?friendId=${friendId}&userId=${userId}&operationType=findChat&chatLimit=${messagesToShow}`
         );
-        console.log(allServers.data.chatObject);
         setFetchingMessages(false);
         setIsMax(messagesToShow > chat.length);
         return setChat(allServers.data.chatObject.chat.toReversed());

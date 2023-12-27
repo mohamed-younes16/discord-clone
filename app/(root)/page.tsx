@@ -17,7 +17,7 @@ export default async function Home() {
     ...(Userdata.freindsWith || []),
     ...(Userdata.freindsOf || []),
   ];
-  console.log(Userdata);
+
   return (
     <main
       className=" min-h-screen dark:bg-[url(/assets/magicdark.png)] 
