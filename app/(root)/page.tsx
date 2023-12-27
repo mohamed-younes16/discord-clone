@@ -42,7 +42,7 @@ export default async function Home() {
               >
                 Direct messages
               </p>
-              <ScrollArea className="flex mt-4 px-3 flex-col">
+              <ScrollArea className="flex mt-4 max-sm:w-[220px] sm:w-[300px] px-3 flex-col">
                 {userFriends.map((e, i) => (
                   <>
                     <div
