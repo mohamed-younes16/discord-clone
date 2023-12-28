@@ -158,7 +158,7 @@ const FriendChat = ({
       <div
         id="text-wrapper"
         ref={wrapper}
-        className="chat overflow-hidden relative pt-[75px]  flex px-4 flex-col max-h-[85%] h-[85%]  gap-10 "
+        className="chat overflow-hidden relative mt-[75px]  flex px-4 flex-col max-h-[85%] h-[85%]  gap-10 "
       >
         {
           <Button
@@ -193,10 +193,10 @@ const FriendChat = ({
         </div>
       </div>
 
-      <div className="p-4 max-h-[15%] h-[15%] ">
+      <div className="p-4 max-h-[20%]  ">
         <Form {...form}>
           <form className="space-y-8">
-            <div className="flex pb-6 gap-4">
+            <div className="flex pb-6 items-center gap-4">
               <FormField
                 control={form.control}
                 name="fileUrl"
@@ -264,13 +264,17 @@ const FriendChat = ({
                   form.formState.isSubmitting ? " bg-zinc-500" : ""
                 } flexcenter gap-6`}
               >
-                <Send />
+                {form.formState.isSubmitting ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  <Send />
+                )}
               </Button>
             </div>
           </form>
         </Form>
-        <div className="flex flex-col pb-3 ">
-          <div>
+        <div className="flex items-center  ">
+          <div className="basis-1/2">
             {connected ? (
               <Badge
                 variant="outline"
@@ -286,9 +290,11 @@ const FriendChat = ({
               </Badge>
             )}
           </div>
-          {fetchingMessages && (
-            <Loader2 className=" self-center h-10 w-10   animate-spin" />
-          )}
+          <div className="basis-1/2">
+            {fetchingMessages && (
+              <Loader2 className=" self-center h-6 w-6   animate-spin" />
+            )}
+          </div>
         </div>
       </div>
     </div>

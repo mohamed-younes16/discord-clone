@@ -1,10 +1,10 @@
 
 import { ThemeProvider } from '@/components/ui/theme-provider';
-import '../globals.css'
-import { ClerkProvider, currentUser,  } from '@clerk/nextjs'
+import { getCurrentUser, } from '@/lib/db-actions';
+import { ClerkProvider, currentUser, } from '@clerk/nextjs';
 import '@radix-ui/themes/styles.css';
 import { ReactNode } from 'react';
-import {   getCurrentUser,  } from '@/lib/db-actions';
+import '../globals.css';
 
 
 import CheckUser from '@/components/CheckUser';

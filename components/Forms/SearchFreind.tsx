@@ -113,7 +113,7 @@ const SearchFreind = ({
   return (
     <div className={` transition-all duration-150 `}>
       <Toaster richColors position="bottom-center" />
-      {!(freinds.length > 0) && (
+      {!(freinds.length > 0) && isSearchingMode && (
         <div
           className=" w-1/3 absolute -translate-x-1/2 top-1/2 left-1/2 -translate-y-1/2 max-md:h-2/3 max-md:w-2/3 h-1/3
            bg-contain bg-center bg-no-repeat bg-[url(/assets/p2.svg)] "
@@ -121,7 +121,7 @@ const SearchFreind = ({
       )}
 
       <div
-        className={`w-full dark:bg-[#252525]   bg-[#6e737c] transition-all duration-150 shadow-xl max-w-[calc(100dvw_-_${
+        className={`w-full dark:bg-[#252525]   bg-zinc-400 transition-all duration-150 shadow-xl max-w-[calc(100dvw_-_${
           SideBarOpen ? "90px" : "0px"
         })] 
       ${SideBarOpen && "max-sm:overflow-x-scroll"}  overflow-y-hidden `}
@@ -323,7 +323,7 @@ const SearchFreind = ({
             <>
               <div
                 key={e.id}
-                className="flex items-center p-2 cursor-pointer hover:bg-zinc-700 rounded-lg 
+                className="flex items-center p-2 cursor-pointer hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-lg 
                  transition-all w-full  gap-4  "
               >
                 <Link

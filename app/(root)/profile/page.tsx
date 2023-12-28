@@ -5,7 +5,7 @@ import "@uploadthing/react/styles.css";
 import { getCurrentUser } from "@/lib/db-actions";
 import { SignOutButton, currentUser } from "@clerk/nextjs";
 
-import { HomeIcon, LucideLogOut } from "lucide-react";
+import { Diff, HomeIcon, LucideLogOut } from "lucide-react";
 import Link from "next/link";
 import {
   Tooltip,

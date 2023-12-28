@@ -141,8 +141,6 @@ const TextChat = ({
   });
   async function onSubmit(values: z.infer<typeof ChannelSchema>) {
     try {
-      toast.loading("sending.....", { dismissible: false, duration: 90000 });
-
       const url = qs.stringifyUrl({
         url: `${apiUrl}/servers/messages`,
       });
@@ -171,7 +169,7 @@ const TextChat = ({
       <div
         id="text-wrapper"
         ref={wrapper}
-        className="chat overflow-hidden relative pt-[100px]  flex px-4 flex-col max-h-[85%] h-[85%]  gap-10 "
+        className="chat overflow-hidden relative mt-[75px]  flex px-4 flex-col max-h-[85%] h-[85%]  gap-10 "
       >
         {!fetchingMessages && !isMax && (
           <Button
@@ -179,7 +177,7 @@ const TextChat = ({
               setMessagesToShow((s) => s + 10);
             }}
             variant={"default"}
-            className="absolute z-20 font-semibold text-lg -translate-x-1/2 left-1/2 top-[100px] p-3"
+            className="absolute z-20 font-semibold text-lg -translate-x-1/2 left-1/2 top-[5px] p-3"
           >
             Show More
           </Button>
@@ -205,10 +203,10 @@ const TextChat = ({
         </div>
       </div>
 
-      <div className="p-4 max-h-[15%] h-[15%] ">
+      <div className="p-4 max-h-[20%]  ">
         <Form {...form}>
           <form className="space-y-8">
-            <div className="flex pb-6 gap-4">
+            <div className="flex items-center pb-6 gap-4">
               <FormField
                 control={form.control}
                 name="fileUrl"
@@ -276,13 +274,17 @@ const TextChat = ({
                   form.formState.isSubmitting ? " bg-zinc-500" : ""
                 } flexcenter gap-6`}
               >
-                <Send />
+                {form.formState.isSubmitting ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  <Send />
+                )}
               </Button>
             </div>
           </form>
         </Form>
-        <div className="flex flex-col pb-3 ">
-          <div>
+        <div className="flex items-center ">
+          <div className="basis-1/2">
             {connected ? (
               <Badge
                 variant="outline"
@@ -298,9 +300,11 @@ const TextChat = ({
               </Badge>
             )}
           </div>
-          {fetchingMessages && (
-            <Loader2 className=" self-center h-10 w-10   animate-spin" />
-          )}
+          <div className="basis-1/2">
+            {fetchingMessages && (
+              <Loader2 className=" self-center h-6 w-6   animate-spin" />
+            )}
+          </div>
         </div>
       </div>
     </div>

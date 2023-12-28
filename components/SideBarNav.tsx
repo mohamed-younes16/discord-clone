@@ -53,12 +53,12 @@ const SideBarNav = ({
   return (
     <div
       suppressHydrationWarning
-      className={`transition-all relative z-[999]  duration-150 `}
+      className={`transition-all relative z-30  duration-150 `}
     >
       <div
         suppressHydrationWarning
         className={`fixed duration-150 top-0 transition-all 
-    max-w-fit z-50   flexcenter left-0 h-screen  
+    max-w-fit z-20   flexcenter left-0 h-screen  
     w-fit 
     bg-zinc-400 dark:bg-[#0f0f0f] shadow-xl shadow-black    
      flex flex-col 
@@ -69,7 +69,7 @@ ${SideBarOpen ? "translate-x-0" : "-translate-x-full"}
 `}
       >
         <button
-          className={`absolute  z-40 cursor-pointer
+          className={`absolute  z-30 cursor-pointer
             bottom-[120px] bg-[url(/assets/right-arrow.svg)] flex
              h-[60px] border-black border-[6px] w-[60px]  duration-150  !rounded-full right-0 
             active:scale-95 
